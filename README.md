@@ -27,7 +27,7 @@ Add the namespace to `composer.json` for autoloading:
 {
   "autoload": {
     "psr-4": {
-      "alanrogers\\tools": "modules/tools/"
+      "alanrogers\\tools": "modules/tools/src/"
     }
   }
 }

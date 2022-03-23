@@ -1,0 +1,34 @@
+{
+    "name": "alanrogers/craft-tools",
+    "description": "A collection of tools used for our Craft sites.",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "homepage": "https://gitlab.alanrogers.com/web-dev/craft-tools",
+    "autoload": {
+        "psr-4": {
+            "alanrogers\\tools\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Rob Baker",
+            "email": "rob.baker@alanrogers.com"
+        }
+    ],
+    "support": {
+        "email": "developers@alanrogers.com",
+        "issues": "https://gitlab.alanrogers.com/web-dev/craft-tools/-/issues",
+        "source": "https://gitlab.alanrogers.com/web-dev/craft-tools",
+        "docs": "https://gitlab.alanrogers.com/web-dev/craft-tools/-/wikis/home"
+    },
+    "require": {
+        "craftcms/cms": "^3.7.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
+    }
+}
