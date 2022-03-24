@@ -30,6 +30,19 @@ In the project's `composer.json` the following must be present:
 }
 ```
 
+And this is needed in `composer.json` to refer to the package repository for the parent group (`web-dev` id: `3`):
+
+```json
+{
+  "repositories": {
+    "gitlab.alanrogers.com/3": {
+      "type": "composer",
+      "url": "https://gitlab.alanrogers.com/api/v4/group/3/-/packages/composer/packages.json"
+    }
+  }
+}
+```
+
 Require this library with composer _(the latest tag from the main branch)_:
 
 ```shell
