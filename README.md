@@ -30,10 +30,10 @@ In the project's `composer.json` the following must be present:
 }
 ```
 
-Require this library with composer:
+Require this library with composer _(the latest tag from the main branch)_:
 
 ```shell
-composer require alanrogers/craft-tools
+composer require alanrogers/craft-tools:dev-main 
 ```
 
 Add something like the following to the parent Craft project's `config/app.php` file:
