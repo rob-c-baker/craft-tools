@@ -23,14 +23,11 @@
         "docs": "https://gitlab.alanrogers.com/web-dev/craft-tools/-/wikis/home"
     },
     "require": {
-        "craftcms/cms": "^3.7.0",
         "beberlei/assert": "^3.2",
+        "craftcms/cms": "^3.7.0",
         "giggsey/libphonenumber-for-php": "^8.12"
     },
     "config": {
-        "allow-plugins": {
-            "yiisoft/yii2-composer": true,
-            "craftcms/plugin-installer": true
-        }
+        "sort-packages": true
     }
 }

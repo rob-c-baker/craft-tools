@@ -2,11 +2,39 @@
 
 A collection of craft custom fields, twig extensions, and various helpers and tools used on one or more of our Crafts sites.
 
-Designed to be included in parent projects as a git `submodule` within the `modules` directory.
+Exists as a Yii `module`.
 
 ## Getting started
 
-Clone this repo as a git `submodule` of the parent project within it's own folder in the `modules` folder. i.e. `modules/tools`.
+Add an `auth.json` file to allow composer to authenticate against our composer package repository file to the root of the parent project with contents like the following:
+
+```json
+{
+  "gitlab-token": {
+    "gitlab.alanrogers.com": "********************"
+  }
+}
+```
+
+`********************` Must be replaced with a [token from Gitlab](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#creating-a-personal-access-token). It must have the `read_api` _(recommended)_ or `api` scope.
+
+In the project's `composer.json` the following must be present:
+
+```json
+{
+  "config": {
+    "gitlab-domains": [
+      "gitlab.alanrogers.com"
+    ]
+  }
+}
+```
+
+Require this library with composer:
+
+```shell
+composer require alanrogers/craft-tools
+```
 
 Add something like the following to the parent Craft project's `config/app.php` file:
 
@@ -19,29 +47,4 @@ return [
         'tools'
     ]
 ];
-```
-
-Add the namespace to `composer.json` for autoloading:
-
-```json
-{
-  "autoload": {
-    "psr-4": {
-      "alanrogers\\tools": "modules/tools/src/"
-    }
-  }
-}
-```
-
-Then: 
-
-```shell
-composer dumpautoload
-```
-
-Ensure you adjust CI jobs on the parent project to recursively fetch from git repositories:
-
-```yaml
-variables:
-  GIT_SUBMODULE_STRATEGY: recursive
 ```
