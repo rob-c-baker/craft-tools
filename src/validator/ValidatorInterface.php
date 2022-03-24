@@ -1,0 +1,42 @@
+<?php
+
+namespace alanrogers\tools\validator;
+
+interface ValidatorInterface
+{
+    /**
+     * Base constructor.
+     * @param mixed $value
+     * @param array $options (Optional - array of options used in concrete implementations)
+     */
+    public function __construct($value=null, array $options = []);
+
+    /**
+     * @return bool
+     */
+    public function isValid() : bool;
+
+    /**
+     * @return mixed
+     */
+    public function getValue();
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setValue($value) : self;
+
+    /**
+     * @param array $options
+     * @return $this
+     */
+    public function setOptions(array $options) : self;
+
+    /**
+     * @param string $name
+     * @param $value
+     * @return $this
+     */
+    public function setOption(string $name, $value) : self;
+}
