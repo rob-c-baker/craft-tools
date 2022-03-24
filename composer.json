@@ -23,7 +23,8 @@
         "docs": "https://gitlab.alanrogers.com/web-dev/craft-tools/-/wikis/home"
     },
     "require": {
-        "craftcms/cms": "^3.7.0"
+        "craftcms/cms": "^3.7.0",
+
     },
     "config": {
         "allow-plugins": {
