@@ -10,12 +10,14 @@ use yii\base\InvalidArgumentException;
  * Class ServiceManager
  * @property GQLClient $gql_client
  * @property Error $error
+ * @property Config $config
  */
 class ServiceManager
 {
     private static array $_service_classes = [
         'gql_client' => GQLClient::class,
-        'error' => Error::class
+        'error' => Error::class,
+        'config' => Config::class
     ];
 
     /**
