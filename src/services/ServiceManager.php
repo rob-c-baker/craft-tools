@@ -9,12 +9,13 @@ use yii\base\InvalidArgumentException;
 /**
  * Class ServiceManager
  * @property GQLClient $gql_client
+ * @property Error $error
  */
 class ServiceManager
 {
     private static array $_service_classes = [
         'gql_client' => GQLClient::class,
-
+        'error' => Error::class
     ];
 
     /**
@@ -64,6 +65,17 @@ class ServiceManager
     public function __isset(string $name)
     {
         return isset(self::$_service_classes[$name]);
+    }
+
+    /**
+     * Make the service manager aware of 1 or more service classes.
+     * @template T
+     * @param array<string, class-string<T>> $service_classes (key => class name)
+     * @return void
+     */
+    public static function registerServiceClasses(array $service_classes) : void
+    {
+        self::$_service_classes = array_replace(self::$_service_classes, $service_classes);
     }
 
     /**
