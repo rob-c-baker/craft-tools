@@ -52,8 +52,10 @@ class CraftTools extends Module
             'ar' => $this->getServiceManager(),
         ]);
 
+        $base_path = $this->getBasePath();
+
         // Alias for this module
-        Craft::setAlias('@modules/alanrogers', $this->getBasePath());
+        Craft::setAlias('@modules/alanrogers', $base_path);
 
         // Register Twig stuff
         Extensions::register();
@@ -61,7 +63,7 @@ class CraftTools extends Module
         // Our custom fields
         FieldRegister::registerFields();
 
-        self::registerTemplateRoot();
+        self::registerTemplateRoot($base_path);
         self::registerUserRules();
         self::enforceFieldPermissions();
 
@@ -80,13 +82,13 @@ class CraftTools extends Module
         return self::$service_manager;
     }
 
-    private static function registerTemplateRoot() : void
+    private static function registerTemplateRoot(string $base_path) : void
     {
         Event::on(
             View::class,
             View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
-            function(RegisterTemplateRootsEvent $event) {
-                $event->roots['alanrogers'] = $this->getBasePath() . '/templates';
+            function(RegisterTemplateRootsEvent $event) use ($base_path) {
+                $event->roots['alanrogers'] = $base_path . '/templates';
             }
         );
     }
