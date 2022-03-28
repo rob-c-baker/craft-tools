@@ -2,7 +2,7 @@
 
 namespace alanrogers\tools\services;
 
-use Exception;
+use InvalidArgumentException;
 use yii\base\Component;
 
 class Config extends Component
@@ -34,7 +34,7 @@ class Config extends Component
 
     /**
      * @param string $name (matches the filename before the .php prefix)
-     * @throws Exception When the named config is not found
+     * @throws InvalidArgumentException When the named config is invalid / not found
      */
     private static function loadConfig(string $name) : void
     {
@@ -42,7 +42,7 @@ class Config extends Component
         if (file_exists($path)) {
             self::$config_data[$name] = require($path);
         } else {
-            throw new Exception(sprintf('Config "%s" not found.', $name));
+            throw new InvalidArgumentException(sprintf('Config "%s" not found.', $name));
         }
         self::$loaded[$name] = true;
     }
@@ -51,7 +51,7 @@ class Config extends Component
      * @param string $name The name of the config entry
      * @param string $config_name The name of the config file
      * @return mixed
-     * @throws Exception When the named config is not found
+     * @throws InvalidArgumentException When the named config is invalid / not found
      */
     public function getItem(string $name, string $config_name='alan-rogers')
     {
@@ -67,7 +67,7 @@ class Config extends Component
      * @param string[] $names
      * @param string $config_name
      * @return array
-     * @throws Exception When the named config is not found
+     * @throws InvalidArgumentException When the named config is invalid / not found
      */
     public function getItems(array $names, string  $config_name='alan-rogers') : array
     {
@@ -85,7 +85,7 @@ class Config extends Component
      * Gets the top level array keys and values for a config
      * @param string $config_name The name of the config file
      * @return array|null
-     * @throws Exception When the named config is not found
+     * @throws InvalidArgumentException When the named config is invalid / not found
      */
     public function getAllItems(string $config_name='alan-rogers') : ?array
     {
