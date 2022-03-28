@@ -12,7 +12,7 @@ class Inline extends AbstractExtension
         return [
             new TwigFunction(
                 'inline',
-                [ \modules\ar\services\Inline::class, 'inline' ],
+                [ \alanrogers\tools\services\Inline::class, 'inline' ],
                 []
             )
         ];
