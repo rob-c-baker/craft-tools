@@ -1,0 +1,100 @@
+<?php
+
+namespace alanrogers\tools\services;
+
+use alanrogers\tools\helpers\BaseHelper;
+use RuntimeException;
+use yii\base\InvalidArgumentException;
+
+/**
+ * Class ServiceManager
+ * @property GQLClient $gql_client
+ */
+class ServiceManager
+{
+    private static array $_service_classes = [
+        'gql_client' => GQLClient::class,
+
+    ];
+
+    /**
+     * Array of namespaces to look for helpers - uses the first match it finds.
+     * @var string[]
+     */
+    private static array $_helper_namespaces = [
+        'alanrogers\\tools\\helpers\\'
+    ];
+
+    private static array $_helpers = [];
+
+    /**
+     * Allows fluent access to the services this class manager.
+     * Sets a property so subsequent calls should not go through this method (the property will then exist!).
+     * @param string $name
+     * @return mixed|void
+     */
+    public function __get(string $name)
+    {
+        if (isset(self::$_service_classes[$name]) && self::$_service_classes[$name]) {
+            $this->$name = new self::$_service_classes[$name]();
+            return $this->$name;
+        }
+
+        throw new InvalidArgumentException(sprintf('ServiceManager: Cannot get - No such AR service: "%.50s"', $name));
+    }
+
+    /**
+     * @param string $name
+     * @param $value
+     */
+    public function __set(string $name, $value)
+    {
+        if (isset(self::$_service_classes[$name])) {
+            $this->$name = $value;
+            return;
+        }
+        throw new InvalidArgumentException(sprintf('ServiceManager: Cannot set - No such AR service: "%.50s"', $name));
+    }
+
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function __isset(string $name)
+    {
+        return isset(self::$_service_classes[$name]);
+    }
+
+    /**
+     * Adds a new namespace to look for helpers.
+     * NOTE: adds to the beginning of the array so if there are name collisions, the most recently set namespace wins.
+     * @param string $ns
+     * @return void
+     */
+    public static function registerHelperNamespace(string $ns) : void
+    {
+        array_unshift(self::$_helper_namespaces, $ns);
+    }
+
+    /**
+     * Method generally called by twig to get an instance of a helper
+     * @param string $name
+     * @return BaseHelper
+     */
+    public function helper(string $name) : BaseHelper
+    {
+        $class_name = '';
+        foreach (self::$_helper_namespaces as $ns) {
+            $class_name = $ns . $name;
+            if (class_exists($class_name)) {
+                self::$_helpers[$class_name] = new $class_name();
+                break;
+            }
+        }
+        if (!isset(self::$_helpers[$class_name])) {
+            throw new RuntimeException('No helper class found with the name: ' . $class_name);
+        }
+        return self::$_helpers[$class_name];
+    }
+}

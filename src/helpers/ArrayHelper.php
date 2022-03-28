@@ -2,7 +2,7 @@
 
 namespace alanrogers\tools\helpers;
 
-class ArrayHelper
+class ArrayHelper extends BaseHelper
 {
     /**
      * @see https://www.codeproject.com/Questions/780780/PHP-Finding-differences-in-two-multidimensional-ar

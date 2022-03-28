@@ -25,9 +25,14 @@
     "require": {
         "beberlei/assert": "^3.2",
         "craftcms/cms": "^3.7.0",
-        "giggsey/libphonenumber-for-php": "^8.12"
+        "giggsey/libphonenumber-for-php": "^8.12",
+        "google/apiclient": "^2.4"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "yiisoft/yii2-composer": false,
+            "craftcms/plugin-installer": false
+        }
     }
 }

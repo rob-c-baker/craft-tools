@@ -1,0 +1,20 @@
+{% import '_includes/forms' as forms %}
+
+{{ forms.checkboxGroupField({
+    label : 'Allowed Sites',
+    instructions : 'The sites that may be chosen for this field.',
+    id : 'whitelistedSites',
+    name : 'whitelistedSites',
+    values: field.whitelistedSites,
+    options : sites
+}) }}
+
+{{ forms.checkboxField({
+    label : 'Propagate to selected sites',
+    instructions : 'instructions : If checked, entries are being propagated to the selected sites. Section must have propagtion enabled.' | t('propagated-sites-field'),
+    id : 'propagate',
+    name : 'propagate',
+    checked: field.propagate
+}) }}
+
+<br />
