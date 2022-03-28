@@ -12,7 +12,7 @@ class MaterialDesignIcons extends AbstractExtension
         return [
             new TwigFunction(
                 'mdiIcon',
-                [ \modules\ar\services\MaterialDesignIcons::class, 'inlineIconSVG' ],
+                [ \alanrogers\tools\services\MaterialDesignIcons::class, 'inlineIconSVG' ],
                 [ 'is_safe' => [ 'html' ] ]
             )
         ];
