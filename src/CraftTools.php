@@ -48,6 +48,9 @@ class CraftTools extends Module
         // Alias for this module
         Craft::setAlias('@modules/alanrogers', $this->getBasePath());
 
+        // Define a custom alias named after the namespace
+        Craft::setAlias('@alanrogers/tools', __DIR__);
+
         // controller namespace
         if (Craft::$app instanceof Console) {
             $this->controllerNamespace = 'alanrogers\\tools\\console\\controllers';
