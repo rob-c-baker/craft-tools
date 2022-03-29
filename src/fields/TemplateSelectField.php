@@ -25,7 +25,7 @@ class TemplateSelectField extends Field
      */
     public static function displayName() : string
     {
-        return Craft::t('template-select', 'Template Select');
+        return 'Template Select';
     }
 
     /**
@@ -80,7 +80,7 @@ class TemplateSelectField extends Field
         ]);
 
         // Add placeholder for when there is no template selected
-        $filteredTemplates = [ '' => Craft::t('template-select', 'No template selected') ];
+        $filteredTemplates = [ '' => 'No template selected' ];
 
         // Iterate over template list
         foreach ($templates as $path) {

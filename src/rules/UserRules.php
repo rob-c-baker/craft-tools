@@ -16,7 +16,7 @@ class UserRules
                 'string',
                 'min' => self::PASSWORD_MIN_LENGTH,
                 'tooShort' => Craft::t(
-                    'site-module',
+                    'craft-tools',
                     'Your password must be at least {min} characters.',
                     ['min' => self::PASSWORD_MIN_LENGTH]
                 )
@@ -26,7 +26,7 @@ class UserRules
                 'match',
                 'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{7,})/',
                 'message' => Craft::t(
-                    'site-module',
+                    'craft-tools',
                     'Your password must contain at least one of each of the following: A number, a lower-case character, an upper-case character, and a special character'
                 )
             ],
