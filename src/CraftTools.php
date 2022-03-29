@@ -102,7 +102,15 @@ class CraftTools extends Module
             View::class,
             View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) use ($base_path) {
-                $event->roots['alanrogers'] = $base_path . '/templates';
+                $event->roots['alanrogers-tools'] = $base_path . '/templates';
+            }
+        );
+
+        Event::on(
+            View::class,
+            View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
+            function(RegisterTemplateRootsEvent $event) use ($base_path) {
+                $event->roots['alanrogers-tools'] = $base_path . '/templates';
             }
         );
     }
