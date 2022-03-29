@@ -13,6 +13,7 @@ use craft\controllers\UsersController;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
 use craft\events\RegisterTemplateRootsEvent;
+use craft\i18n\PhpMessageSource;
 use craft\web\View;
 use yii\base\ActionEvent;
 use yii\base\Controller;
@@ -75,9 +76,10 @@ class CraftTools extends Module
         Extensions::register();
 
         // Our custom fields
-        FieldRegister::registerFields(__DIR__);
+        FieldRegister::registerFields();
 
-        self::registerTemplateRoot($this->getBasePath());
+        self::registerTranslationCategory();
+        self::registerTemplateRoots($this->getBasePath());
         self::registerUserRules();
         self::enforceFieldPermissions();
 
@@ -96,7 +98,17 @@ class CraftTools extends Module
         return self::$service_manager;
     }
 
-    private static function registerTemplateRoot(string $base_path) : void
+    private static function registerTranslationCategory() : void
+    {
+        Craft::$app->getI18n()->translations['craft-tools'] = [
+            'class' => PhpMessageSource::class,
+            'sourceLanguage' => 'en',
+            'basePath' => __DIR__ . '/translations',
+            'allowOverrides' => true,
+        ];
+    }
+
+    private static function registerTemplateRoots(string $base_path) : void
     {
         Event::on(
             View::class,

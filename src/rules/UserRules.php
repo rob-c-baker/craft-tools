@@ -18,7 +18,7 @@ class UserRules
                 'tooShort' => Craft::t(
                     'craft-tools',
                     'Your password must be at least {min} characters.',
-                    ['min' => self::PASSWORD_MIN_LENGTH]
+                    [ 'min' => self::PASSWORD_MIN_LENGTH ]
                 )
             ],
             [
@@ -27,7 +27,7 @@ class UserRules
                 'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{7,})/',
                 'message' => Craft::t(
                     'craft-tools',
-                    'Your password must contain at least one of each of the following: A number, a lower-case character, an upper-case character, and a special character'
+                    'Your password must contain at least one of each of the following: A number, a lower-case character, an upper-case character, and a special character.'
                 )
             ],
         ];
