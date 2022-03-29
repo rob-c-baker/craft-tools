@@ -8,6 +8,7 @@ use alanrogers\tools\services\ServiceManager;
 use alanrogers\tools\twig\Extensions;
 use Craft;
 use craft\base\Model;
+use craft\console\Application as Console;
 use craft\controllers\UsersController;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
@@ -42,6 +43,21 @@ class CraftTools extends Module
      */
     public static array $disallowed_custom_user_fields = [];
 
+    public function __construct($id, $parent = null, $config = [])
+    {
+        // Alias for this module
+        Craft::setAlias('@modules/alanrogers', $this->getBasePath());
+
+        // controller namespace
+        if (Craft::$app instanceof Console) {
+            $this->controllerNamespace = 'alanrogers\\tools\\console\\controllers';
+        } else {
+            $this->controllerNamespace = 'alanrogers\\tools\\controllers';
+        }
+
+        parent::__construct($id, $parent, $config);
+    }
+
     public function init()
     {
         parent::init();
@@ -52,18 +68,13 @@ class CraftTools extends Module
             'ar' => $this->getServiceManager(),
         ]);
 
-        $base_path = $this->getBasePath();
-
-        // Alias for this module
-        Craft::setAlias('@modules/alanrogers', $base_path);
-
         // Register Twig stuff
         Extensions::register();
 
         // Our custom fields
         FieldRegister::registerFields();
 
-        self::registerTemplateRoot($base_path);
+        self::registerTemplateRoot($this->getBasePath());
         self::registerUserRules();
         self::enforceFieldPermissions();
 

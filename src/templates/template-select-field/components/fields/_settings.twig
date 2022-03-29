@@ -1,0 +1,9 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+    label: 'Limit to subfolder',
+    instructions: 'Optional path of the sub folder, i.e. _subfolder/_',
+    id: 'limitToSubfolder',
+    name: 'limitToSubfolder',
+    value: field['limitToSubfolder']})
+}}

@@ -17,12 +17,12 @@ class FieldRegister
 
     private static function registerSitesField()
     {
-        // Sites field based on https://github.com/tonioseiler/propagated-sites-field-plugin
         Event::on(
             View::class,
             View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) {
                 $event->roots['_sites-field'] = __DIR__ . '/templates/sites-field';
+                $event->roots['template-select'] = __DIR__ . '/templates/template-select-field';
             }
         );
 
@@ -31,6 +31,7 @@ class FieldRegister
             Fields::EVENT_REGISTER_FIELD_TYPES,
             function (RegisterComponentTypesEvent $event) {
                 $event->types[] = SitesField::class;
+                $event->types[] = TemplateSelectField::class;
             }
         );
     }
