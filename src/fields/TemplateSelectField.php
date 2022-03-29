@@ -113,7 +113,7 @@ class TemplateSelectField extends Field
                 ]
             );
         } catch (LoaderError|Exception|SyntaxError|RuntimeError $e) {
-            throw new \Exception('Error occurred during renering template-select template.', 0, $e);
+            throw new \Exception('Error occurred during rendering template-select template.', 0, $e);
         }
     }
 }
