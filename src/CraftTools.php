@@ -75,7 +75,7 @@ class CraftTools extends Module
         Extensions::register();
 
         // Our custom fields
-        FieldRegister::registerFields();
+        FieldRegister::registerFields(__DIR__);
 
         self::registerTemplateRoot($this->getBasePath());
         self::registerUserRules();

@@ -10,19 +10,19 @@ use yii\base\Event;
 
 class FieldRegister
 {
-    public static function registerFields() : void
+    public static function registerFields(string $base_dir) : void
     {
-        self::registerSitesField();
+        self::registerSitesField($base_dir);
     }
 
-    private static function registerSitesField()
+    private static function registerSitesField(string $base_dir)
     {
         Event::on(
             View::class,
             View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
-            function(RegisterTemplateRootsEvent $event) {
-                $event->roots['_sites-field'] = __DIR__ . '/templates/sites-field';
-                $event->roots['template-select'] = __DIR__ . '/templates/template-select-field';
+            function(RegisterTemplateRootsEvent $event) use ($base_dir) { // @todo maybe use alias here?
+                $event->roots['_sites-field'] = $base_dir . '/templates/sites-field';
+                $event->roots['template-select'] = $base_dir . '/templates/template-select-field';
             }
         );
 
