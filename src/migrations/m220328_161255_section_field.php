@@ -9,8 +9,8 @@ use yii\db\Exception;
 
 class m220328_161255_section_field extends Migration
 {
-    private const OLD_TPL_TYPE = 'modules\\ar\\fields\\SitesField';
-    private const NEW_TPL_TYPE = 'charliedev\\sectionfield\\fields\\SectionField';
+    private const OLD_TPL_TYPE = 'charliedev\\sectionfield\\fields\\SectionField';
+    private const NEW_TPL_TYPE = 'alanrogers\\tools\\fields\\SectionField';
 
     /**
      * @inheritdoc

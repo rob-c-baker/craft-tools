@@ -4,7 +4,6 @@ namespace alanrogers\tools\twig;
 
 use Craft;
 use Exception;
-use alanrogers\tools\services\MaterialDesignIcons;
 use alanrogers\tools\twig\extensions\DeepMerge;
 use alanrogers\tools\twig\extensions\Inline;
 use Twig\TwigFilter;
