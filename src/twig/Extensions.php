@@ -35,7 +35,6 @@ class Extensions
         }));
 
         try {
-            MaterialDesignIcons::setSVGPath('assets/icons/mdi'); // set the SVG path
             Craft::$app->view->registerTwigExtension(new extensions\MaterialDesignIcons());
         } catch (Exception $e) {
             Craft::error($e->getMessage(), 'MaterialDesignIcons');

@@ -15,8 +15,6 @@ use Twig\Error\SyntaxError;
 use yii\base\Exception;
 use yii\db\Schema;
 
-// based on: https://github.com/tonioseiler/propagated-sites-field-plugin
-
 /**
  * @see https://github.com/tonioseiler/propagated-sites-field-plugin
  * @license https://github.com/tonioseiler/propagated-sites-field-plugin/blob/master/LICENSE.md
