@@ -9,9 +9,12 @@ use alanrogers\tools\twig\Extensions;
 use Craft;
 use craft\base\Model;
 use craft\console\Application as Console;
+use craft\console\controllers\MigrateController;
 use craft\controllers\UsersController;
+use craft\db\MigrationManager;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
+use craft\events\RegisterMigratorEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\i18n\PhpMessageSource;
 use craft\web\View;
@@ -26,6 +29,8 @@ use yii\web\ForbiddenHttpException;
  */
 class CraftTools extends Module
 {
+    public const MIGRATION_TRACK_NAME = 'craft-tools';
+
     /**
      * Static property that is an instance of this module class so that it can be accessed via
      * CraftTools::$instance
@@ -96,6 +101,25 @@ class CraftTools extends Module
             self::$service_manager = new ServiceManager();
         }
         return self::$service_manager;
+    }
+
+    private static function registerMigrationTrack() : void
+    {
+        Event::on(
+            MigrateController::class,
+            MigrateController::EVENT_REGISTER_MIGRATOR,
+            function(RegisterMigratorEvent $event) {
+                if ($event->track === self::MIGRATION_TRACK_NAME) {
+                    $event->migrator = Craft::createObject([
+                        'class' => MigrationManager::class,
+                        'track' => self::MIGRATION_TRACK_NAME,
+                        'migrationNamespace' => 'alanrogers\\tools\\migrations',
+                        'migrationPath' => '@vendor/alanrogers/craft-tools/src/migrations',
+                    ]);
+                    $event->handled = true;
+                }
+            }
+        );
     }
 
     private static function registerTranslationCategory() : void

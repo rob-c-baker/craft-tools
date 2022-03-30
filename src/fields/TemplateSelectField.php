@@ -13,6 +13,10 @@ use Twig\Error\SyntaxError;
 use yii\base\Exception;
 use yii\db\Schema;
 
+/**
+ * @see https://github.com/sjelfull/craft3-templateselect
+ * @license https://github.com/sjelfull/craft3-templateselect/blob/master/CHANGELOG.md
+ */
 class TemplateSelectField extends Field
 {
     /**

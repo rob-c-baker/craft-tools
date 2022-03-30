@@ -61,3 +61,11 @@ return [
     ]
 ];
 ```
+
+## Migrations
+
+Migrations have their own track and therefor need to be manually invoked like this:
+
+```shell
+./craft migrate/up --track=craft-tools
+```

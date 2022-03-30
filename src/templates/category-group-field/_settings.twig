@@ -1,0 +1,18 @@
+{% import '_includes/forms' as forms %}
+
+{{ forms.checkboxSelectField({
+    label : 'Allowed Groups',
+    instructions : 'Which category groups to allow to be selected for this field.',
+    id : 'allowedGroups',
+    name : 'allowedGroups',
+    values: field.allowedGroups,
+    options : options
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Single Selection',
+    instructions: 'Whether this field is limited to selecting one category group.',
+    id: 'singleSelection',
+    name: 'singleSelection',
+    on: is_single_section
+}) }}

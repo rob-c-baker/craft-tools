@@ -1,0 +1,14 @@
+
+{% if is_single_section %}
+    {% include "_includes/forms/select" with {
+        name: field.handle,
+        value: value ? value.id : null,
+        options: options
+    } %}
+{% else %}
+    {% include "_includes/forms/multiselect" with {
+        name: field.handle,
+        value: value ? value.ids() : null,
+        options: options
+    } %}
+{% endif %}

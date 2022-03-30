@@ -16,6 +16,8 @@ class FieldRegister
             function (RegisterComponentTypesEvent $event) {
                 $event->types[] = SitesField::class;
                 $event->types[] = TemplateSelectField::class;
+                $event->types[] = SectionField::class;
+                $event->types[] = CategoryGroupsField::class;
             }
         );
     }
