@@ -84,6 +84,7 @@ class CraftTools extends Module
         FieldRegister::registerFields();
 
         self::registerTranslationCategory();
+        self::registerMigrationTrack();
         self::registerTemplateRoots($this->getBasePath());
         self::registerUserRules();
         self::enforceFieldPermissions();
