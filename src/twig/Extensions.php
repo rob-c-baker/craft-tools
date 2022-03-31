@@ -14,17 +14,20 @@ class Extensions
 {
     public static function register() : void
     {
+        $view = Craft::$app->getView();
+        $twig = $view->getTwig();
+
         // Add our Twig filters
-        Craft::$app->view->twig->addFilter(new TwigFilter('is_array', function($value) {
+        $twig->addFilter(new TwigFilter('is_array', function($value) {
             return is_array($value);
         }));
-        Craft::$app->view->twig->addFilter(new TwigFilter('array_values', function($value) {
+        $twig->addFilter(new TwigFilter('array_values', function($value) {
             return array_values($value);
         }));
-        Craft::$app->view->twig->addFilter(new TwigFilter('intval', function($value) {
+        $twig->addFilter(new TwigFilter('intval', function($value) {
             return intval($value);
         }));
-        Craft::$app->view->twig->addFilter(new TwigFilter('push', function($value, $push1, $push2=null) {
+        $twig->addFilter(new TwigFilter('push', function($value, $push1, $push2=null) {
             if ($push2) {
                 // If there is a second param then  $push1 is the key and push2 is the value
                 $value[$push1] = $push2;
@@ -36,24 +39,24 @@ class Extensions
         }));
 
         try {
-            Craft::$app->view->registerTwigExtension(new extensions\MaterialDesignIcons());
+            $view->registerTwigExtension(new extensions\MaterialDesignIcons());
         } catch (Exception $e) {
             Craft::error($e->getMessage(), 'MaterialDesignIcons');
         }
 
         // Deep merge ability
-        Craft::$app->view->registerTwigExtension(new DeepMerge());
+        $view->registerTwigExtension(new DeepMerge());
 
         // Our inline function
-        Craft::$app->view->registerTwigExtension(new Inline());
+        $view->registerTwigExtension(new Inline());
 
         // Base 64 image encoding
-        Craft::$app->view->registerTwigExtension(new Image64());
+        $view->registerTwigExtension(new Image64());
 
         // Our globals
-        Craft::$app->view->registerTwigExtension(new TwigGlobals());
+        $view->registerTwigExtension(new TwigGlobals());
 
         // ability to unset()
-        Craft::$app->view->registerTwigExtension(new UnsetVariable());
+        $view->registerTwigExtension(new UnsetVariable());
     }
 }
