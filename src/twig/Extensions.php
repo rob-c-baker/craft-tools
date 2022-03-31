@@ -3,6 +3,7 @@
 namespace alanrogers\tools\twig;
 
 use alanrogers\tools\twig\extensions\Image64;
+use alanrogers\tools\twig\extensions\UnsetVariable;
 use Craft;
 use Exception;
 use alanrogers\tools\twig\extensions\DeepMerge;
@@ -51,5 +52,8 @@ class Extensions
 
         // Our globals
         Craft::$app->view->registerTwigExtension(new TwigGlobals());
+
+        // ability to unset()
+        Craft::$app->view->registerTwigExtension(new UnsetVariable());
     }
 }
