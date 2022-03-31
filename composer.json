@@ -26,7 +26,9 @@
         "beberlei/assert": "^3.2",
         "craftcms/cms": "^3.7.0",
         "giggsey/libphonenumber-for-php": "^8.12",
-        "google/apiclient": "^2.4"
+        "google/apiclient": "^2.4",
+        "ext-dom": "*",
+        "yiisoft/yii2-redis": "~2.0.0"
     },
     "config": {
         "sort-packages": true,

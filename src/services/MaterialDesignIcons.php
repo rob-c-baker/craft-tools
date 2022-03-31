@@ -4,6 +4,7 @@ namespace alanrogers\tools\services;
 
 use DOMDocument;
 use DOMElement;
+use RuntimeException;
 use yii\base\Component;
 
 class MaterialDesignIcons extends Component
@@ -25,19 +26,20 @@ class MaterialDesignIcons extends Component
         $path = rtrim(getenv('STATIC_PATH'), '/') . '/'  . trim($path, '/');
         self::$svg_path = realpath($path);
         if (self::$svg_path === false) {
-            throw new \RuntimeException('The path supplied does not exist.');
+            throw new RuntimeException('The path supplied does not exist.');
         }
     }
 
     /**
      * @param string $name
      * @param array $options
-     * @return false|string
+     * @return string
+     * @throws RuntimeException
      */
-    public static function inlineIconSVG(string $name, array $options=[])
+    public static function inlineIconSVG(string $name, array $options=[]) : string
     {
         if (!self::$svg_path) {
-            throw new \RuntimeException('You must set the path to the SVGs with MaterialDesignIcons::setSVGPath($path) before calling this method.');
+            throw new RuntimeException('You must set the path to the SVGs with MaterialDesignIcons::setSVGPath($path) before calling this method.');
         }
 
         $filename = $name . '.svg';
@@ -48,25 +50,25 @@ class MaterialDesignIcons extends Component
         } elseif (is_readable($path)) {
             $svg_data = file_get_contents($path);
             if ($svg_data === false) {
-                throw new \RuntimeException(sprintf('Could not read the filename for icon "%s".', $name));
+                throw new RuntimeException(sprintf('Could not read the filename for icon "%s".', $name));
             }
             self::$loaded[$path] = $svg_data;
         } else {
-            throw new \RuntimeException(sprintf('The icon "%s" does not exist in the SVG path.', $name));
+            throw new RuntimeException(sprintf('The icon "%s" does not exist in the SVG path.', $name));
         }
 
         if (!empty($options)) { // there are at least some options
 
             $svg = new DOMDocument('1.0', 'utf-8');
             if (!$svg->loadXML($svg_data)) {
-                throw new \RuntimeException(sprintf('Could not load svg DOM for icon "%s".', $name));
+                throw new RuntimeException(sprintf('Could not load svg DOM for icon "%s".', $name));
             }
 
             /** @var DOMElement $svg_el */
             $svg_el = $svg->getElementsByTagName('svg')[0] ?? null;
 
             if (!$svg_el) {
-                throw new \RuntimeException(sprintf('Could not find svg element in file for icon "%s".', $name));
+                throw new RuntimeException(sprintf('Could not find svg element in file for icon "%s".', $name));
             }
 
             if (isset($options['width'])) {

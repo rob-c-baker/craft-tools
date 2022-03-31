@@ -2,6 +2,7 @@
 
 namespace alanrogers\tools\twig;
 
+use alanrogers\tools\twig\extensions\Image64;
 use Craft;
 use Exception;
 use alanrogers\tools\twig\extensions\DeepMerge;
@@ -44,6 +45,9 @@ class Extensions
 
         // Our inline function
         Craft::$app->view->registerTwigExtension(new Inline());
+
+        // Base 64 image encoding
+        Craft::$app->view->registerTwigExtension(new Image64());
 
         // Our globals
         Craft::$app->view->registerTwigExtension(new TwigGlobals());
