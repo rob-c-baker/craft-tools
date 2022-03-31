@@ -30,6 +30,14 @@
         "ext-dom": "*",
         "yiisoft/yii2-redis": "~2.0.0"
     },
+    "scripts": {
+        "post-update-cmd": "Google\\Task\\Composer::cleanup"
+    },
+    "extra" : {
+        "google/apiclient-services": [
+            "Analytics"
+        ]
+    },
     "config": {
         "sort-packages": true,
         "allow-plugins": {

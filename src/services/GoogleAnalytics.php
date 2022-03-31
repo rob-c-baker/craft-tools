@@ -3,42 +3,42 @@
 namespace alanrogers\tools\services;
 
 use DateTime;
-use Google_Client;
-use Google_Service_Analytics;
-use Google_Service_Analytics_GaData;
+use Google\Client;
+use Google\Service\Analytics;
+use Google\Service\Analytics\GaData;
 use yii\base\Component;
 
 class GoogleAnalytics extends Component
 {
     /**
-     * @var Google_Client|null
+     * @var Client|null
      */
-    private ?Google_Client $google_client = null;
+    private ?Client $google_client = null;
 
     /**
-     * @var Google_Service_Analytics|null
+     * @var Analytics|null
      */
-    private ?Google_Service_Analytics $analytics_service = null;
+    private ?Analytics $analytics_service = null;
 
-    private function initGoogleClient(): void
+    private function initGoogleClient() : void
     {
-        $this->google_client = new Google_Client();
+        $this->google_client = new Client();
 
         // Tell the Google client to use the credentials in the environment variable "GOOGLE_APPLICATION_CREDENTIALS"
         $this->google_client->useApplicationDefaultCredentials();
     }
 
-    private function initGoogleAnalyticsService(): void
+    private function initGoogleAnalyticsService() : void
     {
         // We are using Analytics (read only) here...
-        $this->getGoogleClient()->addScope(Google_Service_Analytics::ANALYTICS_READONLY);
-        $this->analytics_service = new Google_Service_Analytics($this->google_client);
+        $this->getGoogleClient()->addScope(Analytics::ANALYTICS_READONLY);
+        $this->analytics_service = new Analytics($this->google_client);
     }
 
     /**
-     * @return Google_Client
+     * @return Client
      */
-    public function getGoogleClient(): Google_Client
+    public function getGoogleClient() : Client
     {
         if ($this->google_client === null) {
             $this->initGoogleClient();
@@ -47,9 +47,9 @@ class GoogleAnalytics extends Component
     }
 
     /**
-     * @return Google_Service_Analytics
+     * @return Analytics
      */
-    public function getGoogleAnalyticsService(): Google_Service_Analytics
+    public function getGoogleAnalyticsService() : Analytics
     {
         if ($this->analytics_service === null) {
             $this->initGoogleAnalyticsService();
@@ -63,9 +63,9 @@ class GoogleAnalytics extends Component
      * @param DateTime $end_date
      * @param string $metrics A comma-separated list of Analytics metrics. E.g. 'ga:sessions,ga:pageviews'.
      * @param array $params
-     * @return Google_Service_Analytics_GaData
+     * @return GaData
      */
-    public function getGAData(string $report_id, DateTime $start_date, DateTime $end_date, string $metrics, array $params=[]) : Google_Service_Analytics_GaData
+    public function getGAData(string $report_id, DateTime $start_date, DateTime $end_date, string $metrics, array $params=[]) : GaData
     {
         return $this->getGoogleAnalyticsService()->data_ga->get(
             $report_id,
