@@ -2,7 +2,9 @@
 
 namespace alanrogers\tools\services;
 
+use Craft;
 use yii\base\Component;
+use yii\caching\CacheInterface;
 
 /**
  * Class PwnedPassword
@@ -16,9 +18,18 @@ use yii\base\Component;
  */
 class PwnedPassword extends Component
 {
+    private const CACHE_TTL = 86400;
+
     private const API_URL = 'https://api.pwnedpasswords.com/range/%.5s';
 
-    // @todo cache!
+    public static ?CacheInterface $cache = null;
+
+    public function init()
+    {
+        if (!isset(self::$cache)) {
+            self::$cache = Craft::$app->getCache();
+        }
+    }
 
     /**
      * Returns zero for not pwned or an integer greater than zero to indicate how many times it has been pwned.
@@ -31,7 +42,13 @@ class PwnedPassword extends Component
         $long_hash = self::makeHash($password);
         $short_hash = self::makeShortHash($long_hash);
 
-        $response = self::makeRequest($short_hash);
+        $cache_key = 'pwned_password_' . $short_hash;
+        if (self::$cache->exists($cache_key)) {
+            $response = self::$cache->get($cache_key);
+        } else {
+            $response = self::makeRequest($short_hash);
+            self::$cache->set($cache_key, $response, self::CACHE_TTL);
+        }
 
         if ($response) {
             $data = self::processResponse($response);

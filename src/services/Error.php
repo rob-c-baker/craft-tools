@@ -186,10 +186,11 @@ class Error extends Component
     private static function getCurrentURL(): ?string
     {
         $url = null;
-        if (Craft::$app->getRequest() instanceof Request) {
+        $request = Craft::$app->getRequest();
+        if ($request instanceof Request) {
             // pick up the URL if it was a web request
-            $qs = Craft::$app->getRequest()->queryString;
-            $url = Craft::$app->getRequest()->pathInfo . ($qs ? '?' . $qs : '');
+            $qs = $request->queryString;
+            $url = $request->pathInfo . ($qs ? '?' . $qs : '');
         }
         return $url;
     }

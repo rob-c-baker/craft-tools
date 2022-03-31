@@ -57,6 +57,8 @@ class MaterialDesignIcons extends Component
             throw new RuntimeException(sprintf('The icon "%s" does not exist in the SVG path.', $name));
         }
 
+        // Any options that should NOT be added as <svg> element attributes must be unset() after this point
+
         if (!empty($options)) { // there are at least some options
 
             $svg = new DOMDocument('1.0', 'utf-8');
@@ -71,37 +73,8 @@ class MaterialDesignIcons extends Component
                 throw new RuntimeException(sprintf('Could not find svg element in file for icon "%s".', $name));
             }
 
-            if (isset($options['width'])) {
-                $svg_el->setAttribute('width', (int) $options['width']);
-                unset($options['width']);
-            }
-
-            if (isset($options['height'])) {
-                $svg_el->setAttribute('height', (int) $options['height']);
-                unset($options['height']);
-            }
-
-            if (isset($options['viewBox'])) {
-                $svg_el->setAttribute('viewBox', $options['viewBox']);
-                unset($options['viewBox']);
-            }
-
-            if (isset($options['role'])) {
-                $svg_el->setAttribute('role', $options['role']);
-                unset($options['role']);
-            }
-
-            if (isset($options['transform'])) {
-                $svg_el->setAttribute('transform', $options['transform']);
-                unset($options['transform']);
-            }
-
-            // any options left are other SVG element attributes
-            /** @noinspection NotOptimalIfConditionsInspection */
-            if (!empty($options)) {
-                foreach ($options as $n => $value) {
-                    $svg_el->setAttribute($n, $value);
-                }
+            foreach ($options as $n => $value) {
+                $svg_el->setAttribute($n, $value);
             }
 
             $svg_data = $svg->saveXML($svg_el);
