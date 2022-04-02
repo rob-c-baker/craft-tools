@@ -5,6 +5,9 @@ namespace alanrogers\tools\services;
 use Craft;
 use yii\redis\Connection;
 
+/**
+ * Requires a redis connection passed in or one is collected from the App config.
+ */
 class RateLimiter
 {
     /**
