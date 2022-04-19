@@ -36,6 +36,11 @@ class GQLClient extends Component
     private string $token = '';
 
     /**
+     * @var string[]
+     */
+    private array $headers = [];
+
+    /**
      * @var bool
      */
     private bool $cache_enabled = true;
@@ -95,6 +100,16 @@ class GQLClient extends Component
     }
 
     /**
+     * @param string $header
+     * @return $this
+     */
+    public function addHeader(string $header) : self
+    {
+        $this->headers[] = $header;
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function execute()
@@ -118,6 +133,12 @@ class GQLClient extends Component
 
         if ($this->token) {
             $headers[] = "Authorization: bearer $this->token";
+        }
+
+        if ($this->headers) {
+            foreach ($this->headers as $header) {
+                $headers[] = $header;
+            }
         }
 
         $stream_options = [
