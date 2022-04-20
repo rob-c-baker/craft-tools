@@ -146,17 +146,30 @@ class GQLClient extends Component
                 'method' => 'POST',
                 'header' => $headers,
                 'content' => $this->query,
+                'ignore_errors' => true
             ]
         ];
 
-        $this->response = @file_get_contents($this->endpoint, false, stream_context_create($stream_options));
+        $context = stream_context_create($stream_options);
+        $stream = fopen($this->endpoint, 'r', false, $context);
 
-        if ($this->response === false) {
-            $error = error_get_last();
-            throw new RuntimeException($error['message'], $error['type']);
-        }
+        $this->response = stream_get_contents($stream);
+        $meta = stream_get_meta_data($stream);
+
+        $response_header = $meta['wrapper_data'][0] ?? null;
+        fclose($stream);
 
         $this->response = Json::decode($this->response);
+
+        if ($response_header === null) {
+            throw new RuntimeException('Unexpected error during HTTP request!');
+        }
+
+        if (strpos($response_header, '200') === false) {
+            $msg = sprintf('[%s] (%d) %s', $this->response['name'], $this->response['status'], $this->response['message']);
+            throw new RuntimeException($msg, $this->response['status']);
+        }
+
         $this->executed = true;
 
         if (isset($this->response['errors'])) {
@@ -196,10 +209,10 @@ class GQLClient extends Component
     private static function getCacheKey(string $endpoint, string $query, string $token='') : string
     {
         return 'gql-' . md5(implode('|', [
-            $endpoint,
-            $query,
-            $token
-        ]));
+                $endpoint,
+                $query,
+                $token
+            ]));
     }
 
     /**
