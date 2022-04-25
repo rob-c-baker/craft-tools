@@ -23,7 +23,7 @@ class Dumper extends AbstractExtension
 
         $options = [
             'is_safe' => $isDumpOutputHtmlSafe ? ['html'] : [],
-            'needs_context' => false,
+            'needs_context' => true,
             'needs_environment' => true,
             'debug' => true,
         ];
