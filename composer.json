@@ -29,6 +29,7 @@
         "craftcms/cms": "^3.7.0",
         "giggsey/libphonenumber-for-php": "^8.12",
         "google/apiclient": "^2.4",
+        "symfony/var-dumper": "v5.4.6",
         "yiisoft/yii2-redis": "~2.0.0"
     },
     "scripts": {
