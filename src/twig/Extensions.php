@@ -2,6 +2,7 @@
 
 namespace alanrogers\tools\twig;
 
+use alanrogers\tools\twig\extensions\Dumper;
 use alanrogers\tools\twig\extensions\Image64;
 use alanrogers\tools\twig\extensions\UnsetVariable;
 use Craft;
@@ -58,5 +59,8 @@ class Extensions
 
         // ability to unset()
         $view->registerTwigExtension(new UnsetVariable());
+
+        // ability to unset()
+        $view->registerTwigExtension(new Dumper());
     }
 }
