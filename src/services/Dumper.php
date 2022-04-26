@@ -32,23 +32,16 @@ class Dumper
      */
     public function dd(...$items)
     {
-        $i   = 0;
-        $len = count($items);
-        foreach ($items as $item) {
-            if ($i == $len - 1) {
-                echo dd($item);
-            } else {
-                echo dump($item);
-            }
-            $i++;
-        }
         echo '<style>pre.sf-dump { z-index: 0; !important} </style>';
+        dd(...$items);
     }
 
     public function dump(...$items) : void
     {
         ob_start();
-        VarDumper::dump($items);
+        foreach ($items as $item) {
+            VarDumper::dump($item);
+        }
         echo ob_get_clean();
     }
 }
