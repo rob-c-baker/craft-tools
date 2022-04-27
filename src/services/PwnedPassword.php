@@ -22,15 +22,6 @@ class PwnedPassword extends Component
 
     private const API_URL = 'https://api.pwnedpasswords.com/range/%.5s';
 
-    public static ?CacheInterface $cache = null;
-
-    public function init()
-    {
-        if (!isset(self::$cache)) {
-            self::$cache = Craft::$app->getCache();
-        }
-    }
-
     /**
      * Returns zero for not pwned or an integer greater than zero to indicate how many times it has been pwned.
      * Function returns false if there was no response from the API.
@@ -39,15 +30,16 @@ class PwnedPassword extends Component
      */
     public static function isPasswordPwned(string $password)
     {
+        $cache = Craft::$app->getCache();
         $long_hash = self::makeHash($password);
         $short_hash = self::makeShortHash($long_hash);
 
         $cache_key = 'pwned_password_' . $short_hash;
-        if (self::$cache->exists($cache_key)) {
-            $response = self::$cache->get($cache_key);
+        if ($cache->exists($cache_key)) {
+            $response = $cache->get($cache_key);
         } else {
             $response = self::makeRequest($short_hash);
-            self::$cache->set($cache_key, $response, self::CACHE_TTL);
+            $cache->set($cache_key, $response, self::CACHE_TTL);
         }
 
         if ($response) {
