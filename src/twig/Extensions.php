@@ -4,7 +4,7 @@ namespace alanrogers\tools\twig;
 
 use alanrogers\tools\twig\extensions\Dumper;
 use alanrogers\tools\twig\extensions\Image64;
-use alanrogers\tools\twig\extensions\UnsetVariable;
+use alanrogers\tools\twig\extensions\VariableTools;
 use Craft;
 use Exception;
 use alanrogers\tools\twig\extensions\DeepMerge;
@@ -57,8 +57,8 @@ class Extensions
         // Our globals
         $view->registerTwigExtension(new TwigGlobals());
 
-        // ability to unset()
-        $view->registerTwigExtension(new UnsetVariable());
+        // ability to unset(), set variables and other variable related stuff
+        $view->registerTwigExtension(new VariableTools());
 
         // ability to unset()
         $view->registerTwigExtension(new Dumper());

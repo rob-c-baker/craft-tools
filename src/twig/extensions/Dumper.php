@@ -29,9 +29,9 @@ class Dumper extends AbstractExtension
         ];
 
         return [
-            new TwigFunction('d', [$this, 'd'], $options),
-            new TwigFunction('dd', [$this, 'dd'], $options),
-            new TwigFunction('dump', [$this, 'dump'], [
+            new TwigFunction('d', [Dumper::class, 'd'], $options),
+            new TwigFunction('dd', [Dumper::class, 'dd'], $options),
+            new TwigFunction('dump', [Dumper::class, 'dump'], [
                 'is_safe'           => $isDumpOutputHtmlSafe ? ['html'] : [],
                 'needs_context'     => true,
                 'needs_environment' => true,
@@ -45,7 +45,7 @@ class Dumper extends AbstractExtension
      * @param array $context
      * @param mixed ...$items
      */
-    public function d(Environment $env, array $context, ...$items)
+    public static function d(Environment $env, array $context, ...$items)
     {
         if (!$env->isDebug()) {
             return;
@@ -65,7 +65,7 @@ class Dumper extends AbstractExtension
      * @param array $context
      * @param mixed ...$items
      */
-    public function dd(Environment $env, array $context, ...$items)
+    public static function dd(Environment $env, array $context, ...$items)
     {
         if (!$env->isDebug()) {
             return;
@@ -86,7 +86,7 @@ class Dumper extends AbstractExtension
      * @param array $context
      * @param mixed ...$items
      */
-    public function dump(Environment $env, array $context, ...$items) : void
+    public static function dump(Environment $env, array $context, ...$items) : void
     {
         if (!$env->isDebug()) {
             return;

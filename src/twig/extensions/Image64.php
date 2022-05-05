@@ -16,11 +16,11 @@ class Image64 extends AbstractExtension
         return [
             'asset64' => new TwigFilter(
                 'asset64',
-                [ $this, 'asset64']
+                [ Image64::class, 'asset64']
             ),
             'image64' => new TwigFunction(
                 'image64',
-                [ $this, 'image64']
+                [ Image64::class, 'image64']
             )
         ];
     }
@@ -30,11 +30,11 @@ class Image64 extends AbstractExtension
         return [
             'asset64' => new TwigFunction(
                 'asset64',
-                [ $this, 'asset64']
+                [ Image64::class, 'asset64']
             ),
             'image64' => new TwigFunction(
                 'image64',
-                [ $this, 'image64']
+                [ Image64::class, 'image64']
             )
         ];
     }
@@ -45,7 +45,7 @@ class Image64 extends AbstractExtension
      * @param bool $inline
      * @return string
      */
-    public function asset64(Asset $asset, bool $inline = false) : string
+    public static function asset64(Asset $asset, bool $inline = false) : string
     {
         // Make sure the mime type is an image.
         if (0 !== strpos($asset->getMimeType(), 'image/')) {
@@ -55,7 +55,7 @@ class Image64 extends AbstractExtension
 
         // Get the file.
         try {
-            return $this->image64($asset->getVolume()->getRootPath() . DIRECTORY_SEPARATOR . $asset->getPath(), $asset->getExtension(), $inline);
+            return self::image64($asset->getVolume()->getRootPath() . DIRECTORY_SEPARATOR . $asset->getPath(), $asset->getExtension(), $inline);
         } catch (InvalidConfigException $e) {
             // cannot get the file / error of some sort... Shhhh:
             return false;
@@ -69,7 +69,7 @@ class Image64 extends AbstractExtension
      * @param bool $inline
      * @return string
      */
-    public function image64(string $path, string $extension, bool $inline=false) : string
+    public static function image64(string $path, string $extension, bool $inline=false) : string
     {
         $path = FileHelper::normalizePath($path);
         $binary = file_get_contents($path);

@@ -15,20 +15,20 @@ class DeepMerge extends AbstractExtension
         return [
             'deep_merge' => new TwigFilter(
                 'deep_merge',
-                [ $this, 'deepMerge'],
+                [ DeepMerge::class, 'deepMerge'],
                 $options
             )
         ];
     }
 
-    public function deepMerge(array $array1, array $array2, array $arg = []): array
+    public static function deepMerge(array $array1, array $array2, array $arg = []): array
     {
         $merged = $array1;
 
         foreach ($array2 as $key => $value) {
             if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
                 if (self::isAssoc($value)) {
-                    $merged[$key] = $this->deepMerge($merged[$key], $value);
+                    $merged[$key] = self::deepMerge($merged[$key], $value);
                 } else {
                     $merged[$key] = array_merge($merged[$key], $value);
                 }
