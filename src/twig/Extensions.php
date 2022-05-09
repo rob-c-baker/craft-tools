@@ -54,9 +54,6 @@ class Extensions
         // Base 64 image encoding
         $view->registerTwigExtension(new Image64());
 
-        // Our globals
-        $view->registerTwigExtension(new TwigGlobals());
-
         // ability to unset(), set variables and other variable related stuff
         $view->registerTwigExtension(new VariableTools());
 
