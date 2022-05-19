@@ -4,6 +4,8 @@ namespace alanrogers\tools\services;
 
 use Craft;
 use craft\helpers\Json;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use RuntimeException;
 use yii\base\Component;
 
@@ -100,12 +102,13 @@ class GQLClient extends Component
     }
 
     /**
+     * @param string $name
      * @param string $header
      * @return $this
      */
-    public function addHeader(string $header) : self
+    public function addHeader(string $name, string $header) : self
     {
-        $this->headers[] = $header;
+        $this->headers[$name] = $header;
         return $this;
     }
 
@@ -126,59 +129,69 @@ class GQLClient extends Component
             }
         }
 
-        $headers = [
-            'Content-Type: application/graphql',
-            'User-Agent: AR GraphQL client'
+        $http_headers = [
+            'Content-Type' => 'application/graphql',
+            'User-Agent' => 'AR GraphQL client'
         ];
 
         if ($this->token) {
-            $headers[] = "Authorization: bearer $this->token";
+            $http_headers['Authorization'] = "bearer $this->token";
         }
 
         if ($this->headers) {
-            foreach ($this->headers as $header) {
-                $headers[] = $header;
+            foreach ($this->headers as $name => $header) {
+                $http_headers[$name] = $header;
             }
         }
 
-        $stream_options = [
-            'http' => [
-                'method' => 'POST',
-                'header' => $headers,
-                'content' => $this->query,
-                'ignore_errors' => true
-            ]
-        ];
+        $client = new Client([
+            'headers' => $http_headers
+        ]);
 
-        $context = stream_context_create($stream_options);
-        $stream = fopen($this->endpoint, 'r', false, $context);
-
-        $this->response = stream_get_contents($stream);
-        $meta = stream_get_meta_data($stream);
-
-        $response_header = $meta['wrapper_data'][0] ?? null;
-        fclose($stream);
-
-        $this->response = Json::decode($this->response);
-
-        if ($response_header === null) {
-            throw new RuntimeException('Unexpected error during HTTP request!');
-        }
-
-        if (strpos($response_header, '200') === false) {
-            $msg = sprintf('[%s] (%d) %s', $this->response['name'], $this->response['status'], $this->response['message']);
-            throw new RuntimeException($msg, $this->response['status']);
+        try {
+            $http_response = $client->request('POST', $this->endpoint, [
+                'body' => $this->query,
+                'timeout' => 10, // seconds
+                'connect_timeout' => 5 // seconds
+            ]);
+        } catch (GuzzleException $e) {
+            throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
 
         $this->executed = true;
 
-        if (isset($this->response['errors'])) {
-            $msg = sprintf(
-                '[%s] %s',
-                $this->response['errors'][0]['category'] ?? 'unknown',
-                $this->response['errors'][0]['message']
-            );
-            throw new RuntimeException($msg);
+        $this->response = Json::decodeIfJson((string) $http_response->getBody());
+        if (is_string($this->response)) {
+            throw new RuntimeException('GQL response was not JSON.');
+        }
+
+        if ($http_response->getStatusCode() !== 200) {
+            if (isset($this->response['errors'])) {
+                $msg = sprintf(
+                    '[%s] %s',
+                    $this->response['errors'][0]['category'] ?? 'unknown',
+                    $this->response['errors'][0]['message']
+                );
+                throw new RuntimeException($msg);
+            } else {
+
+                $msg = [];
+                if (isset($this->response['name'])) {
+                    $msg[] = '[' . $this->response['name'] . ']';
+                }
+                if (isset($this->response['status'])) {
+                    $msg[] = '(' . $this->response['status'] . ')';
+                }
+                if (isset($this->response['message'])) {
+                    $msg[] = $this->response['message'];
+                }
+                $msg = implode(' ', $msg);
+                if ($msg) {
+                    throw new RuntimeException($msg, $this->response['status'] ?? 0);
+                } else {
+                    throw new RuntimeException('Unexpected error during HTTP request!');
+                }
+            }
         }
 
         if ($this->cache_enabled && $this->response && empty($this->response['errors'])) {
