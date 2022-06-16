@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\fields;
 
@@ -21,50 +22,50 @@ use yii\db\Schema;
  */
 class SectionField extends Field implements PreviewableFieldInterface
 {
-	/**
-	 * @var bool Whether the field allows multiple selections.
-	 */
-	public bool $allowMultiple = false;
+    /**
+     * @var bool Whether the field allows multiple selections.
+     */
+    public bool $allowMultiple = false;
 
-	/**
-	 * @var array What sections have been whitelisted as selectable for this field.
-	 */
-	public array $whitelistedSections = [];
+    /**
+     * @var array What sections have been whitelisted as selectable for this field.
+     */
+    public array $whitelistedSections = [];
 
-	/**
-	 * @inheritdoc
-	 * @see craft\base\ComponentInterface
-	 */
-	public static function displayName(): string
-	{
-		return 'Section';
-	}
+    /**
+     * @inheritdoc
+     * @see craft\base\ComponentInterface
+     */
+    public static function displayName(): string
+    {
+        return 'Section';
+    }
 
-	/**
-	 * @inheritdoc
-	 * @see craft\base\Field
-	 */
-	public static function hasContentColumn(): bool
-	{
-		return true;
-	}
+    /**
+     * @inheritdoc
+     * @see craft\base\Field
+     */
+    public static function hasContentColumn(): bool
+    {
+        return true;
+    }
 
-	/**
-	 * @inheritdoc
-	 * @see craft\base\Field
-	 */
-	public function getContentColumnType(): string
-	{
-		return Schema::TYPE_STRING;
-	}
+    /**
+     * @inheritdoc
+     * @see craft\base\Field
+     */
+    public function getContentColumnType(): string
+    {
+        return Schema::TYPE_STRING;
+    }
 
     /**
      * @inheritdoc
      * @throws \Exception
      * @see craft\base\SavableComponentInterface
      */
-	public function getSettingsHtml(): string
-	{
+    public function getSettingsHtml(): string
+    {
         try {
             return Craft::$app->getView()->renderTemplate(
                 'alanrogers-tools/section-field/_settings',
@@ -78,47 +79,47 @@ class SectionField extends Field implements PreviewableFieldInterface
         }
     }
 
-	/**
-	 * @inheritdoc
-	 * @see craft\base\Field
-	 */
-	public function rules(): array
-	{
-		$rules = parent::rules();
-		$rules[] = [['whitelistedSections'], 'validateSectionWhitelist'];
-		return $rules;
-	}
-
-	/**
-	 * Ensures the section IDs selected for the whitelist are for valid sections.
-	 * @param string $attribute The name of the attribute being validated.
-	 * @return void
-	 */
-	public function validateSectionWhitelist(string $attribute) : void
+    /**
+     * @inheritdoc
+     * @see craft\base\Field
+     */
+    public function rules(): array
     {
-		$sections = $this->getSections();
+        $rules = parent::rules();
+        $rules[] = [['whitelistedSections'], 'validateSectionWhitelist'];
+        return $rules;
+    }
 
-		foreach ($this->whitelistedSections as $section) {
-			if (!isset($sections[$section])) {
-				$this->addError($attribute, 'Invalid section selected.');
-			}
-		}
-	}
+    /**
+     * Ensures the section IDs selected for the whitelist are for valid sections.
+     * @param string $attribute The name of the attribute being validated.
+     * @return void
+     */
+    public function validateSectionWhitelist(string $attribute): void
+    {
+        $sections = $this->getSections();
+
+        foreach ($this->whitelistedSections as $section) {
+            if (!isset($sections[$section])) {
+                $this->addError($attribute, 'Invalid section selected.');
+            }
+        }
+    }
 
     /**
      * @inheritdoc
      * @throws Exception
      * @see craft\base\Field
      */
-	public function getInputHtml($value, ElementInterface $element = null) : string
-	{
-		$sections = $this->getSections(); // Get all sections available to the current user.
-		$whitelist = array_flip($this->whitelistedSections); // Get all whitelisted sections.
-		$whitelist[''] = true; // Add a blank entry in, in case the field's options allow a 'None' selection.
-		if (!$this->allowMultiple && !$this->required) { // Add a 'None' option specifically for optional, single value fields.
-			$sections = [ '' => 'None' ] + $sections;
-		}
-		$whitelist = array_intersect_key($sections, $whitelist); // Discard any sections not available within the whitelist.
+    public function getInputHtml($value, ElementInterface $element = null): string
+    {
+        $sections = $this->getSections(); // Get all sections available to the current user.
+        $whitelist = array_flip($this->whitelistedSections); // Get all whitelisted sections.
+        $whitelist[''] = true; // Add a blank entry in, in case the field's options allow a 'None' selection.
+        if (!$this->allowMultiple && !$this->required) { // Add a 'None' option specifically for optional, single value fields.
+            $sections = ['' => 'None'] + $sections;
+        }
+        $whitelist = array_intersect_key($sections, $whitelist); // Discard any sections not available within the whitelist.
 
         try {
             return Craft::$app->getView()->renderTemplate(
@@ -133,16 +134,16 @@ class SectionField extends Field implements PreviewableFieldInterface
         }
     }
 
-	/**
-	 * @inheritdoc
-	 * @see craft\base\Field
-	 */
-	public function getElementValidationRules(): array
-	{
-		return [
-			['validateSections'],
-		];
-	}
+    /**
+     * @inheritdoc
+     * @see craft\base\Field
+     */
+    public function getElementValidationRules(): array
+    {
+        return [
+            ['validateSections'],
+        ];
+    }
 
     /**
      * Ensures the section IDs selected are available to the current user.
@@ -150,77 +151,77 @@ class SectionField extends Field implements PreviewableFieldInterface
      * @return void
      * @throws InvalidFieldException
      */
-	public function validateSections(ElementInterface $element)
-	{
-		$value = $element->getFieldValue($this->handle);
+    public function validateSections(ElementInterface $element)
+    {
+        $value = $element->getFieldValue($this->handle);
 
-		if (!is_array($value)) {
-			$value = [$value];
-		}
+        if (!is_array($value)) {
+            $value = [$value];
+        }
 
-		$sections = $this->getSections();
+        $sections = $this->getSections();
 
-		foreach ($value as $section) {
-			if (!isset($sections[$section])) {
-				$element->addError($this->handle, Craft::t('section-field', 'Invalid section selected.'));
-			}
-		}
-	}
+        foreach ($value as $section) {
+            if (!isset($sections[$section])) {
+                $element->addError($this->handle, Craft::t('section-field', 'Invalid section selected.'));
+            }
+        }
+    }
 
-	public function normalizeValue($value, ElementInterface $element = null)
-	{
-		// Convert string representation from db into plain array/int.
-		if (is_string($value)) {
-			$value = Json::decodeIfJson($value);
-		}
+    public function normalizeValue($value, ElementInterface $element = null)
+    {
+        // Convert string representation from db into plain array/int.
+        if (is_string($value)) {
+            $value = Json::decodeIfJson($value);
+        }
 
-		if (is_int($value)
-			&& $this->allowMultiple) {
-			// Int, but field allows multiple, convert to array.
-			$value = [$value];
-		} else if (is_array($value)
-			&& !$this->allowMultiple
-			&& count($value) == 1) {
-			// Array, but field allows only one, if single value, convert.
-			$value = intval($value[0]);
-		}
+        if (is_int($value)
+            && $this->allowMultiple) {
+            // Int, but field allows multiple, convert to array.
+            $value = [$value];
+        } else if (is_array($value)
+            && !$this->allowMultiple
+            && count($value) == 1) {
+            // Array, but field allows only one, if single value, convert.
+            $value = intval($value[0]);
+        }
 
-		// Convert string IDs to integers (for pre 1.1.0 data).
-		if (is_array($value)) {
-			foreach ($value as $key => $id) {
-				$value[$key] = intval($id);
-			}
-		}
+        // Convert string IDs to integers (for pre 1.1.0 data).
+        if (is_array($value)) {
+            foreach ($value as $key => $id) {
+                $value[$key] = intval($id);
+            }
+        }
 
-		return $value;
-	}
+        return $value;
+    }
 
     /**
      * @param $value
      * @param ElementInterface|null $element
      * @return string
      */
-	public function serializeValue($value, ElementInterface $element = null): string
+    public function serializeValue($value, ElementInterface $element = null): string
     {
-		// Convert string IDs to integers for storage.
-		if (is_array($value)) {
-			foreach ($value as $key => $id) {
-				$value[$key] = intval($id);
-			}
-		}
+        // Convert string IDs to integers for storage.
+        if (is_array($value)) {
+            foreach ($value as $key => $id) {
+                $value[$key] = intval($id);
+            }
+        }
 
-		return Json::encode($value);
-	}
+        return Json::encode($value);
+    }
 
-	/**
-	 * Retrieves all sections in an id-name pair, suitable for the underlying options display.
-	 */
-	private function getSections() : array
+    /**
+     * Retrieves all sections in an id-name pair, suitable for the underlying options display.
+     */
+    private function getSections(): array
     {
-		$sections = array();
-		foreach (Craft::$app->getSections()->getEditableSections() as $section) {
-			$sections[$section->id] = $section->name;
-		}
-		return $sections;
-	}
+        $sections = array();
+        foreach (Craft::$app->getSections()->getEditableSections() as $section) {
+            $sections[$section->id] = $section->name;
+        }
+        return $sections;
+    }
 }

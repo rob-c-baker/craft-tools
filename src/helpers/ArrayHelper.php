@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\helpers;
 
@@ -139,7 +140,7 @@ class ArrayHelper extends BaseHelper
                 $parts = explode('.', $k);
                 for ($p_idx = 0; $p_idx < count($parts); $p_idx++) {
                     if (strpos($parts[$p_idx], '[') !== false) {
-                        preg_match('/(.+)\[(\d+)\]/', $parts[$p_idx], $matches);
+                        preg_match('/(.+)\[(\d+)]/', $parts[$p_idx], $matches);
                         if (isset($matches[1], $matches[2])) {
                             $parts[$p_idx] = $matches[1];
                             $idx = $matches[2];

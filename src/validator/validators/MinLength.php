@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\validator\validators;
 
@@ -16,14 +17,14 @@ class MinLength extends Base
         }
 
         if (isset($this->options['strip_tags']) && $this->options['strip_tags']) {
-            $value = strip_tags($value);
+            $value = strip_tags((string) $value);
         }
 
-        $result = mb_strlen($value) >= $this->options['length'];
+        $result = mb_strlen((string) $value) >= $this->options['length'];
         if (!$result) {
             $report_val = $value;
-            if (mb_strlen($report_val) > 200) {
-                $report_val = mb_substr($report_val, 0, 200) . '...';
+            if (mb_strlen((string) $report_val) > 200) {
+                $report_val = mb_substr((string) $report_val, 0, 200) . '...';
             }
             $this->addError(sprintf(
                 'The value "%s" must be no shorter than %d characters.',

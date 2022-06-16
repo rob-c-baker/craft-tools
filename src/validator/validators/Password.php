@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\validator\validators;
 
@@ -55,27 +56,27 @@ class Password extends Base
 
         $this->setOptionProperties();
 
-        if (strlen($value) < $this->min_length) {
+        if (strlen((string) $value) < $this->min_length) {
             $this->addError(sprintf('Password needs to be at least %d characters.', $this->min_length));
             $is_valid = false;
         }
 
-        if (strlen($value) > $this->max_length) {
+        if (strlen((string) $value) > $this->max_length) {
             $this->addError(sprintf('Password needs to be less than %d characters.', $this->max_length));
             $is_valid = false;
         }
 
-        if ($this->check_case && !self::containsBothCases($value)) {
+        if ($this->check_case && !self::containsBothCases((string) $value)) {
             $this->addError('Password needs to contain both upper and lower case letters.');
             $is_valid = false;
         }
 
-        if ($this->check_numbers && !self::containsNumbers($value)) {
+        if ($this->check_numbers && !self::containsNumbers((string) $value)) {
             $this->addError('Password needs to contain at least 1 number.');
             $is_valid = false;
         }
 
-        if ($this->check_symbols && !self::containsSymbols($value)) {
+        if ($this->check_symbols && !self::containsSymbols((string) $value)) {
             $this->addError('Password needs to contain at least 1 symbol like @, !, *, !, etc.');
             $is_valid = false;
         }

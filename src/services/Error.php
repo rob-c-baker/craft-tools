@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\services;
 
@@ -146,6 +147,17 @@ class Error extends Component
         ]);
 
         return Craft::$app->getQueue()->priority(100)->push($msg) > 0;
+    }
+
+    /**
+     * Throws an exception with a message. This is not possible in Twig normally but theis method enables that
+     * @param string $exception_class_name
+     * @param string $message
+     * @return void
+     */
+    public function throwException(string $exception_class_name, string $message) : void
+    {
+        throw new $exception_class_name($message);
     }
 
     /**

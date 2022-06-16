@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\validator\validators;
 
@@ -33,7 +34,6 @@ class IntegerMinMax extends Base
            $result = Assertion::integerish($value);
         } catch (AssertionFailedException $e) {
             $this->addError('The value must be a whole number (integer).');
-            $result = false;
         }
 
         $result = $result && ($value >= $this->options['min'] && $value <= $this->options['max']);

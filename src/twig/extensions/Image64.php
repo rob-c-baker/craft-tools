@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\twig\extensions;
 
@@ -43,14 +44,14 @@ class Image64 extends AbstractExtension
      * Converts an Asset to a base64 string.
      * @param Asset $asset
      * @param bool $inline
-     * @return string
+     * @return string|null
      */
-    public static function asset64(Asset $asset, bool $inline = false) : string
+    public static function asset64(Asset $asset, bool $inline = false) : ?string
     {
         // Make sure the mime type is an image.
         if (0 !== strpos($asset->getMimeType(), 'image/')) {
             // Die quietly.
-            return false;
+            return null;
         }
 
         // Get the file.
@@ -58,7 +59,7 @@ class Image64 extends AbstractExtension
             return self::image64($asset->getVolume()->getRootPath() . DIRECTORY_SEPARATOR . $asset->getPath(), $asset->getExtension(), $inline);
         } catch (InvalidConfigException $e) {
             // cannot get the file / error of some sort... Shhhh:
-            return false;
+            return null;
         }
     }
 

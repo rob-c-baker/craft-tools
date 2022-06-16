@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\fields;
 
@@ -43,22 +44,27 @@ class TemplateSelectField extends Field
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml ()
+    public function getSettingsHtml(): ?string
     {
         // Render the settings template
-        return Craft::$app->getView()->renderTemplate(
-            'alanrogers-tools/template-select-field/components/fields/_settings.twig',
-            [
-                'field' => $this,
-            ]
-        );
+        try {
+            return Craft::$app->getView()->renderTemplate(
+                'alanrogers-tools/template-select-field/components/fields/_settings.twig',
+                [
+                    'field' => $this,
+                ]
+            );
+        } catch (LoaderError|RuntimeError|Exception|SyntaxError $e) {
+            Craft::error($e->getMessage(), 'template-select-field');
+        }
+        return null;
     }
 
     /**
      * @inheritdoc
      * @throws \Exception
      */
-    public function getInputHtml ($value, ElementInterface $element = null): string
+    public function getInputHtml($value, ElementInterface $element = null): string
     {
         // Get site templates path
         $templatesPath = $siteTemplatesPath = Craft::$app->path->getSiteTemplatesPath();

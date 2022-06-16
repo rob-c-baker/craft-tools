@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\validator\validators;
 
@@ -16,7 +17,7 @@ class PhoneNumber extends Base
             throw new \InvalidArgumentException('To use the PhoneNumber validator you must pass in an $options parameter to the constructor with with an array key of "iso2" containing a 2 letter country code.');
         }
 
-        $phone_number_service = new \modules\ar\services\PhoneNumber();
+        $phone_number_service = new \alanrogers\tools\services\PhoneNumber();
         $is_valid = $phone_number_service->validateFromString((string) $value, $this->options['iso2']);
 
         if (!$is_valid) {

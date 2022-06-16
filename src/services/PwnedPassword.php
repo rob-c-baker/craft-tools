@@ -1,10 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\services;
 
 use Craft;
 use yii\base\Component;
-use yii\caching\CacheInterface;
 
 /**
  * Class PwnedPassword

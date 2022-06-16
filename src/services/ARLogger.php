@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace alanrogers\tools\services;
 
@@ -67,7 +68,7 @@ class ARLogger
      * @param string|null $category
      * @return $this
      */
-    public function log(string $message, string $level=Logger::LEVEL_INFO, string $category=null) : ARLogger
+    public function log(string $message, int $level=Logger::LEVEL_INFO, string $category=null) : ARLogger
     {
         if ($category === null) {
             $category = $this->name;
