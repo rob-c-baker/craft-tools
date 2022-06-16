@@ -60,12 +60,12 @@ class CountryISOCode extends Base
         $this->options['standard'] = strtolower($this->options['standard']);
 
         if ($this->options['standard'] == 'iso2') {
-            $result = in_array($value, self::$iso2);
+            $result = in_array($value, self::$iso2, true);
             if (!$result) {
                 $this->addError(sprintf('"%.50s" is not a valid ISO2 country code.', $value));
             }
         } elseif ($this->options['standard'] == 'iso3') {
-            $result = in_array($value, self::$iso3);
+            $result = in_array($value, self::$iso3, true);
             if (!$result) {
                 $this->addError(sprintf('"%.50s" is not a valid ISO3 country code.', $value));
             }

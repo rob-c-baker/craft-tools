@@ -16,6 +16,6 @@ class UUID4 extends Base
         if (!$result) {
             $this->addError('Not a valid UUID v4');
         }
-        return $result;
+        return (bool) $result;
     }
 }
