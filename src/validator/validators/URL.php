@@ -16,7 +16,7 @@ class URL extends Base
         if (!$result) {
             $this->addError('Not a valid URL');
         }
-        return $result;
+        return $result !== false;
     }
 
 }

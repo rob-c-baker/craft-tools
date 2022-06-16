@@ -16,7 +16,7 @@ class Email extends Base
         if (!$result) {
             $this->addError(sprintf('%s is not a valid email address.', $value));
         }
-        return $result;
+        return $result !== false; // filter_var($value, FILTER_VALIDATE_EMAIL) returns the email if it's valid or false
     }
 
 }
