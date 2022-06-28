@@ -46,12 +46,13 @@ class VariableTools extends AbstractExtension
      * @param mixed $value the value to set
      * @return void
      */
-    public static function setKeyValue(&$target, $key, $value)
+    public static function setKeyValue($target, $key, $value)
     {
         if (is_array($target)) {
             $target[$key] = $value;
         } elseif (is_object($target)) {
             $target->$key = $value;
         }
+        return $target;
     }
 }
