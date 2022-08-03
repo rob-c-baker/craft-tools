@@ -39,7 +39,7 @@ class Extensions
             }
             return $value;
         }));
-        $twig->addFilter(new TwigFilter('hash', function($value, string $algorithm, array $options=[]) {
+        $twig->addFilter(new TwigFilter('str_hash', function($value, string $algorithm, array $options=[]) {
             return hash($algorithm, $value, false, $options);
         }));
 
