@@ -39,6 +39,9 @@ class Extensions
             }
             return $value;
         }));
+        $twig->addFilter(new TwigFilter('hash', function($value, string $algorithm, array $options=[]) {
+            return hash($algorithm, $value, false, $options);
+        }));
 
         try {
             $view->registerTwigExtension(new extensions\MaterialDesignIcons());
