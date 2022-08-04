@@ -18,15 +18,15 @@ composer_package:
     URL: "$CI_SERVER_PROTOCOL://$CI_SERVER_HOST:$CI_SERVER_PORT/api/v4/projects/$CI_PROJECT_ID/packages/composer?job_token=$CI_JOB_TOKEN"
   
   script:
-    - version=$(awk -F'"' '/"version"&#58; ".+"/{ print $4; exit; }' composer.json)
-    - insecure=$([ "$CI_SERVER_PROTOCOL" = "http" ] && echo "--insecure" || echo "")
-    - response=$(curl -s -w "\n%{http_code}" $insecure --data $version $URL)
-    - code=$(echo "$response" | tail -n 1)
-    - body=$(echo "$response" | head -n 1)
+    - VERSION=$(grep version composer.json | awk -F \" '{print $4}')
+    - INSECURE=$([ "$CI_SERVER_PROTOCOL" = "http" ] && echo "--insecure" || echo "")
+    - RESPONSE=$(curl -s -w "\n%{http_code}" $INSECURE --data $VERSION $URL)
+    - CODE=$(echo "$RESPONSE" | tail -n 1)
+    - BODY=$(echo "$RESPONSE" | head -n 1)
     # Output state information
-    - if [ $code -eq 201 ]; then
-        echo "Package created - Code $code - $body";
+    - if [ $CODE -eq 201 ]; then
+        echo "Package created - Code $CODE - $BODY";
       else
-        echo "Could not create package - Code $code - $body";
+        echo "Could not create package - Code $CODE - $BODY";
         exit 1;
       fi
