@@ -10,7 +10,7 @@ composer_package:
     - docker
 
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
 
   stage: package
 
@@ -20,7 +20,7 @@ composer_package:
   script:
     - VERSION=$(grep version composer.json | awk -F \" '{print $4}')
     - INSECURE=$([ "$CI_SERVER_PROTOCOL" = "http" ] && echo "--insecure" || echo "")
-    - RESPONSE=$(curl -s -w "\n%{http_code}" $INSECURE --data $VERSION $URL)
+    - RESPONSE=$(curl -s -w "\n%{http_code}" $INSECURE --data tag=$CI_COMMIT_TAG $URL)
     - CODE=$(echo "$RESPONSE" | tail -n 1)
     - BODY=$(echo "$RESPONSE" | head -n 1)
     # Output state information
