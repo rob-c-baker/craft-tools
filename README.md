@@ -46,7 +46,7 @@ And this is needed in `composer.json` to refer to the package repository for the
 Require this library with composer _(the latest tag from the main branch)_:
 
 ```shell
-composer require alanrogers/craft-tools:dev-main 
+composer require alanrogers/craft-tools
 ```
 
 Add something like the following to the parent Craft project's `config/app.php` file:
