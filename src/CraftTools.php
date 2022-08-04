@@ -33,8 +33,7 @@ class CraftTools extends Module
     public const MIGRATION_TRACK_NAME = 'craft-tools';
 
     /**
-     * Static property that is an instance of this module class so that it can be accessed via
-     * CraftTools::$instance
+     * Static property that is an instance of this module class so that it can be accessed via CraftTools::$instance
      * @var CraftTools
      */
     public static CraftTools $instance;

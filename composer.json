@@ -2,7 +2,7 @@
     "name": "alanrogers/craft-tools",
     "description": "A collection of tools used for our Craft sites.",
     "type": "library",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": "proprietary",
     "homepage": "https://gitlab.alanrogers.com/web-dev/craft-tools",
     "autoload": {
