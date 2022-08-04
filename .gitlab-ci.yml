@@ -18,7 +18,7 @@ composer_package:
     URL: "$CI_SERVER_PROTOCOL://$CI_SERVER_HOST:$CI_SERVER_PORT/api/v4/projects/$CI_PROJECT_ID/packages/composer?job_token=$CI_JOB_TOKEN"
   
   script:
-    - version=$(awk -F'"' '/"version"&#58; ".+"/{ print $4; exit; }' package.json)
+    - version=$(awk -F'"' '/"version"&#58; ".+"/{ print $4; exit; }' composer.json)
     - insecure=$([ "$CI_SERVER_PROTOCOL" = "http" ] && echo "--insecure" || echo "")
     - response=$(curl -s -w "\n%{http_code}" $insecure --data $version $URL)
     - code=$(echo "$response" | tail -n 1)
