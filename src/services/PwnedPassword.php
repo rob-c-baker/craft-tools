@@ -66,23 +66,30 @@ class PwnedPassword extends Component
      */
     private static function makeRequest(string $short_hash)
     {
-        $context = [
-            'http' => [
-                'method' => 'GET',
-                'header' =>
-                    "User-Agent: AlanRogersWebSite v1.0.0\r\n"
-                    . "Add-Padding: true\r\n"
-                    . "Accept-Encoding: gzip;q=1.0, *;q=0.5"
-            ]
-        ];
-
         $url = sprintf(self::API_URL, $short_hash);
 
-        $response = file_get_contents($url, false, stream_context_create($context));
+        // need to use curl for this (basic `file_get_contents()` approach with an HTTP stream does not work over TLS)
+        $c = curl_init();
 
-        // Is the string gzipped?
-        if (0 === mb_strpos($response, "\x1f" . "\x8b" . "\x08")) {
-            $response = gzdecode($response);
+        curl_setopt($c, CURLOPT_URL, $url);
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($c, CURLOPT_TIMEOUT, 5);
+        curl_setopt($c, CURLOPT_HTTPHEADER, [
+            'User-Agent: AlanRogersWebSite v1.0.0',
+            'Add-Padding: true'
+        ]);
+
+        // The contents of the "Accept-Encoding: " header. This enables decoding of the response. Supported encodings
+        // are "identity", "deflate", and "gzip". If an empty string, "", is set, a header containing all supported
+        // encoding types is sent.
+        curl_setopt($c, CURLOPT_ENCODING, '');
+
+        $response = curl_exec($c);
+        $http_code = (int) curl_getinfo($c,CURLINFO_HTTP_CODE);
+        curl_close($c);
+
+        if ($http_code !== 200) {
+            return '';
         }
 
         return $response;

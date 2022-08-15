@@ -23,6 +23,7 @@
         "docs": "https://gitlab.alanrogers.com/web-dev/craft-tools/-/wikis/home"
     },
     "require": {
+        "ext-curl": "*",
         "ext-dom": "*",
         "ext-zlib": "*",
         "beberlei/assert": "^3.2",
