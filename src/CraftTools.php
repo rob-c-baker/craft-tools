@@ -9,6 +9,7 @@ use alanrogers\tools\services\ServiceManager;
 use alanrogers\tools\twig\Extensions;
 use Craft;
 use craft\base\Model;
+use craft\web\Application as WebApplication;
 use craft\console\Application as Console;
 use craft\console\controllers\MigrateController;
 use craft\controllers\UsersController;
@@ -78,7 +79,9 @@ class CraftTools extends Module
         ]);
 
         // Register Twig stuff
-        Extensions::register();
+        Craft::$app->on(WebApplication::EVENT_INIT, function() {
+            Extensions::register();
+        });
 
         // Our custom fields
         FieldRegister::registerFields();

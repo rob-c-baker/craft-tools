@@ -27,7 +27,7 @@
         "ext-dom": "*",
         "ext-zlib": "*",
         "beberlei/assert": "^3.2",
-        "craftcms/cms": "^3.7.0|^4.0.0",
+        "craftcms/cms": "^4.2.0",
         "giggsey/libphonenumber-for-php": "^8.12",
         "google/apiclient": "^2.4",
         "guzzlehttp/guzzle": "^7.2.0",
