@@ -4,12 +4,14 @@ declare(strict_types=1);
 namespace alanrogers\tools\services;
 
 use Craft;
-use craft\log\MonologTarget;
+use yii\log\FileTarget;
 use yii\log\Logger;
 
 class ARLogger
 {
     public const DEFAULT_LOG_NAME = 'ar';
+
+    public const LOG_FILE_PATH = '@storage/logs/';
 
     /**
      * @var array<string, ARLogger>
@@ -28,26 +30,25 @@ class ARLogger
     public function __construct(string $name)
     {
         $this->name = $name;
+        $log_filename = $this->name . '.log';
 
-        // Create a new file target and add the new file target to the log dispatcher
-        Craft::getLogger()->dispatcher->targets[$this->name] = new MonologTarget([
-            'name' => $this->name,
+        // Create a new target and add the new file target to the log dispatcher
+        $target = new FileTarget([
+            'logFile' => self::LOG_FILE_PATH . $log_filename,
             'categories' => [ $this->name ],
-            'logContext' => false,
-            'allowLineBreaks' => false,
-            'maxFiles' => 20 // greater than set in logrotate
+            'enableRotation' => false
         ]);
+        Craft::getLogger()->dispatcher->targets[$this->name] = $target;
     }
 
     /**
      * @param string $name
-     * @param array|null $config Optional additional config to set-up log target
      * @return ARLogger
      */
-    public static function getInstance(string $name=self::DEFAULT_LOG_NAME, ?array $config=null) : ARLogger
+    public static function getInstance(string $name=self::DEFAULT_LOG_NAME) : ARLogger
     {
         if (!isset(self::$instances[$name])) {
-            self::$instances[$name] = new self($name, $config['logFile'] ?? null, $config['categories'] ?? null);
+            self::$instances[$name] = new self($name);
         }
         return self::$instances[$name];
     }
