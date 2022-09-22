@@ -151,7 +151,7 @@ class SectionField extends Field implements PreviewableFieldInterface
      * @return void
      * @throws InvalidFieldException
      */
-    public function validateSections(ElementInterface $element)
+    public function validateSections(ElementInterface $element): void
     {
         $value = $element->getFieldValue($this->handle);
 
@@ -168,7 +168,7 @@ class SectionField extends Field implements PreviewableFieldInterface
         }
     }
 
-    public function normalizeValue($value, ElementInterface $element = null)
+    public function normalizeValue($value, ?ElementInterface $element = null) : mixed
     {
         // Convert string representation from db into plain array/int.
         if (is_string($value)) {

@@ -23,6 +23,7 @@
         "docs": "https://gitlab.alanrogers.com/web-dev/craft-tools/-/wikis/home"
     },
     "require": {
+        "php": "^8.1",
         "ext-curl": "*",
         "ext-dom": "*",
         "ext-zlib": "*",

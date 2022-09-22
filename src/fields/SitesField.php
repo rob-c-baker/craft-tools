@@ -197,7 +197,7 @@ class SitesField extends Field implements PreviewableFieldInterface
     /**
      * @inheritdoc
      */
-    public function normalizeValue($value, ElementInterface $element = null)
+    public function normalizeValue($value, ?ElementInterface $element = null) : mixed
     {
         if (is_array($value)) {
             return $value;
@@ -209,7 +209,7 @@ class SitesField extends Field implements PreviewableFieldInterface
     /**
      * @inheritdoc
      */
-    public function serializeValue($value, ElementInterface $element = null)
+    public function serializeValue($value, ?ElementInterface $element = null) : mixed
     {
         if (is_array($value)) {
             return implode(',', $value);
@@ -221,7 +221,7 @@ class SitesField extends Field implements PreviewableFieldInterface
     /**
      * @inheritdoc
      */
-    public function modifyElementsQuery(ElementQueryInterface $query, $value)
+    public function modifyElementsQuery(ElementQueryInterface $query, mixed $value) : void
     {
         // modify the query when called in template or in PHP
 
