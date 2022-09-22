@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace alanrogers\tools\queue\jobs;
 
 use Craft;
+use craft\mail\Message;
 use craft\queue\BaseJob;
 use yii\queue\RetryableJobInterface;
-use yii\swiftmailer\Message;
 
 class SendCustomEmail extends BaseJob implements RetryableJobInterface
 {
@@ -54,7 +54,7 @@ class SendCustomEmail extends BaseJob implements RetryableJobInterface
     /**
      * @inheritDoc
      */
-    public function execute($queue)
+    public function execute($queue) : void
     {
         $message = new Message();
 
