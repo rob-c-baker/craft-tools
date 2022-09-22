@@ -4,14 +4,12 @@ declare(strict_types=1);
 namespace alanrogers\tools\services;
 
 use Craft;
-use craft\log\FileTarget;
+use craft\log\MonologTarget;
 use yii\log\Logger;
 
 class ARLogger
 {
     public const DEFAULT_LOG_NAME = 'ar';
-
-    public const LOG_FILE_PATH = '@storage/logs/';
 
     /**
      * @var array<string, ARLogger>
@@ -26,26 +24,18 @@ class ARLogger
     /**
      * ARLogger constructor.
      * @param string $name
-     * @param string|null $log_filename defaults to "${name}.log"
-     * @param array|null $log_category_patterns defaults to [ $name ]
      */
-    public function __construct(string $name, string $log_filename=null, ?array $log_category_patterns=null)
+    public function __construct(string $name)
     {
         $this->name = $name;
 
-        if ($log_category_patterns === null) {
-            $log_category_patterns = [ $name ];
-        }
-
-        if ($log_filename === null) {
-            $log_filename = $this->name . '.log';
-        }
-
         // Create a new file target and add the new file target to the log dispatcher
-        Craft::getLogger()->dispatcher->targets[] = new FileTarget([
-            'logFile' => self::LOG_FILE_PATH . $log_filename,
-            'categories' => $log_category_patterns,
-            'enableRotation' => false // we assume this is being done by the OS.
+        Craft::getLogger()->dispatcher->targets[$this->name] = new MonologTarget([
+            'name' => $this->name,
+            'categories' => [ $this->name ],
+            'logContext' => false,
+            'allowLineBreaks' => false,
+            'maxFiles' => 20 // greater than set in logrotate
         ]);
     }
 
@@ -64,46 +54,39 @@ class ARLogger
 
     /**
      * @param string $message
-     * @param string|int $level
-     * @param string|null $category
+     * @param int $level
      * @return $this
      */
-    public function log(string $message, int $level=Logger::LEVEL_INFO, string $category=null) : ARLogger
+    public function log(string $message, int $level=Logger::LEVEL_INFO) : ARLogger
     {
-        if ($category === null) {
-            $category = $this->name;
-        }
-        Craft::getLogger()->log($message, $level, $category);
+        Craft::getLogger()->log($message, $level, $this->name);
         return $this;
     }
 
     /**
      * @param string $message
-     * @param string|null $category defaults to the name of the logger
      * @return $this
      */
-    public function info(string $message, string $category=null) : ARLogger
+    public function info(string $message) : ARLogger
     {
-        return $this->log($message, Logger::LEVEL_INFO, $category);
+        return $this->log($message, Logger::LEVEL_INFO);
     }
 
     /**
      * @param string $message
-     * @param string|null $category defaults to the name of the logger
      * @return $this
      */
-    public function warning(string $message, string $category=null) : ARLogger
+    public function warning(string $message) : ARLogger
     {
-        return $this->log($message, Logger::LEVEL_WARNING, $category);
+        return $this->log($message, Logger::LEVEL_WARNING);
     }
 
     /**
      * @param string $message
-     * @param string|null $category defaults to the name of the logger
      * @return $this
      */
-    public function error(string $message, string $category=null) : ARLogger
+    public function error(string $message) : ARLogger
     {
-        return $this->log($message, Logger::LEVEL_ERROR, $category);
+        return $this->log($message, Logger::LEVEL_ERROR);
     }
 }
