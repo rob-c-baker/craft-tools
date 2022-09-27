@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace alanrogers\tools\services;
 
 use Craft;
-use yii\log\FileTarget;
+use craft\log\MonologTarget;
 use yii\log\Logger;
+use Psr\Log\LogLevel;
 
 class ARLogger
 {
+    public const DEFAULT_MAX_FILES = 10;
     public const DEFAULT_LOG_NAME = 'ar';
-
-    public const LOG_FILE_PATH = '@storage/logs/';
 
     /**
      * @var array<string, ARLogger>
@@ -27,16 +27,29 @@ class ARLogger
      * ARLogger constructor.
      * @param string $name
      */
-    public function __construct(string $name)
+    public function __construct(string $name=self::DEFAULT_LOG_NAME)
     {
         $this->name = $name;
-        $log_filename = $this->name . '.log';
+
+        // already an instance with this name created, so the MonologTarget will have already been added
+        if (isset(Craft::getLogger()->dispatcher->targets[$this->name])) {
+            return;
+        }
+
+        if (isset(Craft::getLogger()->dispatcher->monologTargetConfig['maxFiles'])) {
+            $max_files = (int) Craft::getLogger()->dispatcher->monologTargetConfig['maxFiles'];
+        } else {
+            $max_files = self::DEFAULT_MAX_FILES;
+        }
 
         // Create a new target and add the new file target to the log dispatcher
-        $target = new FileTarget([
-            'logFile' => self::LOG_FILE_PATH . $log_filename,
+        $target = new MonologTarget([
+            'name' => $this->name,
             'categories' => [ $this->name ],
-            'enableRotation' => false
+            'level' => LogLevel::INFO,
+            'logContext' => false,
+            'allowLineBreaks' => false,
+            'maxFiles' => $max_files
         ]);
         Craft::getLogger()->dispatcher->targets[$this->name] = $target;
     }
