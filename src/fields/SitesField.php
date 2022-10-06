@@ -197,7 +197,7 @@ class SitesField extends Field implements PreviewableFieldInterface
     /**
      * @inheritdoc
      */
-    public function normalizeValue($value, ?ElementInterface $element = null) : mixed
+    public function normalizeValue(mixed $value, ?ElementInterface $element = null) : array
     {
         if (is_array($value)) {
             return $value;

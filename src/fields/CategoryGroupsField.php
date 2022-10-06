@@ -118,7 +118,7 @@ class CategoryGroupsField extends Field implements PreviewableFieldInterface
      * @inheritdoc
      * @throws \Exception
      */
-    public function normalizeValue($value, ?ElementInterface $element = null): mixed
+    public function normalizeValue(mixed $value, ?ElementInterface $element = null): mixed
     {
         if ($value === null) {
             return null;
