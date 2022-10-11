@@ -118,7 +118,7 @@ class CategoryGroupsField extends Field implements PreviewableFieldInterface
      * @inheritdoc
      * @throws \Exception
      */
-    public function normalizeValue($value, ElementInterface $element = null)
+    public function normalizeValue(mixed $value, ElementInterface $element = null) : mixed
     {
         if ($value === null) {
             return null;
@@ -169,14 +169,14 @@ class CategoryGroupsField extends Field implements PreviewableFieldInterface
     /**
      * @inheritdoc
      */
-    public function serializeValue($value, ElementInterface $element = null)
+    public function serializeValue(mixed $value, ElementInterface $element = null) : mixed
     {
         if ($value instanceof CategoryGroup) {
             // Single selection is enabled, but return an array anyway, in case that setting is disabled in the future
             return [$value->id];
         }
 
-        return $value !== null ? $value->ids() : null;
+        return $value?->ids();
     }
 
     private function _getGroupsSettingsData(array $groups): array

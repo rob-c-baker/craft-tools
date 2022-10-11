@@ -168,7 +168,7 @@ class SectionField extends Field implements PreviewableFieldInterface
         }
     }
 
-    public function normalizeValue($value, ElementInterface $element = null)
+    public function normalizeValue(mixed $value, ElementInterface $element = null) : mixed
     {
         // Convert string representation from db into plain array/int.
         if (is_string($value)) {
