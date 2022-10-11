@@ -203,7 +203,7 @@ class SitesField extends Field implements PreviewableFieldInterface
             return $value;
         }
 
-        return array_map('intval', explode(',', $value));
+        return array_map('intval', explode(',', (string) $value));
     }
 
     /**
