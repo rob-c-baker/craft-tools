@@ -7,9 +7,17 @@ use craft\helpers\ArrayHelper;
 use RuntimeException;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use Twig\TwigTest;
 
 class VariableTools extends AbstractExtension
 {
+    public function getTests() : array
+    {
+        return [
+            'instanceof' => new TwigTest('instanceof', [ VariableTools::class, 'isInstanceof' ])
+        ];
+    }
+
     public function getFunctions() : array
     {
         return [
@@ -24,6 +32,17 @@ class VariableTools extends AbstractExtension
                 [ 'needs_context' => true ]
             ),
         ];
+    }
+
+    /**
+     * Checks if $variable is an instanceof $classname
+     * @param mixed $variable
+     * @param string $classname
+     * @return bool
+     */
+    public static function isInstanceof(mixed $variable, string $classname) : bool
+    {
+        return $variable instanceof $classname;
     }
 
     /**
