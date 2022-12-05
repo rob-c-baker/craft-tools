@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace alanrogers\tools\services;
 
 use alanrogers\tools\helpers\BaseHelper;
+use alanrogers\tools\helpers\HelperInterface;
 use RuntimeException;
 use yii\base\InvalidArgumentException;
 
@@ -95,9 +96,9 @@ class ServiceManager
     /**
      * Method generally called by twig to get an instance of a helper
      * @param string $name
-     * @return BaseHelper
+     * @return BaseHelper|HelperInterface
      */
-    public function helper(string $name) : BaseHelper
+    public function helper(string $name) : BaseHelper|HelperInterface
     {
         $class_name = '';
         foreach (self::$_helper_namespaces as $ns) {
