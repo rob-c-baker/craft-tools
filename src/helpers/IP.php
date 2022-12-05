@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace alanrogers\tools\helpers;
 
-class IP
+class IP implements HelperInterface
 {
     /**
      * Is the supplied ip address a "local" address - NOT public.

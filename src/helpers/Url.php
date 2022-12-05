@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace alanrogers\tools\helpers;
 
-class Url
+class Url implements HelperInterface
 {
     /**
      * Opposite of parse_url() with one parameter. Re-builds a URL.

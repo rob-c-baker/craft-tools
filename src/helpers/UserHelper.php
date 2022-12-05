@@ -9,7 +9,7 @@ use Craft;
 use craft\elements\User;
 use InvalidArgumentException;
 
-class UserHelper
+class UserHelper implements HelperInterface
 {
     /**
      * Sends (adds jobs to queue) an email to each member of the specified group
