@@ -103,6 +103,9 @@ class ServiceManager
         $class_name = '';
         foreach (self::$_helper_namespaces as $ns) {
             $class_name = $ns . $name;
+            if (isset(self::$_helpers[$class_name])) {
+                return self::$_helpers[$class_name];
+            }
             if (class_exists($class_name)) {
                 self::$_helpers[$class_name] = new $class_name();
                 break;
