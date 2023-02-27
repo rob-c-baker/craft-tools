@@ -29,7 +29,7 @@ class MaterialDesignIcons extends Component
         $path = rtrim(getenv('STATIC_PATH'), '/') . '/'  . trim($path, '/');
         $real_path = realpath($path);
         if ($real_path === false) {
-            throw new Exception("SVG Path: \"${$path}\" does not exist.");
+            throw new Exception("SVG Path: \"$path\" does not exist.");
         }
         self::$svg_path = $real_path;
     }
