@@ -5,6 +5,7 @@ namespace alanrogers\tools\services;
 
 use DOMDocument;
 use DOMElement;
+use Exception;
 use RuntimeException;
 use yii\base\Component;
 
@@ -21,14 +22,16 @@ class MaterialDesignIcons extends Component
     /**
      * Sets path relative to WEB_ROOT
      * @param string $path
+     * @throws Exception
      */
     public static function setSVGPath(string $path): void
     {
         $path = rtrim(getenv('STATIC_PATH'), '/') . '/'  . trim($path, '/');
-        self::$svg_path = realpath($path);
-        if (self::$svg_path === false) {
-            throw new RuntimeException('The path supplied does not exist.');
+        $real_path = realpath($path);
+        if ($real_path === false) {
+            throw new Exception("SVG Path: \"${$path}\" does not exist.");
         }
+        self::$svg_path = $real_path;
     }
 
     /**
