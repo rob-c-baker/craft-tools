@@ -47,11 +47,8 @@ class Extensions
         // Twig perversion plugin: https://github.com/marionnewlevant/craft-twig_perversion
         $view->registerTwigExtension(new TwigPerversionTwigExtension());
 
-        try {
-            $view->registerTwigExtension(new extensions\MaterialDesignIcons());
-        } catch (Exception $e) {
-            Craft::error($e->getMessage(), 'MaterialDesignIcons');
-        }
+        // Material Design icons
+        $view->registerTwigExtension(new extensions\MaterialDesignIcons());
 
         // Deep merge ability
         $view->registerTwigExtension(new DeepMerge());
