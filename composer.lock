@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1f33f7ffaa2bcbf6cbd4639467a6c6ab",
+    "content-hash": "39855e630011913382e4a587e70e0ff1",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -2552,6 +2552,61 @@
                 "source": "https://github.com/thephpleague/oauth2-client/tree/2.6.1"
             },
             "time": "2021-12-22T16:42:49+00:00"
+        },
+        {
+            "name": "marionnewlevant/twig-perversion",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/marionnewlevant/craft-twig_perversion.git",
+                "reference": "66e9dcfb4fe67cdcfa9e4e683e8f957c6aa720dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/marionnewlevant/craft-twig_perversion/zipball/66e9dcfb4fe67cdcfa9e4e683e8f957c6aa720dc",
+                "reference": "66e9dcfb4fe67cdcfa9e4e683e8f957c6aa720dc",
+                "shasum": ""
+            },
+            "require": {
+                "craftcms/cms": "^4.0"
+            },
+            "type": "craft-plugin",
+            "extra": {
+                "handle": "twig-perversion",
+                "name": "Twig Perversion",
+                "schemaVersion": "1.0.0",
+                "hasSettings": false,
+                "hasCpSection": false,
+                "documentationUrl": "https://github.com/marionnewlevant/craft-twig_perversion/blob/v2/README.md",
+                "changelogUrl": "https://raw.githubusercontent.com/marionnewlevant/craft-twig_perversion/v2/CHANGELOG.md"
+            },
+            "autoload": {
+                "psr-4": {
+                    "marionnewlevant\\twigperversion\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marion Newlevant",
+                    "homepage": "http://marion.newlevant.com"
+                }
+            ],
+            "description": "Making twig do things it really shouldn't",
+            "keywords": [
+                "Craft",
+                "craftcms",
+                "plugin",
+                "twigperversion"
+            ],
+            "support": {
+                "issues": "https://github.com/marionnewlevant/craft-twig_perversion/issues",
+                "source": "https://github.com/marionnewlevant/craft-twig_perversion/tree/v3.0.0"
+            },
+            "time": "2022-05-20T05:33:54+00:00"
         },
         {
             "name": "mikehaertl/php-shellcommand",
@@ -7350,6 +7405,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
+        "php": "^8.1",
         "ext-curl": "*",
         "ext-dom": "*",
         "ext-zlib": "*"

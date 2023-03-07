@@ -32,6 +32,7 @@
         "giggsey/libphonenumber-for-php": "^8.12",
         "google/apiclient": "^2.4",
         "guzzlehttp/guzzle": "^7.2.0",
+        "marionnewlevant/twig-perversion": "^3.0",
         "symfony/var-dumper": "v5.4.6",
         "yiisoft/yii2-redis": "~2.0.0"
     },

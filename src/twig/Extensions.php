@@ -10,6 +10,7 @@ use Craft;
 use Exception;
 use alanrogers\tools\twig\extensions\DeepMerge;
 use alanrogers\tools\twig\extensions\Inline;
+use marionnewlevant\twigperversion\twigextensions\TwigPerversionTwigExtension;
 use Twig\TwigFilter;
 
 class Extensions
@@ -42,6 +43,9 @@ class Extensions
         $twig->addFilter(new TwigFilter('str_hash', function($value, string $algorithm, array $options=[]) {
             return hash($algorithm, $value, false, $options);
         }));
+
+        // Twig perversion plugin: https://github.com/marionnewlevant/craft-twig_perversion
+        $view->registerTwigExtension(new TwigPerversionTwigExtension());
 
         try {
             $view->registerTwigExtension(new extensions\MaterialDesignIcons());
