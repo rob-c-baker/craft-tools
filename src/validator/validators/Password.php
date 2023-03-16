@@ -48,6 +48,66 @@ class Password extends Base
     private bool $check_pwned_db = self::DEFAULT_CHECK_PWNED_DB;
 
     /**
+     * @var array<string, string>
+     */
+    private static array $criteria_messages = [
+        'min_length' => [
+            'error' => 'Password needs to be at least %d characters.'
+        ],
+        'max_length' => [
+            'error' => 'Password needs to be less than %d characters.'
+        ],
+        'check_case' => [
+            'error' => 'Password needs to contain both upper and lower case letters.'
+        ],
+        'check_numbers' => [
+            'error' => 'Password needs to contain at least 1 number.'
+        ],
+        'check_symbols' => [
+            'error' => 'Password needs to contain at least 1 symbol like @, !, *, !, etc.'
+        ],
+        'check_pwned_db' => [
+            'error' => 'Password appears in a previously exposed 3rd party data breach %d times. See: https://haveibeenpwned.com/Passwords',
+            'explanation' => 'Password must not have been exposed in a 3rd party data breach. See: <a href="https://haveibeenpwned.com/Passwords" target="_blank">https://haveibeenpwned.com/Passwords</a>'
+        ]
+    ];
+
+    /**
+     * Gets the criteria messages for passwords based on what's enabled via defaults and `$this->options`.
+     * This is so, for example, we can show the criteria on the front-end before a user tries to set a password.
+     * Note: messages may include HTML.
+     * @return array
+     */
+    public function getCriteriaMessages() : array
+    {
+        $this->setOptionProperties();
+
+        // add unconditional ones first
+        $messages = [
+            self::$criteria_messages['min_length']['error'],
+            self::$criteria_messages['max_length']['error'],
+        ];
+
+        if ($this->check_case) {
+            $messages[] = self::$criteria_messages['check_case']['error'];
+        }
+
+        if ($this->check_numbers) {
+            $messages[] = self::$criteria_messages['check_numbers']['error'];
+        }
+
+        if ($this->check_symbols) {
+            $messages[] = self::$criteria_messages['check_symbols']['error'];
+        }
+
+        if ($this->check_pwned_db) {
+            $messages[] = self::$criteria_messages['check_pwned_db']['explanation'];
+        }
+
+        return $messages;
+    }
+
+    /**
      * @inheritDoc
      */
     protected function validate($value) : bool
@@ -57,35 +117,34 @@ class Password extends Base
         $this->setOptionProperties();
 
         if (strlen((string) $value) < $this->min_length) {
-            $this->addError(sprintf('Password needs to be at least %d characters.', $this->min_length));
+            $this->addError(sprintf(self::$criteria_messages['min_length']['error'], $this->min_length));
             $is_valid = false;
         }
 
         if (strlen((string) $value) > $this->max_length) {
-            $this->addError(sprintf('Password needs to be less than %d characters.', $this->max_length));
+            $this->addError(sprintf(self::$criteria_messages['max_length']['error'], $this->max_length));
             $is_valid = false;
         }
 
         if ($this->check_case && !self::containsBothCases((string) $value)) {
-            $this->addError('Password needs to contain both upper and lower case letters.');
+            $this->addError(self::$criteria_messages['check_case']['error']);
             $is_valid = false;
         }
 
         if ($this->check_numbers && !self::containsNumbers((string) $value)) {
-            $this->addError('Password needs to contain at least 1 number.');
+            $this->addError(self::$criteria_messages['check_numbers']['error']);
             $is_valid = false;
         }
 
         if ($this->check_symbols && !self::containsSymbols((string) $value)) {
-            $this->addError('Password needs to contain at least 1 symbol like @, !, *, !, etc.');
+            $this->addError(self::$criteria_messages['check_symbols']['error']);
             $is_valid = false;
         }
 
         if ($this->check_pwned_db) {
             $password_count = PwnedPassword::isPasswordPwned($value);
             if ($password_count > 0) {
-                $msg = 'Password appears in a previously exposed 3rd party data breach %d times. See: https://haveibeenpwned.com/Passwords';
-                $this->addError(sprintf($msg, $password_count));
+                $this->addError(sprintf(self::$criteria_messages['check_pwned_db']['error'], $password_count));
                 $is_valid = false;
             } /*elseif ($password_count === false) {
                 // @todo there was no response from Pwned API
