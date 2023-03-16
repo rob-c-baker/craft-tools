@@ -84,8 +84,8 @@ class Password extends Base
 
         // add unconditional ones first
         $messages = [
-            self::$criteria_messages['min_length']['error'],
-            self::$criteria_messages['max_length']['error'],
+            sprintf(self::$criteria_messages['min_length']['error'], $this->min_length),
+            sprintf(self::$criteria_messages['max_length']['error'], $this->max_length),
         ];
 
         if ($this->check_case) {
