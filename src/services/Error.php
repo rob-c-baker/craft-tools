@@ -32,7 +32,7 @@ class Error extends Component
         $error_record->ip_address = $ip_address;
         $error_record->message = $message;
         $error_record->stack = $stack;
-        $error_record->other_data = Json::encode($other_data);
+        $error_record->other_data = Json::encode($other_data, JSON_INVALID_UTF8_SUBSTITUTE);
 
         return $error_record->save();
     }
@@ -89,7 +89,7 @@ class Error extends Component
             $error_record->message = $e->getMessage();
         }
         $error_record->stack = $e->getTraceAsString();
-        $error_record->other_data = Json::encode($other_data);
+        $error_record->other_data = Json::encode($other_data, JSON_INVALID_UTF8_SUBSTITUTE);
 
         $result = $error_record->save();
 
