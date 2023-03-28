@@ -40,9 +40,8 @@ trait ErrorManagementTrait
     /**
      * @param string|string[] $msg
      * @param string|null $key If passed in, will add to an error array under that key
-     * @return $this
      */
-    public function addError($msg, ?string $key=null) : self
+    public function addError(array|string $msg, ?string $key=null) : self
     {
         if (is_array($msg)) {
             foreach ($msg as $m) {
@@ -60,7 +59,6 @@ trait ErrorManagementTrait
 
     /**
      * @param array<string[]> $errors
-     * @return $this
      */
     public function addErrors(array $errors) : self
     {
@@ -80,9 +78,6 @@ trait ErrorManagementTrait
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function clearErrors() : self
     {
         $this->errors = [];

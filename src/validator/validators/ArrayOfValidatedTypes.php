@@ -19,13 +19,20 @@ class ArrayOfValidatedTypes extends Base
         $validator = $this->options['validator'];
         $result = true;
 
-        foreach ($value as $idx => $val) {
-            $valid = $validator->validate($val);
-            if (!$valid) {
-                foreach ($validator->getErrors() as $error) {
-                    $this->addError(sprintf('At index [%d]: %s', $idx, $error));
+        if (!is_array($value)) {
+            $this->addError(sprintf('Validator value must be of type array, it is currently of type "%s".', gettype($value)));
+            $result = false;
+        }
+
+        if ($result) {
+            foreach ($value as $idx => $val) {
+                $valid = $validator->validate($val);
+                if (!$valid) {
+                    foreach ($validator->getErrors() as $error) {
+                        $this->addError(sprintf('At index [%d]: %s', $idx, $error));
+                    }
+                    $result = false;
                 }
-                $result = false;
             }
         }
 
