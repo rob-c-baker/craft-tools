@@ -100,7 +100,12 @@ class Error extends Component
                 get_class($e),
                 getenv('SITE_URL')
             );
-            $message = $e->getMessage()
+            if (Craft::$app->getRequest()->isConsoleRequest) {
+                $message = '[Console Request]' . "\n\n";
+            } else {
+                $message = 'URL: ' . Craft::$app->getRequest()->getAbsoluteUrl() . "\n\n";
+            }
+            $message .= $e->getMessage()
                 . "\n\n"
                 . 'File: "' . $e->getFile() . '" Line: ' . $e->getLine()
                 . "\n\n"
