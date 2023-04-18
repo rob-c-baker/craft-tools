@@ -42,7 +42,7 @@ class RateLimiter
     /**
      * @var Connection|null
      */
-    private Connection $redis;
+    private ?Connection $redis;
 
     /**
      * @param string $name

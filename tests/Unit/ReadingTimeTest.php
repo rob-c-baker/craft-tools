@@ -32,7 +32,6 @@ class ReadingTimeTest extends \Codeception\Test\Unit
     {
     }
 
-    // tests
     public function testFormatImplode()
     {
         $reading_time = new ReadingTime(self::LONG_TEXT, [

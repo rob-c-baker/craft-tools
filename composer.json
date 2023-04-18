@@ -39,7 +39,8 @@
     "require-dev": {
         "codeception/codeception": "^5.0",
         "codeception/module-phpbrowser": "*",
-        "codeception/module-asserts": "*"
+        "codeception/module-asserts": "*",
+        "vlucas/phpdotenv": "^5.0"
     },
     "scripts": {
         "post-update-cmd": "Google\\Task\\Composer::cleanup"

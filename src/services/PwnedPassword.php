@@ -28,7 +28,7 @@ class PwnedPassword extends Component
      * @param string $password
      * @return int | false
      */
-    public static function isPasswordPwned(string $password)
+    public static function isPasswordPwned(string $password) : bool|int
     {
         $cache = Craft::$app->getCache();
         $long_hash = self::makeHash($password);
@@ -64,7 +64,7 @@ class PwnedPassword extends Component
      * @param string $short_hash
      * @return false|string
      */
-    private static function makeRequest(string $short_hash)
+    private static function makeRequest(string $short_hash) : bool|string
     {
         $url = sprintf(self::API_URL, $short_hash);
 
