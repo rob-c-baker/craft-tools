@@ -30,7 +30,7 @@ run_tests:
     - apt-get update && apt-get install -qqy git unzip
 
     # Extensions we need that are not included in image
-    - pecl install bcmath && docker-php-ext-enable bcmath
+    - docker-php-ext-install bcmath && docker-php-ext-enable bcmath
 
     # Install composer
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
