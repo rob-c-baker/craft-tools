@@ -10,6 +10,9 @@ run_tests:
     # clear image entrypoint so bash is accessible
     entrypoint: [ "" ]
 
+  tags:
+    - docker
+
   stage: test
 
   cache:
@@ -32,6 +35,8 @@ run_tests:
 
     # Run the test suite
     - vendor/bin/codecept run acceptance --xml --html
+
+
 
 # Publishes a tag/branch to Composer Packages of the current project
 composer_package:
