@@ -5,10 +5,7 @@ stages:
 # Runs out codeception test suite (just unit tests implemented for now)
 run_tests:
 
-  image:
-    name: codeception/codeception
-    # clear image entrypoint so bash is accessible
-    entrypoint: [ "" ]
+  image: php:8.1
 
   tags:
     - docker
@@ -28,10 +25,17 @@ run_tests:
     reports:
       junit: tests/_output/report.xml
 
-  script:
+  before_script:
+    # Install git and unzip (composer will need them)
+    - apt-get update && apt-get install -qqy git unzip 
+
+    # Install composer
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
     # Install all project dependencies
     - composer install
+
+  script:
 
     # Run the test suite
     - vendor/bin/codecept run acceptance --xml --html
