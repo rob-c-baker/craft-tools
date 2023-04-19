@@ -43,7 +43,7 @@ run_tests:
   script:
 
     # Run the test suite
-    - vendor/bin/codecept run acceptance --xml --html
+    - vendor/bin/codecept run --xml --html
 
 
 
