@@ -26,8 +26,8 @@ run_tests:
       junit: tests/_output/report.xml
 
   before_script:
-    # Install git and unzip (composer will need them)
-    - apt-get update && apt-get install -qqy git unzip
+    # Install git and unzip (composer will need them) and dependencies for extensions etc
+    - apt-get update && apt-get install -qqy git unzip libicu-dev
 
     # Extensions we need that are not included in image
     - docker-php-ext-install bcmath && docker-php-ext-enable bcmath
