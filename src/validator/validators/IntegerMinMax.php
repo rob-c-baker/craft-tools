@@ -16,7 +16,7 @@ class IntegerMinMax extends Base
      * ...Leaving an options out is fine - it will revert to default.
      * @inheritDoc
      */
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
         if (!isset($this->options['min'])) {
             // min defaults to 0, unless otherwise specified
@@ -28,12 +28,11 @@ class IntegerMinMax extends Base
             $this->options['max'] = PHP_INT_MAX;
         }
 
-        $result = false;
-
         try {
            $result = Assertion::integerish($value);
         } catch (AssertionFailedException $e) {
             $this->addError('The value must be a whole number (integer).');
+            return false;
         }
 
         $result = $result && ($value >= $this->options['min'] && $value <= $this->options['max']);

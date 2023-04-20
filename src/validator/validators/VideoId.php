@@ -10,7 +10,7 @@ class VideoId extends Base
     /**
      * @inheritDoc
      */
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
         $result = filter_var($value, FILTER_VALIDATE_URL);
         if ($result) {

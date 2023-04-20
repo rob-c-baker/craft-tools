@@ -12,7 +12,7 @@ class Integer extends Base
     /**
      * @inheritDoc
      */
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
         try {
             return Assertion::integerish($value);

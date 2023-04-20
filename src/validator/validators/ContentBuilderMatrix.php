@@ -15,7 +15,7 @@ class ContentBuilderMatrix extends Base
      * @return bool
      * @throws Exception
      */
-    protected function validate($value) : bool
+    protected function validate(mixed $value) : bool
     {
         throw new Exception('Not yet implemented.'); // @todo
     }

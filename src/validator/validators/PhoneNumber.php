@@ -11,10 +11,15 @@ class PhoneNumber extends Base
     /**
      * @inheritDoc
      */
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
         if (!isset($this->options['iso2'])) {
             throw new \InvalidArgumentException('To use the PhoneNumber validator you must pass in an $options parameter to the constructor with with an array key of "iso2" containing a 2 letter country code.');
+        }
+
+        if (!is_string($value)) {
+            $this->addError('Not a string, so not a valid phone number.');
+            return false;
         }
 
         $phone_number_service = new \alanrogers\tools\services\PhoneNumber();

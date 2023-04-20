@@ -12,7 +12,7 @@ class Latitude extends Base
     /**
      * @inheritDoc
      */
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
         try {
             Assertion::greaterOrEqualThan($value, -90.0);

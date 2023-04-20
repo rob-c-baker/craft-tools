@@ -11,7 +11,7 @@ class ArrayOfValidatedTypes extends Base
     /**
      * @inheritDoc
      */
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
         if (!isset($this->options['validator']) || !$this->options['validator'] instanceof Base) {
             throw new InvalidArgumentException('To use the ArrayOfValidTypes validator you must pass in an $options parameter to the constructor with with an array key of "validator" containing the validator instance to apply to each array element.');

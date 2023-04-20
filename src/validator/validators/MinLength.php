@@ -10,7 +10,7 @@ class MinLength extends Base
     /**
      * @inheritDoc
      */
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
         if (!isset($this->options['length'])) {
             throw new \InvalidArgumentException('To use the MinLength validator you must pass in an $options parameter to the constructor with with an array key of "length" containing the minimum allowed length.');

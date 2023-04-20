@@ -54,7 +54,7 @@ class CountryISOCode extends Base
     /**
      * @inheritDoc
      */
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
         if (!isset($this->options['standard'])) {
             throw new \InvalidArgumentException('To use the CategoryId validator you must pass in an $options parameter to the constructor with with an array key of "standard" containing either "iso2" or "iso3".');

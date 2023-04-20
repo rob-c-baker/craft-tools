@@ -26,7 +26,7 @@ class CategoryId extends Base
     /**
      * @inheritDoc
      */
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
         if (!isset($this->options['group'])) {
             throw new \InvalidArgumentException('To use the CategoryId validator you must pass in an $options parameter to the constructor with with an array key of "group" containing the handle of the category group.');
@@ -55,7 +55,7 @@ class CategoryId extends Base
                 self::$group_ids[$this->options['group']] = Category::find()
                     ->group($this->options['group'])
                     ->withStructure(false)
-                    ->anyStatus()
+                    ->status(null)
                     ->ids();
             }
 

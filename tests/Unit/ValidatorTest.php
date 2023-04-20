@@ -8,6 +8,11 @@ use alanrogers\tools\validator\validators\ARRef;
 use alanrogers\tools\validator\validators\CountryISOCode;
 use alanrogers\tools\validator\validators\Email;
 use alanrogers\tools\validator\validators\Integer;
+use alanrogers\tools\validator\validators\Latitude;
+use alanrogers\tools\validator\validators\Longitude;
+use alanrogers\tools\validator\validators\MaxLength;
+use alanrogers\tools\validator\validators\MinLength;
+use alanrogers\tools\validator\validators\UUID4;
 use stdClass;
 use Tests\Support\UnitTester;
 
@@ -23,29 +28,21 @@ class ValidatorTest extends \Codeception\Test\Unit
     {
         $validator = Factory::create(Integer::class);
 
-        $validator->setValue(0);
-        $this->assertTrue($validator->isValid(), 'Checking 0');
+        $this->assertTrue($validator->setValue(0)->isValid(), 'Checking 0');
 
-        $validator->setValue(1);
-        $this->assertTrue($validator->isValid(), 'Checking 1');
+        $this->assertTrue($validator->setValue(1)->isValid(), 'Checking 1');
 
-        $validator->setValue(-1);
-        $this->assertTrue($validator->isValid(), 'Checking -1');
+        $this->assertTrue($validator->setValue(-1)->isValid(), 'Checking -1');
 
-        $validator->setValue('');
-        $this->assertFalse($validator->isValid(), 'Checking empty string');
+        $this->assertFalse($validator->setValue('')->isValid(), 'Checking empty string');
 
-        $validator->setValue('test');
-        $this->assertFalse($validator->isValid(), 'Checking non-empty string');
+        $this->assertFalse($validator->setValue('test')->isValid(), 'Checking non-empty string');
 
-        $validator->setValue([]);
-        $this->assertFalse($validator->isValid(), 'Checking empty array');
+        $this->assertFalse($validator->setValue([])->isValid(), 'Checking empty array');
 
-        $validator->setValue([ 1, 2, 3 ]);
-        $this->assertFalse($validator->isValid(), 'Checking non-empty array');
+        $this->assertFalse($validator->setValue([ 1, 2, 3 ])->isValid(), 'Checking non-empty array');
 
-        $validator->setValue(new stdClass());
-        $this->assertFalse($validator->isValid(), 'Checking object');
+        $this->assertFalse($validator->setValue(new stdClass())->isValid(), 'Checking object');
     }
 
     public function testARRefValidator()
@@ -54,14 +51,9 @@ class ValidatorTest extends \Codeception\Test\Unit
 
         $this->assertInstanceOf(ARRef::class, $validator, 'Correct type for ARRef validator');
 
-        $validator->setValue('FR29010');
-        $this->assertTrue($validator->isValid(), 'Checking a valid AR Ref');
-
-        $validator->setValue('  FR29010 ');
-        $this->assertFalse($validator->isValid(), 'Checking a valid AR Ref with spaces');
-
-        $validator->setValue('0893ch');
-        $this->assertFalse($validator->isValid(), 'Checking a invalid AR Ref');
+        $this->assertTrue($validator->setValue('FR29010')->isValid(), 'Checking a valid AR Ref');
+        $this->assertFalse($validator->setValue('  FR29010 ')->isValid(), 'Checking a valid AR Ref with spaces');
+        $this->assertFalse($validator->setValue('0893ch')->isValid(), 'Checking a invalid AR Ref');
     }
 
     public function testISO2CountryCode()
@@ -135,13 +127,62 @@ class ValidatorTest extends \Codeception\Test\Unit
         $validator = Factory::create(Email::class);
 
         foreach ($valid_emails as $email => $message) {
-            $validator->setValue($email);
-            $this->assertTrue($validator->isValid(), $message);
+            $this->assertTrue($validator->setValue($email)->isValid(), $message);
         }
 
         foreach ($invalid_emails as $email => $message) {
-            $validator->setValue($email);
-            $this->assertFalse($validator->isValid(), $message);
+            $this->assertFalse($validator->setValue($email)->isValid(), $message);
         }
+    }
+
+    public function testLatLngValidators()
+    {
+        $lat_validator = Factory::create(Latitude::class);
+        $lng_validator = Factory::create(Longitude::class);
+
+        $this->assertTrue($lat_validator->setValue(0)->isValid(), 'Zero Latitude');
+        $this->assertTrue($lng_validator->setValue(0)->isValid(), 'Zero Longitude');
+
+        $this->assertTrue($lat_validator->setValue(-90.0)->isValid(), 'Min Latitude');
+        $this->assertTrue($lat_validator->setValue(90.0)->isValid(), 'Max Latitude');
+
+        $this->assertTrue($lng_validator->setValue(-180.0)->isValid(), 'Min Longitude');
+        $this->assertTrue($lng_validator->setValue(180.0)->isValid(), 'Max Longitude');
+
+        $this->assertFalse($lat_validator->setValue(-91.0)->isValid(), 'Out of bounds - Latitude');
+        $this->assertFalse($lat_validator->setValue(91.0)->isValid(), 'Out of bounds + Latitude');
+
+        $this->assertFalse($lng_validator->setValue(-181.0)->isValid(), 'Out of bounds - Longitude');
+        $this->assertFalse($lng_validator->setValue(181.0)->isValid(), 'Out of bounds + Longitude');
+
+        $this->assertFalse($lng_validator->setValue('fasdfasdfsadf')->isValid(), 'Random string');
+        $this->assertFalse($lng_validator->setValue('')->isValid(), 'Empty string');
+    }
+
+    public function testMinMaxLengthValidators()
+    {
+        $max_validator = Factory::create(MaxLength::class, null, [
+            'length' => 5
+        ]);
+
+        $min_validator = Factory::create(MinLength::class, null, [
+            'length' => 5
+        ]);
+
+        $this->assertTrue($max_validator->setValue('abcde')->isValid(), 'Valid max length');
+        $this->assertFalse($max_validator->setValue('abcdef')->isValid(), 'Invalid max length');
+
+        $this->assertTrue($min_validator->setValue('abcde')->isValid(), 'Valid min length');
+        $this->assertFalse($min_validator->setValue('abcd')->isValid(), 'Invalid min length');
+    }
+
+    public function testUUID4Validator()
+    {
+        $validator = Factory::create(UUID4::class);
+
+        $this->assertTrue($validator->setValue('5f094fc7-bbb7-436f-9b3a-a743d2ae1bd1')->isValid(), 'Valid UUID4');
+        $this->assertFalse($validator->setValue('5f094fc7-bbb7-f36f-9b3a-a743d2ae1bd1')->isValid(), 'Invalid UUID4');
+        $this->assertFalse($validator->setValue('suigfvbf-9qwf-akjs-0ajh-jasfjkasdkjh')->isValid(), 'Random string');
+        $this->assertFalse($validator->setValue('')->isValid(), 'Empty string');
     }
 }

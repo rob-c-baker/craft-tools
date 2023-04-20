@@ -7,9 +7,13 @@ use alanrogers\tools\validator\Base;
 
 class ARRef extends Base
 {
-    protected function validate($value) : bool
+    protected function validate(mixed $value) : bool
     {
-        if (!(bool) preg_match('/^[A-Z]{2}\d{3,5}$/', $value)) {
+        if (!is_string($value)) {
+            $this->addError('AR Ref must be a string.');
+            return false;
+        }
+        if (!preg_match('/^[A-Z]{2}\d{3,5}$/', $value)) {
             $this->addError('Invalid AR Ref.');
             return false;
         }

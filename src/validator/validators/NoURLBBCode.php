@@ -12,9 +12,9 @@ class NoURLBBCode extends Base
 {
     public const BB_CODE_URL_REGEX = '/\[url(?:\=("|\'|)?(.*)?\1)?\](.*)\[\/url\]/';
 
-    protected function validate($value): bool
+    protected function validate(mixed $value): bool
     {
-        $result = preg_match(self::BB_CODE_URL_REGEX, $value);
+        $result = preg_match(self::BB_CODE_URL_REGEX, (string) $value);
         if ($result) {
             $this->addError('BBCode URLs not allowed.');
         }

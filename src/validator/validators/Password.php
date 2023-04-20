@@ -110,33 +110,38 @@ class Password extends Base
     /**
      * @inheritDoc
      */
-    protected function validate($value) : bool
+    protected function validate(mixed $value) : bool
     {
         $is_valid = true;
 
         $this->setOptionProperties();
 
-        if (strlen((string) $value) < $this->min_length) {
+        if (!is_string($value)) {
+            $this->addError('A password must be a string.');
+            return false;
+        }
+
+        if (strlen($value) < $this->min_length) {
             $this->addError(sprintf(self::$criteria_messages['min_length']['error'], $this->min_length));
             $is_valid = false;
         }
 
-        if (strlen((string) $value) > $this->max_length) {
+        if (strlen( $value) > $this->max_length) {
             $this->addError(sprintf(self::$criteria_messages['max_length']['error'], $this->max_length));
             $is_valid = false;
         }
 
-        if ($this->check_case && !self::containsBothCases((string) $value)) {
+        if ($this->check_case && !self::containsBothCases($value)) {
             $this->addError(self::$criteria_messages['check_case']['error']);
             $is_valid = false;
         }
 
-        if ($this->check_numbers && !self::containsNumbers((string) $value)) {
+        if ($this->check_numbers && !self::containsNumbers($value)) {
             $this->addError(self::$criteria_messages['check_numbers']['error']);
             $is_valid = false;
         }
 
-        if ($this->check_symbols && !self::containsSymbols((string) $value)) {
+        if ($this->check_symbols && !self::containsSymbols($value)) {
             $this->addError(self::$criteria_messages['check_symbols']['error']);
             $is_valid = false;
         }
