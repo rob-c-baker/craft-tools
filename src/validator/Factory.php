@@ -14,7 +14,7 @@ class Factory
      * @param array $options
      * @return ValidatorInterface
      */
-    public static function create(string $name, $value, array $options=[]) : ValidatorInterface
+    public static function create(string $name, mixed $value=null, array $options=[]) : ValidatorInterface
     {
         if (class_exists($name)) {
             $instance = new $name($value, $options);

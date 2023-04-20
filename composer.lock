@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dbe74f6f3ca689990ea1e00eb80e9667",
+    "content-hash": "a193e1df0826d5155eac1727f5ae85d2",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -7542,6 +7542,50 @@
                 "source": "https://github.com/Behat/Gherkin/tree/v4.9.0"
             },
             "time": "2021-10-12T13:05:09+00:00"
+        },
+        {
+            "name": "codeception/assert-throws",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Codeception/AssertThrows.git",
+                "reference": "f3b6078a5c7cc3661d3aaa378260ddc29eabc097"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Codeception/AssertThrows/zipball/f3b6078a5c7cc3661d3aaa378260ddc29eabc097",
+                "reference": "f3b6078a5c7cc3661d3aaa378260ddc29eabc097",
+                "shasum": ""
+            },
+            "require": {
+                "phpunit/phpunit": "^8.0|^9.0|^10.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Codeception\\": "./"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "davert",
+                    "email": "davert@codeception.com"
+                },
+                {
+                    "name": "Gustavo Nieves",
+                    "homepage": "https://medium.com/@ganieves"
+                }
+            ],
+            "description": "Assert exception was thrown without stopping a test",
+            "support": {
+                "issues": "https://github.com/Codeception/AssertThrows/issues",
+                "source": "https://github.com/Codeception/AssertThrows/tree/1.3.0"
+            },
+            "time": "2023-02-10T18:43:02+00:00"
         },
         {
             "name": "codeception/codeception",

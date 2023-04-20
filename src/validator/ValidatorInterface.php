@@ -7,10 +7,10 @@ interface ValidatorInterface
 {
     /**
      * Base constructor.
-     * @param mixed $value
+     * @param mixed|null $value
      * @param array $options (Optional - array of options used in concrete implementations)
      */
-    public function __construct($value=null, array $options = []);
+    public function __construct(mixed $value=null, array $options = []);
 
     /**
      * @return bool
@@ -20,7 +20,7 @@ interface ValidatorInterface
     /**
      * @return mixed
      */
-    public function getValue();
+    public function getValue(): mixed;
 
     /**
      * @param $value

@@ -7,6 +7,9 @@ use alanrogers\tools\validator\Base;
 
 class CountryISOCode extends Base
 {
+    public const STANDARD_ISO2 = 'iso2';
+    public const STANDARD_ISO3 = 'iso3';
+
     /**
      * @var string[]
      */
@@ -57,14 +60,12 @@ class CountryISOCode extends Base
             throw new \InvalidArgumentException('To use the CategoryId validator you must pass in an $options parameter to the constructor with with an array key of "standard" containing either "iso2" or "iso3".');
         }
 
-        $this->options['standard'] = strtolower($this->options['standard']);
-
-        if ($this->options['standard'] == 'iso2') {
+        if ($this->options['standard'] == self::STANDARD_ISO2) {
             $result = in_array($value, self::$iso2, true);
             if (!$result) {
                 $this->addError(sprintf('"%.50s" is not a valid ISO2 country code.', $value));
             }
-        } elseif ($this->options['standard'] == 'iso3') {
+        } elseif ($this->options['standard'] == self::STANDARD_ISO3) {
             $result = in_array($value, self::$iso3, true);
             if (!$result) {
                 $this->addError(sprintf('"%.50s" is not a valid ISO3 country code.', $value));

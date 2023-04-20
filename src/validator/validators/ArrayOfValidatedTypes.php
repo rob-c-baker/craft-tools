@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace alanrogers\tools\validator\validators;
 
 use alanrogers\tools\validator\Base;
+use InvalidArgumentException;
 
 class ArrayOfValidatedTypes extends Base
 {
@@ -13,7 +14,7 @@ class ArrayOfValidatedTypes extends Base
     protected function validate($value): bool
     {
         if (!isset($this->options['validator']) || !$this->options['validator'] instanceof Base) {
-            throw new \InvalidArgumentException('To use the ArrayOfValidTypes validator you must pass in an $options parameter to the constructor with with an array key of "validator" containing the validator instance to apply to each array element.');
+            throw new InvalidArgumentException('To use the ArrayOfValidTypes validator you must pass in an $options parameter to the constructor with with an array key of "validator" containing the validator instance to apply to each array element.');
         }
 
         $validator = $this->options['validator'];

@@ -37,9 +37,10 @@
         "yiisoft/yii2-redis": "~2.0.0"
     },
     "require-dev": {
+        "codeception/assert-throws": "^1.3",
         "codeception/codeception": "^5.0",
-        "codeception/module-phpbrowser": "*",
         "codeception/module-asserts": "*",
+        "codeception/module-phpbrowser": "*",
         "vlucas/phpdotenv": "^5.0"
     },
     "scripts": {

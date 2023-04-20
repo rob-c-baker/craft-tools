@@ -18,14 +18,14 @@ abstract class Base implements ValidatorInterface
     /**
      * @var null|mixed
      */
-    protected $value = null;
+    protected mixed $value = null;
 
     /**
      * Base constructor.
-     * @param mixed $value
+     * @param mixed|null $value
      * @param array $options (Optional - array of options used in concrete implementations)
      */
-    public function __construct($value=null, array $options = [])
+    public function __construct(mixed $value=null, array $options = [])
     {
         $this->value = $value;
         $this->setOptions($options);
@@ -34,16 +34,16 @@ abstract class Base implements ValidatorInterface
     /**
      * @return mixed
      */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      * @return $this
      */
-    public function setValue($value) : self
+    public function setValue(mixed $value) : self
     {
         $this->value = $value;
         return $this;
