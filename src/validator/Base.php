@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace alanrogers\tools\validator;
 
 use alanrogers\tools\traits\ErrorManagementTrait;
+use RuntimeException;
 
 abstract class Base implements ValidatorInterface
 {
@@ -28,7 +29,7 @@ abstract class Base implements ValidatorInterface
     public function __construct(mixed $value=null, array $options = [])
     {
         $this->value = $value;
-        $this->setOptions($options);
+        $this->setOptions($options, $options !== []);
     }
 
     /**
@@ -45,17 +46,30 @@ abstract class Base implements ValidatorInterface
      */
     public function setValue(mixed $value) : self
     {
+        // If setting a different value, remove errors and mark for re-validation
+        if ($value !== $this->value) {
+            $this->clearErrors();
+        }
         $this->value = $value;
         return $this;
     }
 
     /**
      * @param array $options
+     * @param bool $set_all_properties
      * @return $this
      */
-    public function setOptions(array $options) : self
+    public function setOptions(array $options, bool $set_all_properties=false) : self
     {
-        $this->options = $options;
+        foreach ($options as $name => $value) {
+            $this->setOption($name, $value);
+            if (!$set_all_properties) {
+                $this->setOptionProperties($name);
+            }
+        }
+        if ($set_all_properties) {
+            $this->setOptionProperties();
+        }
         return $this;
     }
 
@@ -67,17 +81,25 @@ abstract class Base implements ValidatorInterface
     public function setOption(string $name, $value) : self
     {
         $this->options[$name] = $value;
+        $this->setOptionProperties($name);
         return $this;
     }
 
     /**
      * Sets any present class properties with values found in the $this->options array
+     * @param string|null $property If provided, will only set that specific property
      */
-    protected function setOptionProperties() : void
+    public function setOptionProperties(?string $property=null) : void
     {
-        foreach ($this->options as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->$key = $value;
+        if ($property) {
+            if (property_exists($this, $property) && isset($this->options[$property])) {
+                $this->$property = $this->options[$property];
+            }
+        } else {
+            foreach ($this->options as $key => $value) {
+                if (property_exists($this, $key)) {
+                    $this->$key = $value;
+                }
             }
         }
     }

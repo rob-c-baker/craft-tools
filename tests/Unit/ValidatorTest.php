@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-use alanrogers\tools\validator\Base;
 use alanrogers\tools\validator\Factory;
 use alanrogers\tools\validator\validators\ARRef;
 use alanrogers\tools\validator\validators\CountryISOCode;
@@ -12,6 +11,7 @@ use alanrogers\tools\validator\validators\Latitude;
 use alanrogers\tools\validator\validators\Longitude;
 use alanrogers\tools\validator\validators\MaxLength;
 use alanrogers\tools\validator\validators\MinLength;
+use alanrogers\tools\validator\validators\Password;
 use alanrogers\tools\validator\validators\UUID4;
 use stdClass;
 use Tests\Support\UnitTester;
@@ -184,5 +184,62 @@ class ValidatorTest extends \Codeception\Test\Unit
         $this->assertFalse($validator->setValue('5f094fc7-bbb7-f36f-9b3a-a743d2ae1bd1')->isValid(), 'Invalid UUID4');
         $this->assertFalse($validator->setValue('suigfvbf-9qwf-akjs-0ajh-jasfjkasdkjh')->isValid(), 'Random string');
         $this->assertFalse($validator->setValue('')->isValid(), 'Empty string');
+    }
+
+    public function testPasswordValidator()
+    {
+        $validator = Factory::create(Password::class, null, [
+            'min_length' => 8,
+            'max_length' => 12,
+            'check_pwned_db' => false
+        ]);
+
+        $validator->setOptionProperties();
+
+        $validator->setOptions([
+            'check_case' => false,
+            'check_numbers' => false,
+            'check_symbols' => false
+        ])->setOptionProperties();
+        $this->assertTrue($validator->setValue('aaaaaaaa')->isValid(), 'Weak test');
+
+        $validator->setOptions([
+            'check_case' => true,
+            'check_numbers' => false,
+            'check_symbols' => false
+        ])->setOptionProperties();
+        $this->assertTrue($validator->setValue('aaaAaaaa')->isValid(), 'Check case OK');
+        $this->assertFalse($validator->setValue('aaaaaaaa')->isValid(), 'Check case Bad');
+
+        $validator->setOptions([
+            'check_case' => false,
+            'check_numbers' => true,
+            'check_symbols' => false
+        ])->setOptionProperties();
+        $this->assertTrue($validator->setValue('aaa1aaaa')->isValid(), 'Check numbers OK');
+        $this->assertFalse($validator->setValue('aaaaaaaa')->isValid(), 'Check numbers Bad');
+
+        $validator->setOptions([
+            'check_case' => false,
+            'check_numbers' => false,
+            'check_symbols' => true
+        ])->setOptionProperties();
+        $this->assertTrue($validator->setValue('aaa!aaaa')->isValid(), 'Check symbols OK');
+        $this->assertFalse($validator->setValue('aaaaaaaa')->isValid(), 'Check symbols Bad');
+
+        // defaults
+        $validator->setOptions([
+            'min_length' => 8,
+            'max_length' => 12,
+            'check_case' => true,
+            'check_numbers' => true,
+            'check_symbols' => true
+        ])->setOptionProperties();
+
+        $this->assertTrue($validator->setValue('asL!k8fh')->isValid(), 'Valid min length');
+        $this->assertTrue($validator->setValue('asLdk8fh*H31')->isValid(), 'Valid max length');
+
+        $this->assertFalse($validator->setValue('asLdkffh')->isValid(), 'Invalid min length');
+        $this->assertFalse($validator->setValue('asLdkafhpHddddd')->isValid(), 'Invalid max length');
     }
 }

@@ -20,32 +20,32 @@ class Password extends Base
     /**
      * @var int
      */
-    private int $min_length = self::DEFAULT_MIN_LENGTH;
+    protected int $min_length = self::DEFAULT_MIN_LENGTH;
 
     /**
      * @var int
      */
-    private int $max_length = self::DEFAULT_MAX_LENGTH;
+    protected int $max_length = self::DEFAULT_MAX_LENGTH;
 
     /**
      * @var bool
      */
-    private bool $check_case = self::DEFAULT_CHECK_CASE;
+    protected bool $check_case = self::DEFAULT_CHECK_CASE;
 
     /**
      * @var bool
      */
-    private bool $check_numbers = self::DEFAULT_CHECK_NUMBERS;
+    protected bool $check_numbers = self::DEFAULT_CHECK_NUMBERS;
 
     /**
      * @var bool
      */
-    private bool $check_symbols = self::DEFAULT_CHECK_SYMBOLS;
+    protected bool $check_symbols = self::DEFAULT_CHECK_SYMBOLS;
 
     /**
      * @var bool
      */
-    private bool $check_pwned_db = self::DEFAULT_CHECK_PWNED_DB;
+    protected bool $check_pwned_db = self::DEFAULT_CHECK_PWNED_DB;
 
     /**
      * @var array<string, string>
@@ -80,8 +80,6 @@ class Password extends Base
      */
     public function getCriteriaMessages() : array
     {
-        $this->setOptionProperties();
-
         // add unconditional ones first
         $messages = [
             sprintf(self::$criteria_messages['min_length']['error'], $this->min_length),
@@ -114,8 +112,6 @@ class Password extends Base
     {
         $is_valid = true;
 
-        $this->setOptionProperties();
-
         if (!is_string($value)) {
             $this->addError('A password must be a string.');
             return false;
@@ -126,7 +122,7 @@ class Password extends Base
             $is_valid = false;
         }
 
-        if (strlen( $value) > $this->max_length) {
+        if (strlen($value) > $this->max_length) {
             $this->addError(sprintf(self::$criteria_messages['max_length']['error'], $this->max_length));
             $is_valid = false;
         }
@@ -184,6 +180,6 @@ class Password extends Base
      */
     private static function containsSymbols(string $value) : bool
     {
-        return (bool) preg_match('/[^a-zA-Z\d]/', $value);
+        return (bool) preg_match('/\W/', $value);
     }
 }

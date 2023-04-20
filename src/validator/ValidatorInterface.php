@@ -40,4 +40,9 @@ interface ValidatorInterface
      * @return $this
      */
     public function setOption(string $name, $value) : self;
+
+    /**
+     * Sets any present class properties with values found in the $this->options array
+     */
+    public function setOptionProperties() : void;
 }
