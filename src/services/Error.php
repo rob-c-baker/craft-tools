@@ -40,9 +40,10 @@ class Error extends Component
     /**
      * @param string $message
      * @param bool $send_email (defaults to false)
+     * @param array $other_data
      * @return bool
      */
-    public function reportBackEndError(string $message, bool $send_email=false) : bool
+    public function reportBackEndError(string $message, bool $send_email=false, array $other_data=[]) : bool
     {
         $error_record = new ErrorRecord();
 
@@ -52,12 +53,26 @@ class Error extends Component
         $error_record->ip_address = '127.0.0.1';
         $error_record->message = $message;
         $error_record->stack = '';
-        $error_record->other_data = '';
+        $error_record->other_data = Json::encode($other_data, JSON_INVALID_UTF8_SUBSTITUTE);
 
         $result = $error_record->save();
 
         if ($send_email) {
+
+            if (Craft::$app->getRequest()->isConsoleRequest) {
+                $message = '[Console Request]' . "\n\n" . $message;
+            } else {
+                $message = 'URL: ' . Craft::$app->getRequest()->getAbsoluteUrl() . "\n\n" . $message;
+            }
+
+            if ($error_record->other_data) {
+                $message .= "\n\n--------------------------------------------------------------------------";
+                $message .= "\nOther Data: ";
+                $message .= "\n" . $error_record->other_data;
+            }
+
             $env = '[' . strtoupper(getenv('ENVIRONMENT')) . ']';
+
             $this->sendAdminNotificationEmail(
                 $env . ' ERROR reported from alanrogers.com',
                 $message
