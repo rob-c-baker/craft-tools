@@ -65,7 +65,7 @@ class Error extends Component
                 $message = 'URL: ' . Craft::$app->getRequest()->getAbsoluteUrl() . "\n\n" . $message;
             }
 
-            if ($error_record->other_data) {
+            if ($other_data) {
                 $message .= "\n\n--------------------------------------------------------------------------";
                 $message .= "\nOther Data: ";
                 $message .= "\n" . $error_record->other_data;
