@@ -3,29 +3,41 @@ declare(strict_types=1);
 
 namespace alanrogers\tools\traits;
 
+const __DEFAULT_ERROR_TRAIT_KEY = '__no_key__';
+
 trait ErrorManagementTrait
 {
     /**
-     * @var string[]
+     * @var array<string, string[]>
      */
     protected array $errors = [];
 
     /**
-     * @return string[]
+     * Becomes true if sting keys are used and changes return type of `getErrors()` from `string[]`
+     * to `array<string, string[]>`
+     * @var bool
+     */
+    protected bool $uses_keys = false;
+
+    /**
+     * @return array<string, string[]>|string[]
      */
     public function getErrors() : array
     {
-        return $this->errors;
+        if ($this->uses_keys) {
+            return $this->errors;
+        }
+        return $this->errors[__DEFAULT_ERROR_TRAIT_KEY] ?? [];
     }
 
     /**
      * Overwrites all errors with those passed in
-     * @param array $errors
-     * @return $this
+     * @param array<string, string[]> $errors
      */
     public function setErrors(array $errors) : self
     {
-        $this->errors = $errors;
+        $this->clearErrors();
+        $this->addErrors($errors);
         return $this;
     }
 
@@ -49,16 +61,17 @@ trait ErrorManagementTrait
             }
         } else {
             if ($key !== null) {
+                $this->uses_keys = true;
                 $this->errors[$key][] = $msg;
             } else {
-                $this->errors[] = $msg;
+                $this->errors[__DEFAULT_ERROR_TRAIT_KEY][] = $msg;
             }
         }
         return $this;
     }
 
     /**
-     * @param array<string[]> $errors
+     * @param array<string, string[]>|string[] $errors
      */
     public function addErrors(array $errors) : self
     {
@@ -80,6 +93,7 @@ trait ErrorManagementTrait
 
     public function clearErrors() : self
     {
+        $this->uses_keys = false;
         $this->errors = [];
         return $this;
     }
