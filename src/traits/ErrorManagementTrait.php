@@ -32,7 +32,7 @@ trait ErrorManagementTrait
 
     /**
      * Overwrites all errors with those passed in
-     * @param array<string, string[]> $errors
+     * @param array<string, string[]>|string[] $errors
      */
     public function setErrors(array $errors) : self
     {
