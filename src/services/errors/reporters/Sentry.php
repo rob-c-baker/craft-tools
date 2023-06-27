@@ -8,6 +8,7 @@ class Sentry implements Reporting
 {
     public function report(ErrorModel $error): bool
     {
-        // TODO: Implement report() method.
+        // @todo
+        return true;
     }
 }
