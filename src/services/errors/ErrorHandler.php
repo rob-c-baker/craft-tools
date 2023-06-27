@@ -11,31 +11,19 @@ use yii\base\Event;
 
 class ErrorHandler
 {
-    /**
-     * @var array{ enabled: boolean, reporters: class-string[] }
-     */
-    private static array $default_config = [
-        'enabled' => true,
-        'reporters' => [
-            Database::class,
-            Email::class,
-            Sentry::class
-        ]
-    ];
-
-    public bool $enabled = false;
+    public bool $enabled = true;
 
     /**
      * @var array<class-string, Reporting|null>
      */
-    private array $reporters = [];
+    private array $reporters = [
+        Database::class,
+        Email::class,
+        Sentry::class
+    ];
 
-
-    public function __construct(array $config=[]) // @todo how to get config in when triggered via ServiceManager (no constructor params?)
+    public function __construct()
     {
-        $config = [ ...self::$default_config, ...$config ];
-        $this->enabled = $config['enabled'];
-        $this->reporters = array_fill_keys($config['reporters'], null);
         $this->registerEvents();
     }
 
