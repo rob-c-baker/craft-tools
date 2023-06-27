@@ -1,0 +1,29 @@
+{% if is_console %}
+[Console Request] {{ error_model.message }}
+{% else %}
+URL: {{ url ?? '[unknown]' }}
+{{ error_model.message }}
+{% endif %}
+
+{% if error_model.exception %}
+--------------------------------------------------------------------------
+Exception: {{ className(error_model.exception) }}
+File: "{{ error_model.exception.getFile() }}" Line: {{ error_model.exception.getLine() }}
+{% endif %}
+{% if stack_trace %}
+{{ stack_trace }}
+{% endif %}
+
+{% if error_model.exception.getPrevious() %}
+--------------------------------------------------------------------------
+Previous Exception: {{ className(error_model.exception.getPrevious()) }}
+Message: {{ error_model.exception.getPrevious().getMessage() }}
+File: "{{ error_model.exception.getPrevious().getFile() }}" Line: {{ error_model.exception.getPrevious().getLine() }}
+{{ error_model.exception.getPrevious().getTraceAsString() }}
+{% endif %}
+
+{% if error_model.data %}
+--------------------------------------------------------------------------
+Other Data:
+{{ error_model.getData(true) }}
+{% endif %}

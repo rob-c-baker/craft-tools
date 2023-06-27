@@ -75,7 +75,7 @@ class CraftTools extends Module
         self::$instance = $this;
 
         $this->setComponents([
-            'ar' => $this->getServiceManager(),
+            'ar' => ServiceManager::getInstance()
         ]);
 
         // Register Twig stuff
@@ -94,17 +94,6 @@ class CraftTools extends Module
 
         // Set this as the global instance of this module class
         static::setInstance($this);
-    }
-
-    /**
-     * @return ServiceManager
-     */
-    public function getServiceManager() : ServiceManager
-    {
-        if (self::$service_manager === null) {
-            self::$service_manager = new ServiceManager();
-        }
-        return self::$service_manager;
     }
 
     private static function registerMigrationTrack() : void

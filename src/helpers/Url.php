@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace alanrogers\tools\helpers;
 
+use Craft;
+use craft\web\Request;
+
 class Url implements HelperInterface
 {
     /**
@@ -53,5 +56,21 @@ class Url implements HelperInterface
         }
 
         return $url_1 === $url_2;
+    }
+
+    /**
+     * Returns the current URL as long as it's a web request, otherwise null.
+     * @return string|null
+     */
+    public static function getCurrentURL(): ?string
+    {
+        $url = null;
+        $request = Craft::$app->getRequest();
+        if ($request instanceof Request) {
+            // pick up the URL if it was a web request
+            $qs = $request->queryString;
+            $url = $request->pathInfo . ($qs ? '?' . $qs : '');
+        }
+        return $url;
     }
 }

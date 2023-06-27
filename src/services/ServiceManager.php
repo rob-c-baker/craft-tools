@@ -5,6 +5,7 @@ namespace alanrogers\tools\services;
 
 use alanrogers\tools\helpers\BaseHelper;
 use alanrogers\tools\helpers\HelperInterface;
+use alanrogers\tools\services\errors\ErrorHandler;
 use RuntimeException;
 use yii\base\InvalidArgumentException;
 
@@ -12,6 +13,7 @@ use yii\base\InvalidArgumentException;
  * Class ServiceManager
  * @property GQLClient $gql_client
  * @property Error $error
+ * @property ErrorHandler $error_handler
  * @property Config $config
  */
 class ServiceManager
@@ -19,6 +21,7 @@ class ServiceManager
     private static array $_service_classes = [
         'gql_client' => GQLClient::class,
         'error' => Error::class,
+        'error_handler' => ErrorHandler::class,
         'config' => Config::class
     ];
 
@@ -31,6 +34,16 @@ class ServiceManager
     ];
 
     private static array $_helpers = [];
+
+    private static ?ServiceManager $instance = null;
+
+    public static function getInstance() : static
+    {
+        if (self::$instance === null) {
+            self::$instance = new static();
+        }
+        return self::$instance;
+    }
 
     /**
      * Allows fluent access to the services this class manager.
