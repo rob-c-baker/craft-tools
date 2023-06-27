@@ -12,6 +12,8 @@ use Throwable;
 
 class Database implements Reporting
 {
+    public function initialise(): void {}
+
     public function report(ErrorModel $error): bool
     {
         $error_record = new ErrorRecord();

@@ -2,28 +2,54 @@
 
 namespace alanrogers\tools\services\errors;
 
+use alanrogers\tools\events\ErrorHandlerInitEvent;
 use alanrogers\tools\services\errors\reporters\Database;
 use alanrogers\tools\services\errors\reporters\Email;
 use alanrogers\tools\services\errors\reporters\Reporting;
 use alanrogers\tools\services\errors\reporters\Sentry;
+use craft\base\Component;
 use craft\events\ExceptionEvent;
 use yii\base\Event;
 
-class ErrorHandler
+class ErrorHandler extends Component
 {
+    /**
+     * @event ErrorHandlerInit The event that is triggered when the error handler is initialised, can be used for
+     * configuration and other modifications.
+     */
+    const EVENT_ERROR_HANDLER_INIT = 'errorHandlerInit';
+
     public bool $enabled = true;
 
     /**
      * @var array<class-string, Reporting|null>
      */
-    private array $reporters = [
-        Database::class,
-        Email::class,
-        Sentry::class
-    ];
+    private array $reporters = [];
 
-    public function __construct()
+    public function init(): void
     {
+        $event = new ErrorHandlerInitEvent([
+            'enabled' => true,
+            'reporters' => [
+                Database::class,
+                Email::class,
+                Sentry::class
+            ]
+        ]);
+
+        $this->trigger(self::EVENT_ERROR_HANDLER_INIT, $event);
+
+        $this->enabled = $event->enabled;
+        $this->reporters = $event->reporters;
+
+        foreach ($this->reporters as $class_name => $reporter) {
+            if (!isset($this->reporters[$class_name])) {
+                $r = new $reporter();
+                $r->initialise();
+                $this->reporters[$class_name] = $r;
+            }
+        }
+
         $this->registerEvents();
     }
 
@@ -34,13 +60,13 @@ class ErrorHandler
      */
     public function report(ErrorModel $model): bool
     {
+        if (!$this->enabled) {
+            return false;
+        }
         $results = [];
         foreach ($this->reporters as $class_name => $reporter) {
             if ($model->isPrevented($class_name)) {
                 continue;
-            }
-            if (!isset($this->reporters[$class_name])) {
-                $this->reporters[$class_name] = new $reporter();
             }
             $results[$class_name] = $this->reporters[$class_name]->report($model);
         }

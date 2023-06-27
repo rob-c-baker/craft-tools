@@ -13,6 +13,8 @@ use yii\web\Request;
 
 class Email implements Reporting
 {
+    public function initialise(): void {}
+
     public function report(ErrorModel $error): bool
     {
         $request = Craft::$app->getRequest();

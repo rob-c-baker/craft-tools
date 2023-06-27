@@ -33,6 +33,7 @@
         "google/apiclient": "^2.4",
         "guzzlehttp/guzzle": "^7.2.0",
         "marionnewlevant/twig-perversion": "^3.0",
+        "sentry/sdk": "^3.5",
         "symfony/var-dumper": "v5.4.6",
         "yiisoft/yii2-redis": "~2.0.0"
     },
@@ -55,7 +56,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "yiisoft/yii2-composer": false,
-            "craftcms/plugin-installer": false
+            "craftcms/plugin-installer": false,
+            "php-http/discovery": true
         }
     }
 }
