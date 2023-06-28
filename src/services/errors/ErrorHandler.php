@@ -31,9 +31,9 @@ class ErrorHandler extends Component
         $event = new ErrorHandlerInitEvent([
             'enabled' => true,
             'reporters' => [
-                Database::class,
-                Email::class,
-                Sentry::class
+                Database::class => null,
+                Email::class => null,
+                Sentry::class => null
             ]
         ]);
 
