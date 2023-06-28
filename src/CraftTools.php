@@ -21,6 +21,7 @@ use craft\events\RegisterTemplateRootsEvent;
 use craft\i18n\PhpMessageSource;
 use craft\web\View;
 use yii\base\ActionEvent;
+use yii\base\BootstrapInterface;
 use yii\base\Controller;
 use yii\base\Event;
 use yii\base\Module;
@@ -29,8 +30,10 @@ use yii\web\ForbiddenHttpException;
 /**
  * @property ServiceManager $ar
  */
-class CraftTools extends Module
+class CraftTools extends Module implements BootstrapInterface
 {
+    const ID = 'ar-tools';
+
     public const MIGRATION_TRACK_NAME = 'craft-tools';
 
     /**
@@ -50,13 +53,16 @@ class CraftTools extends Module
      */
     public static array $disallowed_custom_user_fields = [];
 
-    public function __construct($id, $parent = null, $config = [])
+    public function __construct($id=self::ID, $parent = null, $config = [])
     {
         // Alias for this module
         Craft::setAlias('@modules/alanrogers', $this->getBasePath());
 
         // Define a custom alias named after the namespace
-        Craft::setAlias('@alanrogers/tools', __DIR__);
+        Craft::setAlias('@' . $id, __DIR__);
+
+        // Alias for AR Module Twig templates
+        Craft::setAlias('@' . $id . '-templates', __DIR__ . '/templates');
 
         // controller namespace
         if (Craft::$app instanceof Console) {
@@ -68,10 +74,8 @@ class CraftTools extends Module
         parent::__construct($id, $parent, $config);
     }
 
-    public function init()
+    public function bootstrap($app): void
     {
-        parent::init();
-
         self::$instance = $this;
 
         $this->setComponents([
@@ -81,7 +85,7 @@ class CraftTools extends Module
         // Register Twig stuff
         Craft::$app->on(WebApplication::EVENT_INIT, function() {
             Extensions::register();
-            self::registerTemplateRoots();
+            $this->registerTemplateRoots();
         });
 
         // Our custom fields
@@ -117,7 +121,7 @@ class CraftTools extends Module
 
     private static function registerTranslationCategory() : void
     {
-        Craft::$app->getI18n()->translations['craft-tools'] = [
+        Craft::$app->getI18n()->translations['ar-tools'] = [
             'class' => PhpMessageSource::class,
             'sourceLanguage' => 'en',
             'basePath' => __DIR__ . '/translations',
@@ -125,13 +129,15 @@ class CraftTools extends Module
         ];
     }
 
-    private static function registerTemplateRoots() : void
+    private function registerTemplateRoots() : void
     {
         Event::on(
             View::class,
             View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) {
-                $event->roots['ar-tools'] = __DIR__ . '/templates';
+                if (is_dir($base_dir = $this->getBasePath() . DIRECTORY_SEPARATOR . 'templates')) {
+                    $event->roots[$this->id] = $base_dir;
+                }
             }
         );
 
@@ -139,7 +145,9 @@ class CraftTools extends Module
             View::class,
             View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) {
-                $event->roots['ar-tools'] = __DIR__ . '/templates';
+                if (is_dir($base_dir = $this->getBasePath() . DIRECTORY_SEPARATOR . 'templates')) {
+                    $event->roots[$this->id] = $base_dir;
+                }
             }
         );
     }
