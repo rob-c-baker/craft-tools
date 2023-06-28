@@ -20,7 +20,7 @@ class Sentry extends Component implements Reporting
     public function initialise(): void
     {
         $event = new ErrorHandlerSentryConfigEvent([
-            'dsn' => $_SERVER['SENTRY_DSN'],
+            'dsn' => $_SERVER['SENTRY_DSN'] ?? null,
             'environment' => $_SERVER['ENVIRONMENT'] ?? 'production',
             'release' => gethostname() . '@' . ($_SERVER['COMMIT_REF'] ?? 'master'),
             'excluded_status_codes' => [ 400, 404 ]
