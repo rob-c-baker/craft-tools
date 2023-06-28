@@ -68,7 +68,7 @@ class SectionField extends Field implements PreviewableFieldInterface
     {
         try {
             return Craft::$app->getView()->renderTemplate(
-                'alanrogers-tools/section-field/_settings',
+                'ar-tools/section-field/_settings',
                 [
                     'field' => $this,
                     'sections' => $this->getSections()
@@ -123,7 +123,7 @@ class SectionField extends Field implements PreviewableFieldInterface
 
         try {
             return Craft::$app->getView()->renderTemplate(
-                'alanrogers-tools/section-field/_input', [
+                'ar-tools/section-field/_input', [
                     'field' => $this,
                     'value' => $value,
                     'sections' => $whitelist,

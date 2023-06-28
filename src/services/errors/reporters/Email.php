@@ -27,7 +27,7 @@ class Email implements Reporting
 
         try {
             $email_content = Craft::$app->getView()->renderTemplate(
-                'alanrogers-tools/error-reporting/plain-text-email.twig',
+                'ar-tools/error-reporting/plain-text-email',
                 [
                     'error_model' => $error,
                     'is_console' => Craft::$app->getRequest()->isConsoleRequest,

@@ -49,7 +49,7 @@ class CategoryGroupsField extends Field implements PreviewableFieldInterface
     {
         try {
             return Craft::$app->getView()->renderTemplate(
-                'alanrogers-tools/category-groups-field/_settings',
+                'ar-tools/category-groups-field/_settings',
                 [
                     'field' => $this,
                     'options' => $this->_getGroupsSettingsData(Craft::$app->getCategories()->getAllGroups()),
@@ -77,7 +77,7 @@ class CategoryGroupsField extends Field implements PreviewableFieldInterface
 
         try {
             return Craft::$app->getView()->renderTemplate(
-                'alanrogers-tools/category-groups-field/_input',
+                'ar-tools/category-groups-field/_input',
                 [
                     'field' => $this,
                     'value' => $value,

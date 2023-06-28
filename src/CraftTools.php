@@ -81,6 +81,7 @@ class CraftTools extends Module
         // Register Twig stuff
         Craft::$app->on(WebApplication::EVENT_INIT, function() {
             Extensions::register();
+            self::registerTemplateRoots();
         });
 
         // Our custom fields
@@ -88,7 +89,6 @@ class CraftTools extends Module
 
         self::registerTranslationCategory();
         self::registerMigrationTrack();
-        self::registerTemplateRoots($this->getBasePath());
         self::registerUserRules();
         self::enforceFieldPermissions();
 
@@ -125,21 +125,21 @@ class CraftTools extends Module
         ];
     }
 
-    private static function registerTemplateRoots(string $base_path) : void
+    private static function registerTemplateRoots() : void
     {
         Event::on(
             View::class,
             View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
-            function(RegisterTemplateRootsEvent $event) use ($base_path) {
-                $event->roots['alanrogers-tools'] = $base_path . '/templates';
+            function(RegisterTemplateRootsEvent $event) {
+                $event->roots['ar-tools'] = __DIR__ . '/templates';
             }
         );
 
         Event::on(
             View::class,
             View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
-            function(RegisterTemplateRootsEvent $event) use ($base_path) {
-                $event->roots['alanrogers-tools'] = $base_path . '/templates';
+            function(RegisterTemplateRootsEvent $event) {
+                $event->roots['ar-tools'] = __DIR__ . '/templates';
             }
         );
     }

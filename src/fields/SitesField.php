@@ -73,7 +73,7 @@ class SitesField extends Field implements PreviewableFieldInterface
     {
         try {
             return Craft::$app->getView()->renderTemplate(
-                'alanrogers-tools/sites-field/_settings.twig',
+                'ar-tools/sites-field/_settings.twig',
                 [
                     'field' => $this,
                     'sites' => $this->getSites()
@@ -134,7 +134,7 @@ class SitesField extends Field implements PreviewableFieldInterface
 
         try {
             return Craft::$app->getView()->renderTemplate(
-                'alanrogers-tools/sites-field/_input.twig',
+                'ar-tools/sites-field/_input.twig',
                 [
                     'field' => $this,
                     'value' => $value,

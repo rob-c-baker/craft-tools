@@ -49,7 +49,7 @@ class TemplateSelectField extends Field
         // Render the settings template
         try {
             return Craft::$app->getView()->renderTemplate(
-                'alanrogers-tools/template-select-field/components/fields/_settings.twig',
+                'ar-tools/template-select-field/components/fields/_settings.twig',
                 [
                     'field' => $this,
                 ]
@@ -112,7 +112,7 @@ class TemplateSelectField extends Field
         // Render the input template
         try {
             return Craft::$app->getView()->renderTemplate(
-                'alanrogers-tools/template-select-field/components/fields/_input.twig',
+                'ar-tools/template-select-field/components/fields/_input.twig',
                 [
                     'name' => $this->handle,
                     'value' => $value,
