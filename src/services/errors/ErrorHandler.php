@@ -44,7 +44,7 @@ class ErrorHandler extends Component
 
         foreach ($this->reporters as $class_name => $reporter) {
             if (!isset($this->reporters[$class_name])) {
-                $r = new $reporter();
+                $r = new $class_name();
                 $r->initialise();
                 $this->reporters[$class_name] = $r;
             }
