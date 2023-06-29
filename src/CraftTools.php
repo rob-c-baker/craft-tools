@@ -72,13 +72,13 @@ class CraftTools extends Plugin
         // Alias for AR Module Twig templates
         Craft::setAlias('@' . $this->id . '-templates', __DIR__ . '/templates');
 
+        Extensions::register();
+
         Craft::$app->onInit(function() {
 
             $this->setComponents([
                 'ar' => ServiceManager::getInstance()
             ]);
-
-            Extensions::register();
 
             // Our custom fields
             FieldRegister::registerFields();
