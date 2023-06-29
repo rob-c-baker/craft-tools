@@ -13,7 +13,9 @@ use craft\base\Plugin;
 use craft\controllers\UsersController;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
+use craft\events\RegisterTemplateRootsEvent;
 use craft\i18n\PhpMessageSource;
+use craft\web\View;
 use yii\base\ActionEvent;
 use yii\base\Controller;
 use yii\base\Event;
@@ -25,8 +27,6 @@ use yii\web\ForbiddenHttpException;
 class CraftTools extends Plugin
 {
     const ID = '_ar-tools';
-
-    public const MIGRATION_TRACK_NAME = 'craft-tools';
 
     public string $schemaVersion = '1.0.0';
 
@@ -87,6 +87,12 @@ class CraftTools extends Plugin
             self::registerUserRules();
             self::enforceFieldPermissions();
 
+            // Need front-end templates (cp template root gets registered in parent class)
+            Event::on(View::class, View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS, function(RegisterTemplateRootsEvent $e) {
+                if (is_dir($base_dir = $this->getBasePath() . DIRECTORY_SEPARATOR . 'templates')) {
+                    $e->roots[$this->id] = $base_dir;
+                }
+            });
         });
     }
 
