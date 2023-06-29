@@ -9,32 +9,26 @@ use alanrogers\tools\services\ServiceManager;
 use alanrogers\tools\twig\Extensions;
 use Craft;
 use craft\base\Model;
-use craft\web\Application as WebApplication;
-use craft\console\Application as Console;
-use craft\console\controllers\MigrateController;
+use craft\base\Plugin;
 use craft\controllers\UsersController;
-use craft\db\MigrationManager;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
-use craft\events\RegisterMigratorEvent;
-use craft\events\RegisterTemplateRootsEvent;
 use craft\i18n\PhpMessageSource;
-use craft\web\View;
 use yii\base\ActionEvent;
-use yii\base\BootstrapInterface;
 use yii\base\Controller;
 use yii\base\Event;
-use yii\base\Module;
 use yii\web\ForbiddenHttpException;
 
 /**
  * @property ServiceManager $ar
  */
-class CraftTools extends Module implements BootstrapInterface
+class CraftTools extends Plugin
 {
-    const ID = 'ar-tools';
+    const ID = '_ar-tools';
 
     public const MIGRATION_TRACK_NAME = 'craft-tools';
+
+    public string $schemaVersion = '1.0.0';
 
     /**
      * Static property that is an instance of this module class so that it can be accessed via CraftTools::$instance
@@ -43,113 +37,67 @@ class CraftTools extends Module implements BootstrapInterface
     public static CraftTools $instance;
 
     /**
-     * @var ServiceManager|null
-     */
-    private static ?ServiceManager $service_manager = null;
-
-    /**
      * An array of field handles that must NOT be edited by the owning user.
      * @var array
      */
     public static array $disallowed_custom_user_fields = [];
 
-    public function __construct($id=self::ID, $parent = null, $config = [])
+    public static function config(): array
     {
+        return [
+            'components' => [
+                // Define component configs here...
+            ],
+        ];
+    }
+
+    protected function settingsHtml(): ?string
+    {
+        return Craft::$app->view->renderTemplate('_craft-test-plugin/_settings.twig', [
+            'plugin' => $this,
+            'settings' => $this->getSettings(),
+        ]);
+    }
+
+    public function init(): void
+    {
+        parent::init();
+
         // Alias for this module
         Craft::setAlias('@modules/alanrogers', $this->getBasePath());
 
         // Define a custom alias named after the namespace
-        Craft::setAlias('@' . $id, __DIR__);
+        Craft::setAlias('@' . $this->id, __DIR__);
 
         // Alias for AR Module Twig templates
-        Craft::setAlias('@' . $id . '-templates', __DIR__ . '/templates');
+        Craft::setAlias('@' . $this->id . '-templates', __DIR__ . '/templates');
 
-        // controller namespace
-        if (Craft::$app instanceof Console) {
-            $this->controllerNamespace = 'alanrogers\\tools\\console\\controllers';
-        } else {
-            $this->controllerNamespace = 'alanrogers\\tools\\controllers';
-        }
+        Craft::$app->onInit(function() {
 
-        parent::__construct($id, $parent, $config);
-    }
+            $this->setComponents([
+                'ar' => ServiceManager::getInstance()
+            ]);
 
-    public function bootstrap($app): void
-    {
-        self::$instance = $this;
-
-        $this->setComponents([
-            'ar' => ServiceManager::getInstance()
-        ]);
-
-        // Register Twig stuff
-        Craft::$app->on(WebApplication::EVENT_INIT, function() {
             Extensions::register();
-            $this->registerTemplateRoots();
+
+            // Our custom fields
+            FieldRegister::registerFields();
+
+            $this->registerTranslationCategory();
+            self::registerUserRules();
+            self::enforceFieldPermissions();
+
         });
-
-        // Our custom fields
-        FieldRegister::registerFields();
-
-        self::registerTranslationCategory();
-        self::registerMigrationTrack();
-        self::registerUserRules();
-        self::enforceFieldPermissions();
-
-        // Set this as the global instance of this module class
-        static::setInstance($this);
     }
 
-    private static function registerMigrationTrack() : void
+    private function registerTranslationCategory() : void
     {
-        Event::on(
-            MigrateController::class,
-            MigrateController::EVENT_REGISTER_MIGRATOR,
-            function(RegisterMigratorEvent $event) {
-                if ($event->track === self::MIGRATION_TRACK_NAME) {
-                    $event->migrator = Craft::createObject([
-                        'class' => MigrationManager::class,
-                        'track' => self::MIGRATION_TRACK_NAME,
-                        'migrationNamespace' => 'alanrogers\\tools\\migrations',
-                        'migrationPath' => '@vendor/alanrogers/craft-tools/src/migrations',
-                    ]);
-                    $event->handled = true;
-                }
-            }
-        );
-    }
-
-    private static function registerTranslationCategory() : void
-    {
-        Craft::$app->getI18n()->translations['ar-tools'] = [
+        Craft::$app->getI18n()->translations[$this->id] = [
             'class' => PhpMessageSource::class,
             'sourceLanguage' => 'en',
             'basePath' => __DIR__ . '/translations',
             'allowOverrides' => true,
         ];
-    }
-
-    private function registerTemplateRoots() : void
-    {
-        Event::on(
-            View::class,
-            View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
-            function(RegisterTemplateRootsEvent $event) {
-                if (is_dir($base_dir = $this->getBasePath() . DIRECTORY_SEPARATOR . 'templates')) {
-                    $event->roots[$this->id] = $base_dir;
-                }
-            }
-        );
-
-        Event::on(
-            View::class,
-            View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
-            function(RegisterTemplateRootsEvent $event) {
-                if (is_dir($base_dir = $this->getBasePath() . DIRECTORY_SEPARATOR . 'templates')) {
-                    $event->roots[$this->id] = $base_dir;
-                }
-            }
-        );
     }
 
     private static function registerUserRules() : void
@@ -171,6 +119,8 @@ class CraftTools extends Module implements BootstrapInterface
             UsersController::class,
             Controller::EVENT_BEFORE_ACTION,
             function(ActionEvent $event) {
+
+                // @todo make this into an event
                 if ($event->action->id === 'save-user' && Craft::$app->request->isSiteRequest) {
 
                     // check whether each of the fields submitted in the posted field's parameter (which can be renamed

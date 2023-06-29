@@ -18,7 +18,7 @@ use yii\base\InvalidArgumentException;
  */
 class ServiceManager
 {
-    private static array $_service_classes = [
+    protected static array $_service_classes = [
         'gql_client' => GQLClient::class,
         'error' => Error::class,
         'error_handler' => ErrorHandler::class,
@@ -29,21 +29,26 @@ class ServiceManager
      * Array of namespaces to look for helpers - uses the first match it finds.
      * @var string[]
      */
-    private static array $_helper_namespaces = [
+    protected static array $_helper_namespaces = [
         'alanrogers\\tools\\helpers\\'
     ];
 
-    private static array $_helpers = [];
+    protected static array $_helpers = [];
 
-    private static ?ServiceManager $instance = null;
+    protected static array $_instances = [];
+
+    final protected function __construct() {}
 
     public static function getInstance() : static
     {
-        if (self::$instance === null) {
-            self::$instance = new static();
+        if (!isset(self::$_instances[static::class])) {
+            self::$_instances[static::class] = new static();
+            self::$_instances[static::class]->init();
         }
-        return self::$instance;
+        return self::$_instances[static::class];
     }
+
+    public function init() : void {}
 
     /**
      * Allows fluent access to the services this class manager.
@@ -57,7 +62,6 @@ class ServiceManager
             $this->$name = new self::$_service_classes[$name]();
             return $this->$name;
         }
-
         throw new InvalidArgumentException(sprintf('ServiceManager: Cannot get - No such AR service: "%.50s"', $name));
     }
 
