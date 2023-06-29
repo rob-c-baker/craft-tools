@@ -1,3 +1,4 @@
+{% autoescape false %}
 {% if is_console %}
 [Console Request] {{ error_model.message }}
 {% else %}
@@ -27,3 +28,4 @@ File: "{{ error_model.exception.getPrevious().getFile() }}" Line: {{ error_model
 Other Data:
 {{ error_model.getData(true) }}
 {% endif %}
+{% endautoescape %}
