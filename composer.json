@@ -11,7 +11,7 @@
     },
     "extra": {
         "handle": "_ar-tools",
-        "name": "ar-tools-plugin",
+        "name": "Alan Rogers Tools",
         "developer": "alanrogers",
         "documentationUrl": "https://gitlab.alanrogers.com/web-dev/craft-tools/-/wikis/home",
         "class": "alanrogers\\tools\\CraftTools",
