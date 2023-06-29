@@ -5,6 +5,7 @@ namespace alanrogers\tools\services\errors\reporters;
 use alanrogers\tools\queue\jobs\SendCustomEmail;
 use alanrogers\tools\services\errors\ErrorModel;
 use Craft;
+use craft\web\View;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -33,7 +34,8 @@ class Email implements Reporting
                     'is_console' => Craft::$app->getRequest()->isConsoleRequest,
                     'url' => $request instanceof Request ? $request->getAbsoluteUrl() : null,
                     'stack_trace' => $stack_trace
-                ]
+                ],
+                View::TEMPLATE_MODE_CP
             );
         } catch (LoaderError|RuntimeError|SyntaxError|Exception $e) {
             Craft::error('Cannot report error due to template exception: ' . $e->getMessage());

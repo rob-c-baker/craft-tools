@@ -86,13 +86,13 @@ class CraftTools extends Plugin
             $this->registerTranslationCategory();
             self::registerUserRules();
             self::enforceFieldPermissions();
+        });
 
-            // Need front-end templates (cp template root gets registered in parent class)
-            Event::on(View::class, View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS, function(RegisterTemplateRootsEvent $e) {
-                if (is_dir($base_dir = $this->getBasePath() . DIRECTORY_SEPARATOR . 'templates')) {
-                    $e->roots[$this->id] = $base_dir;
-                }
-            });
+        // Need front-end templates (cp template root gets registered in parent class)
+        Event::on(View::class, View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS, function(RegisterTemplateRootsEvent $e) {
+            if (is_dir($base_dir = $this->getBasePath() . DIRECTORY_SEPARATOR . 'templates')) {
+                $e->roots[$this->id] = $base_dir;
+            }
         });
     }
 
