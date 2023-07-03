@@ -16,7 +16,9 @@ class Sentry implements Reporting
     public function initialise(): void
     {
         $this->enabled = (bool) ($_SERVER['SENTRY_ENABLED'] ?? false);
-        $this->excluded_status_codes = [ 404 ];
+        $this->excluded_status_codes = isset($_SERVER['SENTRY_IGNORE_ERROR_CODES'])
+            ?  array_map('intval', array_map('trim', explode(',', $_SERVER['SENTRY_IGNORE_ERROR_CODES'])))
+            : [ 404, 410 ];
     }
 
     public function report(ErrorModel $error): bool
@@ -25,8 +27,9 @@ class Sentry implements Reporting
             return true;
         }
         if ($error->exception) {
-            if (isset($error->exception->statusCode)) {
-                if (in_array($error->exception->statusCode, $this->excluded_status_codes)) {
+            if (isset($error->exception->statusCode) || $error->exception->getCode()) {
+                if (in_array($error->exception->statusCode, $this->excluded_status_codes)
+                    || in_array($error->exception->getCode(), $this->excluded_status_codes)) {
                     return true;
                 }
             }
