@@ -26,6 +26,11 @@ class ErrorHandler extends Component
      */
     private array $reporters = [];
 
+    /**
+     * @var string|int[]
+     */
+    private array $ignored_error_codes = [];
+
     public function init(): void
     {
         $event = new ErrorHandlerInitEvent([
@@ -51,6 +56,15 @@ class ErrorHandler extends Component
     }
 
     /**
+     * @param string|int[] $codes
+     * @return void
+     */
+    public function setIgnoredExceptionCodes(array $codes) : void
+    {
+        $this->ignored_error_codes = $codes;
+    }
+
+    /**
      * @param class-string<Reporting> $class_name
      * @return Reporting|null
      */
@@ -71,6 +85,9 @@ class ErrorHandler extends Component
     {
         if (!$this->enabled) {
             return false;
+        }
+        if ($model->exception && in_array($model->exception->getCode(), $this->ignored_error_codes)) {
+            return true; // ignore but report successful
         }
         $results = [];
         foreach ($this->reporters as $class_name => $reporter) {

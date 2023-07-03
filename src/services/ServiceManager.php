@@ -52,6 +52,7 @@ class ServiceManager
     public function init() : void
     {
         // Special case for error_handler: need to register Sentry as early as possible
+        $this->error_handler->setIgnoredExceptionCodes([ 404, 410 ]);
         $this->error_handler->getReporter(Sentry::class)->initialise();
     }
 
