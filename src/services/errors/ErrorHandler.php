@@ -43,14 +43,23 @@ class ErrorHandler extends Component
         $this->reporters = $event->reporters;
 
         foreach ($this->reporters as $class_name => $reporter) {
-            if (!isset($this->reporters[$class_name])) {
-                $r = new $class_name();
-                $r->initialise();
-                $this->reporters[$class_name] = $r;
-            }
+            $this->reporters[$class_name] = new $class_name();
+            $this->reporters[$class_name]->initialise();
         }
 
         $this->registerEvents();
+    }
+
+    /**
+     * @param class-string<Reporting> $class_name
+     * @return Reporting|null
+     */
+    public function getReporter(string $class_name) : ?Reporting
+    {
+        if (isset($this->reporters[$class_name])) {
+            return $this->reporters[$class_name];
+        }
+        return null;
     }
 
     /**

@@ -6,6 +6,7 @@ namespace alanrogers\tools\services;
 use alanrogers\tools\helpers\BaseHelper;
 use alanrogers\tools\helpers\HelperInterface;
 use alanrogers\tools\services\errors\ErrorHandler;
+use alanrogers\tools\services\errors\reporters\Sentry;
 use RuntimeException;
 use yii\base\InvalidArgumentException;
 
@@ -48,7 +49,11 @@ class ServiceManager
         return self::$_instances[static::class];
     }
 
-    public function init() : void {}
+    public function init() : void
+    {
+        // Special case for error_handler: need to register Sentry as early as possible
+        $this->error_handler->getReporter(Sentry::class)->initialise();
+    }
 
     /**
      * Allows fluent access to the services this class manager.

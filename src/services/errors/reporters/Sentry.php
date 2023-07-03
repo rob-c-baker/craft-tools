@@ -2,48 +2,21 @@
 
 namespace alanrogers\tools\services\errors\reporters;
 
-use alanrogers\tools\events\ErrorHandlerSentryConfigEvent;
 use alanrogers\tools\services\errors\ErrorModel;
-use Craft;
-use craft\base\Component;
 use Sentry\Severity;
 use function Sentry\captureException;
 use function Sentry\captureMessage;
-use function Sentry\init;
 
-class Sentry extends Component implements Reporting
+class Sentry implements Reporting
 {
-    const EVENT_DEFINE_SENTRY_CONFIG = 'defineSentryConfig';
-
     private bool $enabled = false;
 
     private array $excluded_status_codes = [];
 
     public function initialise(): void
     {
-        if (!($_SERVER['SENTRY_ENABLED'] ?? false)) {
-            $this->enabled = false;
-            return;
-        }
-
-        $this->enabled = true;
-
-        $event = new ErrorHandlerSentryConfigEvent([
-            'dsn' => $_SERVER['SENTRY_DSN'] ?? null,
-            'environment' => $_SERVER['ENVIRONMENT'] ?? 'production',
-            'release' => gethostname() . '@' . ($_SERVER['COMMIT_REF'] ?? 'master'),
-            'excluded_status_codes' => [ 400, 404 ]
-        ]);
-
-        $this->trigger(self::EVENT_DEFINE_SENTRY_CONFIG, $event);
-
-        if (!isset($_SERVER['SENTRY_DSN'])) {
-            Craft::warning('SENTRY_DSN env variable is not defined. Sentry not enabled.');
-            return;
-        }
-        $this->excluded_status_codes = $event->excluded_status_codes;
-
-        init($event->asSentryConfig());
+        $this->enabled = (bool) ($_SERVER['SENTRY_ENABLED'] ?? false);
+        $this->excluded_status_codes = [ 404 ];
     }
 
     public function report(ErrorModel $error): bool
