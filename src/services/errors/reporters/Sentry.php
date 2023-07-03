@@ -15,10 +15,19 @@ class Sentry extends Component implements Reporting
 {
     const EVENT_DEFINE_SENTRY_CONFIG = 'defineSentryConfig';
 
+    private bool $enabled = false;
+
     private array $excluded_status_codes = [];
 
     public function initialise(): void
     {
+        if (!($_SERVER['SENTRY_ENABLED'] ?? false)) {
+            $this->enabled = false;
+            return;
+        }
+
+        $this->enabled = true;
+
         $event = new ErrorHandlerSentryConfigEvent([
             'dsn' => $_SERVER['SENTRY_DSN'] ?? null,
             'environment' => $_SERVER['ENVIRONMENT'] ?? 'production',
@@ -39,6 +48,9 @@ class Sentry extends Component implements Reporting
 
     public function report(ErrorModel $error): bool
     {
+        if (!$this->enabled) {
+            return true;
+        }
         if ($error->exception) {
             if (isset($error->exception->statusCode)) {
                 if (in_array($error->exception->statusCode, $this->excluded_status_codes)) {
