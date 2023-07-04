@@ -9,6 +9,7 @@ use alanrogers\tools\services\errors\reporters\Reporting;
 use alanrogers\tools\services\errors\reporters\Sentry;
 use craft\base\Component;
 use craft\events\ExceptionEvent;
+use Throwable;
 use yii\base\Event;
 
 class ErrorHandler extends Component
@@ -29,7 +30,7 @@ class ErrorHandler extends Component
     /**
      * @var string|int[]
      */
-    private array $ignored_error_codes = [];
+    private array $suppressed_exception_codes = [];
 
     public function init(): void
     {
@@ -59,9 +60,9 @@ class ErrorHandler extends Component
      * @param string|int[] $codes
      * @return void
      */
-    public function setIgnoredExceptionCodes(array $codes) : void
+    public function setSuppressedExceptionCodes(array $codes) : void
     {
-        $this->ignored_error_codes = $codes;
+        $this->suppressed_exception_codes = $codes;
     }
 
     /**
@@ -86,7 +87,7 @@ class ErrorHandler extends Component
         if (!$this->enabled) {
             return false;
         }
-        if ($model->exception && in_array($model->exception->getCode(), $this->ignored_error_codes)) {
+        if ($model->exception && !$this->isErrorCodeSuppressed($model->exception)) {
             return true; // ignore but report successful
         }
         $results = [];
@@ -122,5 +123,18 @@ class ErrorHandler extends Component
             \craft\console\ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
             $handler
         );
+    }
+
+    /**
+     * @param Throwable $exception
+     * @return bool
+     */
+    private function isErrorCodeSuppressed(Throwable $exception) : bool
+    {
+        $code = $exception->getCode();
+        if (isset($exception->statusCode)) {
+            $code = $exception->statusCode;
+        }
+        return in_array($code, $this->suppressed_exception_codes);
     }
 }
