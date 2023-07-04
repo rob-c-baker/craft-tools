@@ -49,12 +49,7 @@ class ServiceManager
         return self::$_instances[static::class];
     }
 
-    public function init() : void
-    {
-        // Special case for error_handler: need to register Sentry as early as possible
-        $this->error_handler->setSuppressedExceptionCodes([ 404, 410 ]);
-        $this->error_handler->getReporter(Sentry::class)->initialise();
-    }
+    public function init() : void {}
 
     /**
      * Allows fluent access to the services this class manager.

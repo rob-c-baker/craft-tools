@@ -30,7 +30,10 @@ class ErrorHandler extends Component
     /**
      * @var string|int[]
      */
-    private array $suppressed_exception_codes = [];
+    private array $suppressed_exception_codes = [
+        404,
+        410
+    ];
 
     public function init(): void
     {
