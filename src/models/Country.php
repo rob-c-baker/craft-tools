@@ -62,7 +62,7 @@ class Country extends Model
         $rules[] = [ [ 'iso3', 'currency_code', 'continent_code' ], 'string', 'length' => 3 ];
 
         // Uppercase
-        $rules[] = [ [ 'iso2', 'iso3', 'currency_code', 'continent_code' ], 'filter', 'filter' => 'strtoupper' ];
+        $rules[] = [ [ 'iso2', 'iso3', 'currency_code' ], 'filter', 'filter' => 'strtoupper' ];
 
         return $rules;
     }
