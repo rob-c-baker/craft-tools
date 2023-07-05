@@ -72,20 +72,22 @@ class CraftTools extends Plugin
         // Alias for AR Module Twig templates
         Craft::setAlias('@' . $this->id . '-templates', __DIR__ . '/templates');
 
-        Extensions::register();
+        // Our custom fields
+        FieldRegister::registerFields();
+
+        $this->registerTranslationCategory();
+
+        self::enforceFieldPermissions();
 
         Craft::$app->onInit(function() {
+
+            Extensions::register();
 
             $this->setComponents([
                 'ar' => ServiceManager::getInstance()
             ]);
 
-            // Our custom fields
-            FieldRegister::registerFields();
-
-            $this->registerTranslationCategory();
             self::registerUserRules();
-            self::enforceFieldPermissions();
         });
 
         // Need front-end templates (cp template root gets registered in parent class)
