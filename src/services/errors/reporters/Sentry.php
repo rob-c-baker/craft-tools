@@ -11,6 +11,9 @@ class Sentry implements Reporting
 {
     private bool $enabled = false;
 
+    /**
+     * @var int[]
+     */
     private array $excluded_status_codes = [];
 
     public function initialise(): void
@@ -27,11 +30,12 @@ class Sentry implements Reporting
             return true;
         }
         if ($error->exception) {
-            if (isset($error->exception->statusCode) || $error->exception->getCode()) {
-                if (in_array($error->exception->statusCode, $this->excluded_status_codes)
-                    || in_array($error->exception->getCode(), $this->excluded_status_codes)) {
-                    return true;
-                }
+            $status_code = isset($error->exception->statusCode) ? (int) $error->exception->statusCode : null;
+            if (in_array($status_code, $this->excluded_status_codes, true)) {
+                return true;
+            }
+            if (in_array($error->exception->getCode(), $this->excluded_status_codes, true)) {
+                return true;
             }
             return (bool) captureException($error->exception);
         }
