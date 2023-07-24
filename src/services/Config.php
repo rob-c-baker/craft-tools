@@ -56,7 +56,7 @@ class Config extends Component
     {
         if (!isset($this->config_paths[$name])) {
             $path = $this->base_path . $name . '.php';
-            if (!file_exists($this->config_paths[$name])) {
+            if (!file_exists($path)) {
                 throw new InvalidArgumentException(sprintf('Config "%s" not found.', $name));
             }
             $this->config_paths[$name] = $path;
