@@ -38,6 +38,7 @@
         "ext-zlib": "*",
         "beberlei/assert": "^3.2",
         "craftcms/cms": "^4.2.0",
+        "elasticsearch/elasticsearch": "^8.7.0",
         "giggsey/libphonenumber-for-php": "^8.12",
         "google/apiclient": "^2.4",
         "guzzlehttp/guzzle": "^7.2.0",
@@ -59,7 +60,7 @@
     "config": {
         "sort-packages": true,
         "platform": {
-            "php": "^8.1.0"
+            "php": "8.1"
         },
         "allow-plugins": {
             "yiisoft/yii2-composer": false,

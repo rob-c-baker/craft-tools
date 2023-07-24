@@ -13,6 +13,12 @@ class Config extends Component
      */
     private ?string $base_path;
 
+    /**
+     * Complete paths to the config files. Indexed on name.
+     * @var array<string, string>
+     */
+    private array $config_paths = [];
+
     private string $default_config_name;
 
     /**
@@ -46,19 +52,42 @@ class Config extends Component
         }
     }
 
+    private function ensureConfigPath(string $name): void
+    {
+        if (!isset($this->config_paths[$name])) {
+            $path = $this->base_path . $name . '.php';
+            if (!file_exists($this->config_paths[$name])) {
+                throw new InvalidArgumentException(sprintf('Config "%s" not found.', $name));
+            }
+            $this->config_paths[$name] = $path;
+        }
+    }
+
+    /**
+     * Whether this named config (file usually) exists
+     * @param string|null $name (matches the filename before the .php prefix)
+     * @return bool
+     */
+    public function configExists(?string $name=null) : bool
+    {
+        try {
+            $this->ensureConfigPath($name ?? $this->default_config_name);
+            return isset($this->config_paths[$name]);
+        } catch (InvalidArgumentException) {
+            return false;
+        }
+    }
+
     /**
      * @param string $name (matches the filename before the .php prefix)
      * @throws InvalidArgumentException When the named config is invalid / not found
      */
     private function loadConfig(string $name) : void
     {
-        $path = $this->base_path . $name . '.php';
-        if (file_exists($path)) {
-            $this->config_data[$name] = require($path);
-        } else {
-            throw new InvalidArgumentException(sprintf('Config "%s" not found.', $name));
+        if ($this->configExists($name)) {
+            $this->config_data[$name] = require($this->config_paths[$name]);
+            $this->loaded[$name] = true;
         }
-        $this->loaded[$name] = true;
     }
 
     /**

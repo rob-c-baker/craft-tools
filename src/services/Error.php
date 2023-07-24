@@ -27,7 +27,7 @@ class Error extends Component
             'ip_address' => $ip_address,
             'other_data' => $other_data
         ]);
-        return ServiceManager::getInstance()->error_handler->report($error_model);
+        return ServiceLocator::getInstance()->error_handler->report($error_model);
     }
 
     /**
@@ -42,7 +42,7 @@ class Error extends Component
         if (!$send_email) {
             $error_model->preventReport(Email::class);
         }
-        return ServiceManager::getInstance()->error_handler->report($error_model);
+        return ServiceLocator::getInstance()->error_handler->report($error_model);
     }
 
     /**
@@ -58,7 +58,7 @@ class Error extends Component
         if (!$send_email) {
             $error_model->preventReport(Email::class);
         }
-        return ServiceManager::getInstance()->error_handler->report($error_model);
+        return ServiceLocator::getInstance()->error_handler->report($error_model);
     }
 
     /**

@@ -5,7 +5,8 @@ namespace alanrogers\tools;
 
 use alanrogers\tools\fields\FieldRegister;
 use alanrogers\tools\rules\UserRules;
-use alanrogers\tools\services\ServiceManager;
+use alanrogers\tools\services\es\Events;
+use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\twig\Extensions;
 use Craft;
 use craft\base\Model;
@@ -16,13 +17,17 @@ use craft\events\DefineRulesEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\i18n\PhpMessageSource;
 use craft\web\View;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use yii\base\ActionEvent;
 use yii\base\Controller;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\web\ForbiddenHttpException;
 
 /**
- * @property ServiceManager $ar
+ * @property ServiceLocator $ar
  */
 class CraftTools extends Plugin
 {
@@ -51,6 +56,12 @@ class CraftTools extends Plugin
         ];
     }
 
+    /**
+     * @throws SyntaxError
+     * @throws Exception
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
     protected function settingsHtml(): ?string
     {
         return Craft::$app->view->renderTemplate('_craft-test-plugin/_settings.twig', [
@@ -79,12 +90,15 @@ class CraftTools extends Plugin
 
         self::enforceFieldPermissions();
 
+        // Elasticsearch events
+        Events::registerEvents();
+
         Craft::$app->onInit(function() {
 
             Extensions::register();
 
             $this->setComponents([
-                'ar' => ServiceManager::getInstance()
+                'ar' => ServiceLocator::getInstance()
             ]);
 
             self::registerUserRules();

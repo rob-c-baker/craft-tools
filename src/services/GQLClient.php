@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace alanrogers\tools\services;
 
@@ -230,7 +229,7 @@ class GQLClient extends Component
     }
 
     /**
-     * So we can easily call this from Twig via ServiceManager
+     * So we can easily call this from Twig via ServiceLocator
      * @param string $endpoint
      * @return self
      */
