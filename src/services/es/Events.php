@@ -80,7 +80,7 @@ class Events
             if ($index->type === IndexType::SAYT && $index->auto_index) {
                 $sayt_jobs[] = new ElasticSearchUpdate([
                     'delete_index_first' => false,
-                    'index' => $index->indexName(),
+                    'index' => $index->indexName(false),
                     'element_ids' => [ $entry->id ],
                     'refresh_index' => true
                 ]);

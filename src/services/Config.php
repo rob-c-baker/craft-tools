@@ -71,8 +71,9 @@ class Config extends Component
     public function configExists(?string $name=null) : bool
     {
         try {
-            $this->ensureConfigPath($name ?? $this->default_config_name);
-            return isset($this->config_paths[$name]);
+            $name_to_check = $name ?? $this->default_config_name;
+            $this->ensureConfigPath($name_to_check);
+            return isset($this->config_paths[$name_to_check]);
         } catch (InvalidArgumentException) {
             return false;
         }
