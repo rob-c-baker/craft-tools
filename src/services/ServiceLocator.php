@@ -15,6 +15,7 @@ use yii\di\ServiceLocator as YiiServiceLocator;
  * @property Error $error
  * @property ErrorHandler $error_handler
  * @property Config $config
+ * @property-read YiiServiceLocator $helpers
  * @property ElasticSearch $elastic_search
  */
 class ServiceLocator extends YiiServiceLocator
@@ -30,7 +31,7 @@ class ServiceLocator extends YiiServiceLocator
         'alanrogers\\tools\\helpers\\'
     ];
 
-    private function __construct()
+    protected function __construct()
     {
         parent::__construct();
         $this->_helpers = new YiiServiceLocator();

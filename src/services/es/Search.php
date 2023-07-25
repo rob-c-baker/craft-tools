@@ -78,13 +78,12 @@ class Search
      * @param int $size
      * @param int $from
      * @return SearchResponse
-     * @throws ESException
      */
     public function fullTextSearch(string $query, int $size=10, int $from=0) : SearchResponse
     {
         $params = $this->fullTextSearchParams($size, $from);
-        $params['body']['query'] = $this->fullTextQuery($query);
         try {
+            $params['body']['query'] = $this->fullTextQuery($query);
             $response = $this->es->getClient()->search($params);
             return SearchResponse::build($response);
         } catch (ClientResponseException|ServerResponseException|ESException $e) {
