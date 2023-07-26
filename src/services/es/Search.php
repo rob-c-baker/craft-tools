@@ -116,7 +116,7 @@ class Search
         {
             if ($value instanceof DateTime) {
                 $value = $value->format('c');
-            } elseif (method_exists($value, 'getParsedContent')) { // another way of doing "$value instanceof FieldData" without requiring the redactor plugin in this repo
+            } elseif (is_object($value) && method_exists( $value, 'getParsedContent')) { // another way of doing "$value instanceof FieldData" without requiring the redactor plugin in this repo
                 $value = strip_tags($value->getParsedContent());
             } elseif ($value instanceof Category) {
                 $value = [
