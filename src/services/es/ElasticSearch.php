@@ -12,6 +12,7 @@ use Elastic\Elasticsearch\Exception\MissingParameterException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Psr\Log\LogLevel;
 use RuntimeException;
+use Throwable;
 use yii\base\Component;
 
 /**
@@ -125,11 +126,13 @@ class ElasticSearch extends Component
      */
     public function updateIndexMapping(string $index, array $mapping, ?array $settings=null) : bool
     {
+        $index_open = true;
         try {
             // see https://www.elastic.co/guide/en/elasticsearch/reference/7.17/indices-update-settings.html
             // cannot update analysers on "open" indexes - they need to be closed, updated and then opened again.
             $indices = $this->getClient()->indices();
             $indices->close([ 'index' => $index ]);
+            $index_open = false;
             $response = $this->getClient()->indices()->putMapping([
                 'index' => $index,
                 'body' => [
@@ -138,8 +141,16 @@ class ElasticSearch extends Component
                 ]
             ]);
             $indices->open([ 'index' => $index ]);
+            $index_open = true;
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            if (!$index_open) {
+                try {
+                    $this->getClient()->indices()->open([ 'index' => $index ]);
+                } catch (Throwable $e) {
+                    throw new RuntimeException('ES: Could not re-open index on failed settings / mapping update.', (int) $e->getCode(), $e);
+                }
+            }
             return false;
         }
 
