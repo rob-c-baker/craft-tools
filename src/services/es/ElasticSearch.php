@@ -137,6 +137,7 @@ class ElasticSearch extends Component
                     'settings' => $settings ?? Config::getInstance()->getGlobalIndexSettings()
                 ]
             ]);
+            $indices->open([ 'index' => $index ]);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
             return false;
