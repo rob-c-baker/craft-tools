@@ -73,14 +73,18 @@ class IconLibrary
 
     /**
      * Gets the filesystem path to the icon
-     * @param string $name
+     * @param string|null $name If null, empty string returned
      * @param string $type a TYPE_* class constant
      * @return string|null
      */
-    public function getIconPath(string $name, string $type=self::TYPE_SVG) : ?string
+    public function getIconPath(?string $name, string $type=self::TYPE_SVG) : ?string
     {
         if (!in_array($type, self::ALLOWED_TYPES, true)) {
             throw new InvalidArgumentException(sprintf('Invalid type supplied: "%s".', $type));
+        }
+
+        if ($name === null) {
+            return '';
         }
 
         $filename = $name . '.' . $type;
@@ -110,15 +114,19 @@ class IconLibrary
 
     /**
      * Gets the contents of the icon file.
-     * @param string $name
+     * @param string|null $name If null, empty string returned
      * @param string $type a TYPE_* class constant
      * @param array $attributes
      * @return string|null
      */
-    public function getIconData(string $name, string $type=self::TYPE_SVG, array $attributes=[]) : ?string
+    public function getIconData(?string $name, string $type=self::TYPE_SVG, array $attributes=[]) : ?string
     {
         if (!in_array($type, self::ALLOWED_TYPES, true)) {
             throw new InvalidArgumentException(sprintf('Invalid type supplied: "%s".', $type));
+        }
+
+        if ($name === null) {
+            return '';
         }
 
         $filename = $name . '.' . $type;
@@ -190,7 +198,7 @@ class IconLibrary
         $key = $path . '__' . $name;
 
         if (!isset(self::$instances[$key])) {
-            self::$instances[$key] = new IconLibrary($path, $name);
+            self::$instances[$key] = new IconLibrary($name, $path);
         }
 
         return self::$instances[$key];
