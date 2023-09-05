@@ -131,8 +131,8 @@ class IconLibrary
 
         $filename = $name . '.' . $type;
 
-        if (isset($this->loaded[$filename]['path'])) {
-            $data = $this->loaded[$filename]['path'];
+        if (isset($this->loaded[$filename]['data'])) {
+            $data = $this->loaded[$filename]['data'];
         } else {
             $path = $this->getIconPath($name, $type);
             $data = file_get_contents($path);
