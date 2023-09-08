@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace alanrogers\tools\console\controllers;
+
 use alanrogers\tools\queue\jobs\ElasticSearchUpdate;
 use alanrogers\tools\services\es\ESException;
 use craft\helpers\Console;
