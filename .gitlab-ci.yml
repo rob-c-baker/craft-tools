@@ -30,8 +30,8 @@ run_tests:
     - apt-get update && apt-get install -qqy git unzip libicu-dev libzip-dev
 
     # Extensions we need that are not included in image
-    - docker-php-ext-install -j$(nproc) bcmath intl zip exif
-    - docker-php-ext-enable bcmath intl zip exif
+    - docker-php-ext-install -j$(nproc) bcmath intl zip exif gd
+    - docker-php-ext-enable bcmath intl zip exif gd
 
     # Install composer
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
