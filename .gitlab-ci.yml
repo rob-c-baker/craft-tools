@@ -27,7 +27,7 @@ run_tests:
 
   before_script:
     # Install git and unzip (composer will need them) and dependencies for extensions etc
-    - apt-get update && apt-get install -qqy git unzip libicu-dev libzip-dev
+    - apt-get update && apt-get install -qqy git unzip libicu-dev libzip-dev libpng-dev
 
     # Extensions we need that are not included in image
     - docker-php-ext-install -j$(nproc) bcmath intl zip exif gd
