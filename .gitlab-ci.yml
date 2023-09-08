@@ -27,10 +27,11 @@ run_tests:
 
   before_script:
     # Install git and unzip (composer will need them) and dependencies for extensions etc
-    - apt-get update && apt-get install -qqy git unzip libicu-dev libzip-dev libpng-dev
+    - apt-get update && apt-get install -qqy git unzip libicu-dev libzip-dev libpng-dev && apt-get install -y libmagickwand-dev --no-install-recommends
 
     # Extensions we need that are not included in image
-    - docker-php-ext-install -j$(nproc) bcmath intl zip exif gd imagick
+    - docker-php-ext-install -j$(nproc) bcmath intl zip exif gd
+    - pecl install imagick
     - docker-php-ext-enable bcmath intl zip exif gd imagick
 
     # Install composer
