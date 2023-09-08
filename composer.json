@@ -36,6 +36,7 @@
         "ext-curl": "*",
         "ext-dom": "*",
         "ext-zlib": "*",
+        "alanrogers/arimager": "^3.1",
         "beberlei/assert": "^3.2",
         "craftcms/cms": "^4.2.0",
         "elasticsearch/elasticsearch": "^8.7.0",
@@ -43,6 +44,7 @@
         "google/apiclient": "^2.4",
         "guzzlehttp/guzzle": "^7.2.0",
         "marionnewlevant/twig-perversion": "^3.0",
+        "nystudio107/craft-seomatic": "^4.0",
         "sentry/sdk": "^3.5",
         "symfony/var-dumper": "v5.4.6",
         "yiisoft/yii2-redis": "~2.0.0"
@@ -59,6 +61,9 @@
     },
     "config": {
         "sort-packages": true,
+        "gitlab-domains": [
+            "gitlab.alanrogers.com"
+        ],
         "platform": {
             "php": "8.1"
         },
@@ -66,6 +71,17 @@
             "yiisoft/yii2-composer": false,
             "craftcms/plugin-installer": false,
             "php-http/discovery": true
+        }
+    },
+    "repositories": {
+        "gitlab.alanrogers.com/30": {
+            "type": "composer",
+            "url": "https://gitlab.alanrogers.com/api/v4/group/30/-/packages/composer/packages.json",
+            "canonical": false
+        },
+        "gitlab.alanrogers.com/3": {
+            "type": "composer",
+            "url": "https://gitlab.alanrogers.com/api/v4/group/3/-/packages/composer/packages.json"
         }
     }
 }

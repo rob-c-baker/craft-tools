@@ -15,6 +15,7 @@ use yii\di\ServiceLocator as YiiServiceLocator;
  * @property Error $error
  * @property ErrorHandler $error_handler
  * @property Config $config
+ * @property AlanRogersCache $cache
  * @property-read YiiServiceLocator $helpers
  * @property ElasticSearch $elastic_search
  */
@@ -43,6 +44,7 @@ class ServiceLocator extends YiiServiceLocator
 
         // default components
         $this->setComponents([
+            'cache' => AlanRogersCache::class,
             'gql_client' => GQLClient::class,
             'error' => Error::class,
             'error_handler' => ErrorHandler::class,
