@@ -11,6 +11,7 @@ use alanrogers\tools\twig\Extensions;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
+use craft\console\Application as Console;
 use craft\controllers\UsersController;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
@@ -82,6 +83,13 @@ class CraftTools extends Plugin
 
         // Alias for AR Module Twig templates
         Craft::setAlias('@' . $this->id . '-templates', __DIR__ . '/templates');
+
+        // controller namespace
+        if (Craft::$app instanceof Console) {
+            $this->controllerNamespace = 'alanrogers\\tools\\console\\controllers';
+        } else {
+            $this->controllerNamespace = 'alanrogers\\tools\\controllers';
+        }
 
         // Our custom fields
         FieldRegister::registerFields();
