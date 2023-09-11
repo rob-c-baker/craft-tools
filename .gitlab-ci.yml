@@ -25,6 +25,9 @@ run_tests:
     reports:
       junit: tests/_output/report.xml
 
+  variables:
+    COMPOSER_AUTH_JSON: "{\"gitlab-token\":{\"gitlab.alanrogers.com\":\"$COMPOSER_TOKEN\"}}"
+
   before_script:
     # Install git and unzip (composer will need them) and dependencies for extensions etc
     - apt-get update && apt-get install -qqy git unzip libicu-dev libzip-dev libpng-dev && apt-get install -y libmagickwand-dev --no-install-recommends
@@ -38,7 +41,7 @@ run_tests:
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
     # Add our auth token (Gitlab secret) so we can fetch from local repositories
-    - composer config --global --auth gitlab.alanrogers.com $COMPOSER_TOKEN
+    - cat "$COMPOSER_AUTH_JSON" > auth.json
 
     # Install all project dependencies
     - composer install
