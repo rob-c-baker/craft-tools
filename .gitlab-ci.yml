@@ -34,11 +34,12 @@ run_tests:
 
     # Extensions we need that are not included in image
     - docker-php-ext-install -j$(nproc) bcmath intl zip exif gd
-    - docker-php-ext-enable bcmath intl zip exif gd imagick
+    - docker-php-ext-enable bcmath intl zip exif gd
 
     # Need imagick for ARImager...
     - wget --no-check-certificate https://pecl.php.net/get/imagick-3.7.0.tgz
     - pecl install imagick-3.7.0.tgz
+    - docker-php-ext-enable imagick
 
     # Install composer
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
