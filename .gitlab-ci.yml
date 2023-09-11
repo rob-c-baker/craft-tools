@@ -37,7 +37,7 @@ run_tests:
     - docker-php-ext-enable bcmath intl zip exif gd
 
     # Need imagick for ARImager...
-    - wget --no-check-certificate https://pecl.php.net/get/imagick-3.7.0.tgz
+    - curl https://pecl.php.net/get/imagick-3.7.0.tgz --insecure --output imagick-3.7.0.tgz
     - pecl install imagick-3.7.0.tgz
     - docker-php-ext-enable imagick
 
