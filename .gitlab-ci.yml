@@ -34,7 +34,6 @@ run_tests:
 
     # Extensions we need that are not included in image
     - docker-php-ext-install -j$(nproc) bcmath intl zip exif gd
-    - pecl install imagick
     - docker-php-ext-enable bcmath intl zip exif gd imagick
 
     # Need imagick for ARImager...
