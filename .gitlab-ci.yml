@@ -41,7 +41,7 @@ run_tests:
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
     # Add our auth token (Gitlab secret) so we can fetch from local repositories
-    - cat "$COMPOSER_AUTH_JSON" > auth.json
+    - echo "$COMPOSER_AUTH_JSON" > auth.json
 
     # Install all project dependencies
     - composer install
