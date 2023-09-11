@@ -4,6 +4,7 @@ namespace alanrogers\tools\console\controllers;
 
 use alanrogers\tools\queue\jobs\ElasticSearchUpdate;
 use alanrogers\tools\services\es\ESException;
+use Craft;
 use craft\helpers\Console;
 use yii\console\Controller;
 use yii\console\ExitCode;
