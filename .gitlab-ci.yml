@@ -37,6 +37,10 @@ run_tests:
     - pecl install imagick
     - docker-php-ext-enable bcmath intl zip exif gd imagick
 
+    # Need imagick for ARImager...
+    - wget --no-check-certificate https://pecl.php.net/get/imagick-3.7.0.tgz
+    - pecl install imagick-3.7.0.tgz
+
     # Install composer
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
