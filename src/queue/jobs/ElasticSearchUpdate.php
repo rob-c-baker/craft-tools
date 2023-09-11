@@ -161,7 +161,7 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
             $es = $search->getES();
 
             if ($this->delete_index_first) {
-                $es->deleteIndex($index->name);
+                $es->deleteIndex($index_name);
             }
 
             $mapping = $index->fieldMapping();
