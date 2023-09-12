@@ -6,6 +6,7 @@ use alanrogers\arimager\ARImager;
 use alanrogers\arimager\models\TransformedImageInterface;
 use alanrogers\tools\queue\jobs\XMLSitemap;
 use alanrogers\tools\services\ServiceLocator;
+use alanrogers\tools\models\sitemaps\XMLSitemap as XMLSitemapModel;
 use Craft;
 use craft\elements\Asset;
 use DateTime;
@@ -70,7 +71,7 @@ class SitemapGenerator
     }
 
     /** @noinspection PhpUnused */
-    public function getXML() : XMLSitemap
+    public function getXML() : XMLSitemapModel
     {
         if ($this->config->use_cache) {
             $this->model->xml = $this->getCachedXML();

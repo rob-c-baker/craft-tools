@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace alanrogers\tools;
 
+use alanrogers\tools\controllers\SitemapsController;
 use alanrogers\tools\fields\FieldRegister;
 use alanrogers\tools\rules\UserRules;
 use alanrogers\tools\services\es\Events;
@@ -16,7 +17,9 @@ use craft\controllers\UsersController;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
 use craft\events\RegisterTemplateRootsEvent;
+use craft\events\RegisterUrlRulesEvent;
 use craft\i18n\PhpMessageSource;
+use craft\web\UrlManager;
 use craft\web\View;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -41,6 +44,10 @@ class CraftTools extends Plugin
      * @var CraftTools
      */
     public static CraftTools $instance;
+
+    public $controllerMap = [
+        'sitemaps' => SitemapsController::class
+    ];
 
     /**
      * An array of field handles that must NOT be edited by the owning user.
@@ -98,6 +105,9 @@ class CraftTools extends Plugin
 
         self::enforceFieldPermissions();
 
+        // Front-end routes
+        self::registerFrontEndRoutes();
+
         // Elasticsearch events
         Events::registerEvents();
 
@@ -118,6 +128,18 @@ class CraftTools extends Plugin
                 $e->roots[$this->id] = $base_dir;
             }
         });
+    }
+
+    private static function registerFrontEndRoutes() : void
+    {
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_SITE_URL_RULES,
+            function(RegisterUrlRulesEvent $event) {
+                $event->rules['sitemap.xml'] = self::ID . '/sitemaps/list';
+                $event->rules['sitemaps/<identifier:{slug}>.xml'] = self::ID . '/sitemaps/xml';
+            }
+        );
     }
 
     private function registerTranslationCategory() : void
