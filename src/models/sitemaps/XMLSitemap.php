@@ -2,12 +2,14 @@
 
 namespace alanrogers\tools\models\sitemaps;
 
+use alanrogers\tools\helpers\SitemapHelper;
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\services\sitemap\SitemapConfig;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
 use craft\helpers\StringHelper;
 use DateTime;
+use nystudio107\seomatic\models\MetaBundle;
 use yii\base\Model;
 
 class XMLSitemap extends Model

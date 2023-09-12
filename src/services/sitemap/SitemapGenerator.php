@@ -25,9 +25,9 @@ class SitemapGenerator
     private const CACHE_TTL = 172800; // 172800 == 2 days in seconds
 
     /**
-     * @var XMLSitemap|null
+     * @var XMLSitemapModel|null
      */
-    private ?XMLSitemap $model;
+    private ?XMLSitemapModel $model;
 
     /**
      * @var SitemapConfig
