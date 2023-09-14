@@ -8,6 +8,7 @@ use alanrogers\tools\fields\FieldRegister;
 use alanrogers\tools\rules\UserRules;
 use alanrogers\tools\services\es\Events;
 use alanrogers\tools\services\ServiceLocator;
+use alanrogers\tools\services\sitemap\SitemapConfig;
 use alanrogers\tools\twig\Extensions;
 use Craft;
 use craft\base\Model;
@@ -132,14 +133,16 @@ class CraftTools extends Plugin
 
     private static function registerFrontEndRoutes() : void
     {
-        Event::on(
-            UrlManager::class,
-            UrlManager::EVENT_REGISTER_SITE_URL_RULES,
-            function(RegisterUrlRulesEvent $event) {
-                $event->rules['sitemap.xml'] = self::ID . '/sitemaps/list';
-                $event->rules['sitemaps/<identifier:{slug}>.xml'] = self::ID . '/sitemaps/xml';
-            }
-        );
+        if (SitemapConfig::isEnabled()) {
+            Event::on(
+                UrlManager::class,
+                UrlManager::EVENT_REGISTER_SITE_URL_RULES,
+                function(RegisterUrlRulesEvent $event) {
+                    $event->rules['sitemap.xml'] = self::ID . '/sitemaps/list';
+                    $event->rules['sitemaps/<identifier:{slug}>.xml'] = self::ID . '/sitemaps/xml';
+                }
+            );
+        }
     }
 
     private function registerTranslationCategory() : void
