@@ -70,7 +70,11 @@ class SitemapGenerator
         return self::CACHE_KEY_PREFIX . $identifier;
     }
 
-    /** @noinspection PhpUnused */
+    /**
+     * Only throws exception in devMode
+     * @throws SitemapException
+     * @noinspection PhpUnused
+     */
     public function getXML() : XMLSitemapModel
     {
         if ($this->config->use_cache) {
@@ -104,7 +108,7 @@ class SitemapGenerator
             try {
                 $lines = $this->generate();
                 $this->model->generated = true;
-            } catch (InvalidConfigException) {
+            } catch (InvalidConfigException $e) {
                 $lines = [
                     '<?xml version="1.0" encoding="UTF-8"?>',
                     '<?xml-stylesheet type="text/xsl" href="/sitemap-empty.xsl"?>',
@@ -113,6 +117,11 @@ class SitemapGenerator
                     '</urlset>'
                 ];
                 $this->model->generated = false;
+                if (Craft::$app->getConfig()->getGeneral()->devMode) {
+                    throw new SitemapException('There was an error generating the sitemap.', $e->getCode(), $e);
+                } else {
+                    ServiceLocator::getInstance()->error->reportBackendException($e);
+                }
             }
         }
 
@@ -122,12 +131,14 @@ class SitemapGenerator
     }
 
     /**
-     * @throws InvalidConfigException
      * @return string[] An array of XML lines
+     * @throws SitemapException
+     * @throws InvalidConfigException
      */
     public function generate() : array
     {
         $total_items = $this->model->totalItems();
+        $dev_mode = Craft::$app->getConfig()->getGeneral()->devMode;
 
         /** @noinspection HttpUrlsUsage */
         /** @noinspection XmlUnusedNamespaceDeclaration */
@@ -138,7 +149,12 @@ class SitemapGenerator
         ];
 
         if ($total_items === 0) {
-            ServiceLocator::getInstance()->error->reportBackEndError('Zero entries found while generating XML sitemap for: ' . $this->config->name, true);
+            $msg = 'Zero entries found while generating XML sitemap for: ' . $this->config->name;
+            if ($dev_mode) {
+                throw new SitemapException($msg);
+            } else {
+                ServiceLocator::getInstance()->error->reportBackEndError($msg);
+            }
             $lines[] = '</urlset>';
             return $lines;
         }
@@ -149,11 +165,7 @@ class SitemapGenerator
             call_user_func($this->progress_callback, $total_items, $this->processed_items);
         }
 
-        if (!$this->config->image_field) {
-            ServiceLocator::getInstance()->error->reportBackEndError(
-                sprintf('No `image_field_handle` supplied for sitemap generation for "%s". Images will not be listed in the sitemap.', $this->config->name)
-            );
-        } else {
+        if ($this->config->image_field) {
             $with[] = $this->config->image_field;
         }
 
@@ -162,10 +174,12 @@ class SitemapGenerator
         if ($this->config->image_transform) {
             $main_img_transform = ARImager::$plugin->transforms::getTransform($this->config->image_transform);
             if (empty($main_img_transform['transform'])) {
-                ServiceLocator::getInstance()->error->reportBackEndError(
-                    sprintf('Cannot find image transformation "%s" while generating XML sitemap for "%s".', $this->config->image_transform, $this->config->name),
-                    true
-                );
+                $msg = sprintf('Cannot find image transformation "%s" while generating XML sitemap for "%s".', $this->config->image_transform, $this->config->name);
+                if ($dev_mode) {
+                    throw new SitemapException($msg);
+                } else {
+                    ServiceLocator::getInstance()->error->reportBackEndError($msg);
+                }
             }
             $main_img_transform = $main_img_transform['transform'];
         }
@@ -223,7 +237,7 @@ class SitemapGenerator
                         $count++;
                     }
 
-                    if ($max_count > -1 && $count >= $max_count) {
+                    if ($max_count !== null && $max_count > -1 && $count >= $max_count) {
                         break;
                     }
                 }

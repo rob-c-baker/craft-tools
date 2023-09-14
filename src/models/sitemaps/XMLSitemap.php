@@ -93,7 +93,7 @@ class XMLSitemap extends Model
         $batch = [];
         foreach ($this->loadElementQuery($with)->all() as $item) {
             $batch[] = new SitemapURL([
-                'entry' => $item,
+                'element' => $item,
                 'image_field' => $this->config->image_field ? $item->{$this->config->image_field} : null,
                 'date_updated' => $item->dateUpdated,
                 'date_created' => $item->dateCreated,
@@ -127,11 +127,12 @@ class XMLSitemap extends Model
      */
     public function addImagesToSiteMap(Element $element) : bool
     {
-        if (empty($element->seoOptions)) {
+        $seomatic_field_handle = SitemapConfig::getSEOMaticFieldHandle();
+        if (empty($element->$seomatic_field_handle)) {
             return true;
         }
         /** @var MetaBundle $seo_options */
-        $seo_options = $element->seoOptions;
+        $seo_options = $element->$seomatic_field_handle;
         return $seo_options->metaSitemapVars->sitemapAssets === null || (bool) $seo_options->metaSitemapVars->sitemapAssets;
     }
 

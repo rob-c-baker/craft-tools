@@ -9,10 +9,17 @@ use Closure;
 use craft\elements\db\ElementQuery;
 use craft\helpers\ArrayHelper;
 use DateTime;
+use phpDocumentor\Reflection\Types\Boolean;
 use yii\base\Component;
 
 class SitemapConfig extends Component
 {
+    /**
+     * Cache the whole sitemap config here:
+     * @var array|null
+     */
+    private static ?array $sitemap_config = null;
+
     /**
      * The name / identifier of the sitemap as it appears in the sitemap index
      * @var string
@@ -66,7 +73,7 @@ class SitemapConfig extends Component
 
     /**
      * A callback to override the way the maximum image count for a Sitemap URL is established.
-     * @var (callable(SitemapURL): int)|null
+     * @var (callable(SitemapURL): int|null)|null
      */
     public $max_image_count = null;
 
@@ -80,18 +87,49 @@ class SitemapConfig extends Component
      */
     public ?Closure $progress_callback = null;
 
+    private static function loadAllConfig() : void
+    {
+        self::$sitemap_config = ServiceLocator::getInstance()->config->getAllItems('sitemaps');
+    }
+
     /**
      * @return array<SitemapConfig>
      */
     public static function getAllConfigs() : array
     {
         $configs = [];
-        $sitemap_config = ServiceLocator::getInstance()->config->getAllItems('sitemaps');
-        foreach ($sitemap_config as $name => $config) {
+        if (self::$sitemap_config === null) {
+            self::loadAllConfig();
+        }
+        foreach (self::$sitemap_config['sitemaps'] ?? [] as $name => $config) {
             $config['name'] = $name;
             $configs[] = new SitemapConfig($config);
         }
         return $configs;
+    }
+
+    public static function isEnabled() : bool
+    {
+        if (self::$sitemap_config === null) {
+            self::loadAllConfig();
+        }
+        return !self::$sitemap_config ? false : (self::$sitemap_config['enabled'] ?? false);
+    }
+
+    public static function isCacheEnabled() : bool
+    {
+        if (self::$sitemap_config === null) {
+            self::loadAllConfig();
+        }
+        return !self::$sitemap_config ? false : (self::$sitemap_config['use_cache'] ?? false);
+    }
+
+    public static function getSEOMaticFieldHandle() : string
+    {
+        if (self::$sitemap_config === null) {
+            self::loadAllConfig();
+        }
+        return !self::$sitemap_config ? 'seoOptions' : (self::$sitemap_config['seomatic_field_handle'] ?? 'seoOptions');
     }
 
     /**

@@ -2,10 +2,9 @@
 
 namespace alanrogers\tools\helpers;
 
-use alanrogers\tools\helpers\HelperInterface;
+use alanrogers\tools\services\sitemap\SitemapConfig;
 use Craft;
 use craft\base\Element;
-use craft\elements\Entry;
 use nystudio107\seomatic\helpers\Sitemap;
 use nystudio107\seomatic\Seomatic;
 
@@ -21,7 +20,8 @@ class SitemapHelper extends Sitemap implements HelperInterface
      */
     public static function isElementAllowedOnSiteMap(Element $element, ?int $site_id=null) : bool
     {
-        if (empty($element->seoOptions)) {
+        $seomatic_field_handle = SitemapConfig::getSEOMaticFieldHandle();
+        if (empty($element->$seomatic_field_handle)) {
             return true;
         }
         $site_id = $site_id ?? Craft::$app->getSites()->currentSite->id;

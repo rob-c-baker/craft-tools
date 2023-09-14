@@ -26,15 +26,17 @@ class SitemapsController extends Controller
      * Produces XML for the initial list of campsites i.e. /sitemap.xml that contains the <sitemapindex> element
      * @return Response
      * @throws ServerErrorHttpException
+     * @throws NotFoundHttpException
      */
     public function actionList() : Response
     {
-        $is_dev = $_SERVER['ENVIRONMENT'] === 'dev';
+        if (!SitemapConfig::isEnabled()) {
+            throw new NotFoundHttpException('Sitemaps disabled.');
+        }
 
-        $service = new SitemapIndexGenerator(
-            SitemapConfig::getAllConfigs(),
-            !$is_dev
-        );
+        $use_cache = SitemapConfig::isCacheEnabled();
+
+        $service = new SitemapIndexGenerator(SitemapConfig::getAllConfigs(), $use_cache);
 
         $this->response->format = YiiResponse::FORMAT_RAW;
         $this->response->getHeaders()->set('Content-Type', 'application/xml; charset="UTF-8"');
@@ -45,7 +47,7 @@ class SitemapsController extends Controller
             throw new ServerErrorHttpException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if (!$is_dev) {
+        if ($use_cache) {
             CacheControlHelper::setCacheHeaders(43200, $this->response); // 12 hours
         }
 
@@ -57,11 +59,12 @@ class SitemapsController extends Controller
      * @param string $identifier The section slug
      * @return Response
      * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
     public function actionXml(string $identifier) : Response
     {
         $sitemap_config = SitemapConfig::getConfig($identifier);
-        if (!$sitemap_config) {
+        if (!SitemapConfig::isEnabled() || !$sitemap_config) {
             throw new NotFoundHttpException();
         }
 
@@ -72,11 +75,16 @@ class SitemapsController extends Controller
 
         $is_dev = $_SERVER['ENVIRONMENT'] === 'dev';
 
-        $sitemap_config->use_cache = !$is_dev; // only cache in live
+        $sitemap_config->use_cache = SitemapConfig::isCacheEnabled(); // only cache if enabled
         $sitemap_config->use_queue = !$is_dev; // only use queue in live
 
         $service = new SitemapGenerator($sitemap_config);
-        $xml_model = $service->getXML();
+        try {
+            $xml_model = $service->getXML();
+        } catch (SitemapException $e) {
+            // OK to throw as only happens in `devMode`.
+            throw new ServerErrorHttpException($e->getMessage(), $e->getCode(), $e);
+        }
 
         $this->response->format = YiiResponse::FORMAT_RAW;
         $this->response->getHeaders()->set('Content-Type', 'application/xml; charset="UTF-8"');
