@@ -5,6 +5,8 @@ namespace alanrogers\tools\models\sitemaps;
 use alanrogers\tools\helpers\SitemapHelper;
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\services\sitemap\SitemapConfig;
+use craft\base\Element;
+use craft\elements\db\ElementQuery;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
 use craft\helpers\StringHelper;
@@ -12,6 +14,9 @@ use DateTime;
 use nystudio107\seomatic\models\MetaBundle;
 use yii\base\Model;
 
+/**
+ * Model based on an XML sitemap containing entries.
+ */
 class XMLSitemap extends Model
 {
     const DEFAULT_MAX_IMAGE_COUNT = 5;
@@ -54,7 +59,7 @@ class XMLSitemap extends Model
         if (ServiceLocator::getInstance()->cache->exists($cache_key)) {
             return ServiceLocator::getInstance()->cache->get($cache_key);
         }
-        $ids = $this->_entriesQuery()->orderBy('dateUpdated DESC')->ids();
+        $ids = $this->_elementQuery()->orderBy('dateUpdated DESC')->ids();
         // cached for a day - should protect a bit against un-spotted errors preventing the call to `$this->clearQueryOrderingIds()`
         ServiceLocator::getInstance()->cache->set($cache_key, $ids, 86400);
         return $ids;
@@ -75,7 +80,7 @@ class XMLSitemap extends Model
      */
     public function totalItems() : int
     {
-        return (int) $this->loadEntriesQuery()->count();
+        return (int) $this->loadElementQuery()->count();
     }
 
     /**
@@ -86,7 +91,7 @@ class XMLSitemap extends Model
     public function getURLs(array $with=[]) : array
     {
         $batch = [];
-        foreach ($this->loadEntriesQuery($with)->all() as $item) {
+        foreach ($this->loadElementQuery($with)->all() as $item) {
             $batch[] = new SitemapURL([
                 'entry' => $item,
                 'image_field' => $this->config->image_field ? $item->{$this->config->image_field} : null,
@@ -100,11 +105,11 @@ class XMLSitemap extends Model
 
     /**
      * @param array $with
-     * @return EntryQuery
+     * @return ElementQuery
      */
-    protected function loadEntriesQuery(array $with=[]) : EntryQuery
+    protected function loadElementQuery(array $with=[]) : ElementQuery
     {
-        $query = $this->_entriesQuery()
+        $query = $this->_elementQuery()
             ->id($this->getQueryOrderingIds())
             ->fixedOrder();
 
@@ -115,21 +120,19 @@ class XMLSitemap extends Model
         return $query;
     }
 
-
-
     /**
      * Whether to render links to images on the sitemap for this entry
-     * @param Entry $entry
+     * @param Element $element
      * @return bool
      */
-    public function addImagesToSiteMap(Entry $entry) : bool
+    public function addImagesToSiteMap(Element $element) : bool
     {
-        if (empty($entry->seoOptions)) {
+        if (empty($element->seoOptions)) {
             return true;
         }
         /** @var MetaBundle $seo_options */
-        $seo_options = $entry->seoOptions;
-        return $seo_options->metaSitemapVars->sitemapAssets === null ? true : $seo_options->metaSitemapVars->sitemapAssets;
+        $seo_options = $element->seoOptions;
+        return $seo_options->metaSitemapVars->sitemapAssets === null || (bool) $seo_options->metaSitemapVars->sitemapAssets;
     }
 
     /**
@@ -139,7 +142,7 @@ class XMLSitemap extends Model
     public function filterURLs(array &$urls) : void
     {
         foreach ($urls as $idx => $url) {
-            if ($url->entry && !SitemapHelper::isEntryAllowedOnSiteMap($url->entry)) {
+            if ($url->element && !SitemapHelper::isElementAllowedOnSiteMap($url->element)) {
                 unset($urls[$idx]);
             }
         }
@@ -147,22 +150,25 @@ class XMLSitemap extends Model
 
     /**
      * Whether to include images , optionally considers a passed in entry
-     * @param Entry|null $entry
+     * @param SitemapURL $url
      * @return bool
      */
-    public function includeImages(?Entry $entry) : bool
+    public function includeImages(SitemapURL $url) : bool
     {
-        return $entry && $this->addImagesToSiteMap($entry);
+        return $url->element && $this->addImagesToSiteMap($url->element);
     }
 
     /**
-     * The maximum number of images to put on the sitemap (for each entry)
+     * The maximum number of images to put on the sitemap (for each entry / category / product / element)
      * -1 means no limit.
-     * @param Entry|null $entry
-     * @return int
+     * @param SitemapURL $url
+     * @return int|null `null` for no limit
      */
-    public function getMaxImageCount(?Entry $entry) : int
+    public function getMaxImageCount(SitemapURL $url) : ?int
     {
+        if ($this->config->max_image_count !== null) {
+            return ($this->config->max_image_count)($url);
+        }
         return self::DEFAULT_MAX_IMAGE_COUNT;
     }
 
@@ -171,6 +177,9 @@ class XMLSitemap extends Model
      */
     public function getIndexModifiedDate() : ?DateTime
     {
+        if ($this->config->index_modified_date !== null) {
+            return ($this->config->index_modified_date)($this);
+        }
         $entry = Entry::find()
             ->section(StringHelper::camelCase($this->config->name))
             ->withStructure(false)
@@ -182,10 +191,14 @@ class XMLSitemap extends Model
     }
 
     /**
-     * @return EntryQuery
+     * By default, returns an entries query, but if an element query is in the config, it will use that.
+     * @return ElementQuery|EntryQuery
      */
-    protected function _entriesQuery() : EntryQuery
+    protected function _elementQuery() : ElementQuery|EntryQuery
     {
+        if ($this->config->element_query !== null) {
+            return ($this->config->element_query)($this);
+        }
         return Entry::find()
             ->section(StringHelper::camelCase($this->config->name))
             ->withStructure(false);

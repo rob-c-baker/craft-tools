@@ -2,9 +2,13 @@
 
 namespace alanrogers\tools\services\sitemap;
 
+use alanrogers\tools\models\sitemaps\SitemapURL;
+use alanrogers\tools\models\sitemaps\XMLSitemap;
 use alanrogers\tools\services\ServiceLocator;
 use Closure;
+use craft\elements\db\ElementQuery;
 use craft\helpers\ArrayHelper;
+use DateTime;
 use yii\base\Component;
 
 class SitemapConfig extends Component
@@ -47,6 +51,24 @@ class SitemapConfig extends Component
      * @var bool
      */
     public bool $use_cache = true;
+
+    /**
+     * A callback to override the element query used to fetch elements for XMLSitemapURLs.
+     * @var (callable(XMLSiteMap): ElementQuery)|null
+     */
+    public $element_query = null;
+
+    /**
+     * A callback to override the way a modified date for a sitemap index is established
+     * @var (callable(XMLSiteMap): DateTime)|null
+     */
+    public $index_modified_date = null;
+
+    /**
+     * A callback to override the way the maximum image count for a Sitemap URL is established.
+     * @var (callable(SitemapURL): int)|null
+     */
+    public $max_image_count = null;
 
     /**
      * @var string

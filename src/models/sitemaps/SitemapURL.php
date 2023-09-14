@@ -2,7 +2,7 @@
 
 namespace alanrogers\tools\models\sitemaps;
 
-use craft\elements\Entry;
+use craft\base\Element;
 use DateTime;
 use yii\base\Model;
 
@@ -33,7 +33,7 @@ class SitemapURL extends Model
 
     /**
      * For URLs that have an associated entry, this is it.
-     * @var Entry|null
+     * @var Element|null
      */
-    public ?Entry $entry = null;
+    public ?Element $element = null;
 }

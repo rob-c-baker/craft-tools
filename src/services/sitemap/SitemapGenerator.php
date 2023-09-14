@@ -186,10 +186,10 @@ class SitemapGenerator
             $lines[] = $date_updated->format(DateTimeInterface::W3C);
             $lines[] = '</lastmod>';
 
-            if ($this->model->includeImages($url->entry)) {
+            if ($url->image_field && $this->model->includeImages($url)) {
 
                 // limit image count
-                $max_count = $this->model->getMaxImageCount($url->entry);
+                $max_count = $this->model->getMaxImageCount($url);
 
                 $count = 0;
 
