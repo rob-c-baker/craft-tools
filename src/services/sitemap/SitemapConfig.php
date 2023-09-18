@@ -9,7 +9,6 @@ use Closure;
 use craft\elements\db\ElementQuery;
 use craft\helpers\ArrayHelper;
 use DateTime;
-use phpDocumentor\Reflection\Types\Boolean;
 use yii\base\Component;
 
 class SitemapConfig extends Component
@@ -87,6 +86,42 @@ class SitemapConfig extends Component
      */
     public ?Closure $progress_callback = null;
 
+    /**
+     * So we can use Closures / callbacks - that cannot be serialised
+     * @return array
+     */
+    public function __serialize()
+    {
+        return [
+            'name' => $this->name,
+            'model_class' => $this->model_class,
+            'type' => $this->type,
+            'image_field' => $this->image_field,
+            'image_transform' => $this->image_transform,
+            'use_queue' => $this->use_queue,
+            'use_cache' => $this->use_cache,
+            'cache_key' => $this->cache_key
+        ];
+    }
+
+    public function __unserialize(array $data)
+    {
+        $this->name            = $data['name'];
+        $this->model_class     = $data['model_class'];
+        $this->type            = $data['type'];
+        $this->image_field     = $data['image_field'];
+        $this->image_transform = $data['image_transform'];
+        $this->use_queue       = $data['use_queue'];
+        $this->use_cache       = $data['use_cache'];
+        $this->cache_key       = $data['cache_key'];
+
+        // add the callbacks back in:
+        $config = self::getConfig($this->name);
+        $this->element_query = $config->element_query;
+        $this->index_modified_date = $config->index_modified_date;
+        $this->max_image_count = $config->max_image_count;
+    }
+
     private static function loadAllConfig() : void
     {
         self::$sitemap_config = ServiceLocator::getInstance()->config->getAllItems('sitemaps');
@@ -106,6 +141,17 @@ class SitemapConfig extends Component
             $configs[] = new SitemapConfig($config);
         }
         return $configs;
+    }
+
+    /**
+     * @param string $name
+     * @return SitemapConfig|null
+     */
+    public static function getConfig(string $name) : ?SitemapConfig
+    {
+        $sitemap_configs = self::getAllConfigs();
+        $sitemap_config = ArrayHelper::firstWhere($sitemap_configs, 'name', $name);
+        return $sitemap_config ?: null;
     }
 
     public static function isEnabled() : bool
@@ -130,16 +176,5 @@ class SitemapConfig extends Component
             self::loadAllConfig();
         }
         return !self::$sitemap_config ? 'seoOptions' : (self::$sitemap_config['seomatic_field_handle'] ?? 'seoOptions');
-    }
-
-    /**
-     * @param string $name
-     * @return SitemapConfig|null
-     */
-    public static function getConfig(string $name) : ?SitemapConfig
-    {
-        $sitemap_configs = self::getAllConfigs();
-        $sitemap_config = ArrayHelper::firstWhere($sitemap_configs, 'name', $name);
-        return $sitemap_config ?: null;
     }
 }

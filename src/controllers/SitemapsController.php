@@ -8,6 +8,7 @@ use alanrogers\tools\services\sitemap\SitemapException;
 use alanrogers\tools\services\sitemap\SitemapGenerator;
 use alanrogers\tools\services\sitemap\SitemapIndexGenerator;
 use alanrogers\tools\services\sitemap\SitemapType;
+use Craft;
 use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\Response;
@@ -73,7 +74,7 @@ class SitemapsController extends Controller
             $sitemap_config->name = StringHelper::camelCase($sitemap_config->name);
         }
 
-        $is_dev = $_SERVER['ENVIRONMENT'] === 'dev';
+        $is_dev = Craft::$app->getConfig()->getGeneral()->devMode;
 
         $sitemap_config->use_cache = SitemapConfig::isCacheEnabled(); // only cache if enabled
         $sitemap_config->use_queue = !$is_dev; // only use queue in live

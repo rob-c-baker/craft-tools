@@ -216,7 +216,7 @@ class SitemapGenerator
                             $transformed = ARImager::getInstance()->imager->transformImage($image, $main_img_transform);
                         } catch (Throwable $e) {
                             // report and send email if not in DEV environment
-                            ServiceLocator::getInstance()->error->reportBackendException($e, getenv('ENVIRONMENT') !== 'dev');
+                            ServiceLocator::getInstance()->error->reportBackendException($e, !Craft::$app->getConfig()->getGeneral()->devMode);
                             $transformed = null;
                         }
                     } else { // not transforming, use the existing Asset Url
