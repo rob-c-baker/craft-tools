@@ -17,9 +17,11 @@ use craft\console\Application as Console;
 use craft\controllers\UsersController;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
+use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\i18n\PhpMessageSource;
+use craft\utilities\ClearCaches;
 use craft\web\UrlManager;
 use craft\web\View;
 use Twig\Error\LoaderError;
@@ -109,6 +111,9 @@ class CraftTools extends Plugin
         // Front-end routes
         self::registerFrontEndRoutes();
 
+        // AR cache
+        self::arCacheEvents();
+
         // Elasticsearch events
         Events::registerEvents();
 
@@ -143,6 +148,24 @@ class CraftTools extends Plugin
                 }
             );
         }
+    }
+
+    private static function arCacheEvents() : void
+    {
+        // Register cache purge checkbox
+        Event::on(
+            ClearCaches::class,
+            ClearCaches::EVENT_REGISTER_CACHE_OPTIONS,
+            function (RegisterCacheOptionsEvent $event) {
+                $event->options[] = [
+                    'key'    => 'ar-cache-purge-all',
+                    'label'  => 'Alan Rogers Redis Cache',
+                    'action' => function () {
+                        ServiceLocator::getInstance()->cache->flush();
+                    },
+                ];
+            }
+        );
     }
 
     private function registerTranslationCategory() : void
