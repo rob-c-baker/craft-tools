@@ -144,6 +144,8 @@ class ElasticSearch extends Component
             $index_open = true;
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            return false;
+        } finally {
             if (!$index_open) {
                 try {
                     $this->getClient()->indices()->open([ 'index' => $index ]);
@@ -151,7 +153,6 @@ class ElasticSearch extends Component
                     throw new RuntimeException('ES: Could not re-open index on failed settings / mapping update.', (int) $e->getCode(), $e);
                 }
             }
-            return false;
         }
 
         return $response->asBool();
