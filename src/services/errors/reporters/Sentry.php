@@ -4,8 +4,10 @@ namespace alanrogers\tools\services\errors\reporters;
 
 use alanrogers\tools\services\errors\ErrorModel;
 use Sentry\Severity;
+use Sentry\State\Scope;
 use function Sentry\captureException;
 use function Sentry\captureMessage;
+use function Sentry\withScope;
 
 class Sentry implements Reporting
 {
@@ -37,9 +39,21 @@ class Sentry implements Reporting
             if (in_array($error->exception->getCode(), $this->excluded_status_codes, true)) {
                 return true;
             }
-            return (bool) captureException($error->exception);
+            return (bool) withScope(function(Scope $scope) use ($error) {
+                $data = $error->getData();
+                if ($data) {
+                    $scope->setContext('data', $error->getData());
+                }
+                return captureException($error->exception);
+            });
         }
         $message = $error->extra_message ? ($error->extra_message . "\n\n" . $error->message) : $error->message;
-        return (bool) captureMessage($message, Severity::error());
+        return (bool) withScope(function(Scope $scope) use ($message, $error) {
+            $data = $error->getData();
+            if ($data) {
+                $scope->setContext('data', $error->getData());
+            }
+            return captureMessage($message, Severity::error());
+        });
     }
 }
