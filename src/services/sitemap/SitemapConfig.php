@@ -6,6 +6,7 @@ use alanrogers\tools\models\sitemaps\SitemapURL;
 use alanrogers\tools\models\sitemaps\XMLSitemap;
 use alanrogers\tools\services\ServiceLocator;
 use Closure;
+use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\ArrayHelper;
 use DateTime;
@@ -77,6 +78,12 @@ class SitemapConfig extends Component
     public $max_image_count = null;
 
     /**
+     * A callback to override the way the element URL is established.
+     * @var (callable(ElementInterface): string)|null
+     */
+    public $element_url = null;
+
+    /**
      * @var string
      */
     public string $cache_key = 'xml-sitemap-';
@@ -120,6 +127,7 @@ class SitemapConfig extends Component
         $this->element_query = $config->element_query;
         $this->index_modified_date = $config->index_modified_date;
         $this->max_image_count = $config->max_image_count;
+        $this->element_url = $config->element_url;
     }
 
     private static function loadAllConfig() : void

@@ -6,6 +6,7 @@ use alanrogers\tools\helpers\SitemapHelper;
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\services\sitemap\SitemapConfig;
 use craft\base\Element;
+use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
@@ -97,10 +98,18 @@ class XMLSitemap extends Model
                 'image_field' => $this->config->image_field ? $item->{$this->config->image_field} : null,
                 'date_updated' => $item->dateUpdated,
                 'date_created' => $item->dateCreated,
-                'url' => $item->getUrl()
+                'url' => $this->getElementURL($item)
             ]);
         }
         return $batch;
+    }
+
+    protected function getElementURL(ElementInterface $element) : string
+    {
+        if ($this->config->element_url !== null) {
+            return ($this->config->element_url)($element);
+        }
+        return $element->getUrl();
     }
 
     /**
