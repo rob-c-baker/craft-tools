@@ -68,13 +68,13 @@ class ElasticSearch extends Component
     /**
      * Gets an instance of a service class for section based searching.
      * Used from templates or via the ServiceLocator
-     * @param string $section_handle
+     * @param string $index_name
      * @return Search|null
      */
-    public function getSearch(string $section_handle) : ?Search
+    public function getSearch(string $index_name) : ?Search
     {
         try {
-            return SearchFactory::getSearch($section_handle);
+            return SearchFactory::getSearch($index_name);
         } catch (ESException $e) {
             ServiceLocator::getInstance()->error->reportBackendException($e);
         }
