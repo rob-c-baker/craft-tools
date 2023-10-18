@@ -39,6 +39,12 @@ class Index
     public string $label;
 
     /**
+     * The section id for section based indexes, otherwise `0`.
+     * @var int
+     */
+    public int $section_id = 0;
+
+    /**
      * A field mapping suitable for creating ES indexes
      * @var array
      */
@@ -88,6 +94,7 @@ class Index
      * @param array{
      *         name: string,
      *         label: string,
+     *         section_id: int|null,
      *         search_class: string,
      *         match_fields: string[],
      *         field_mapping:  array{ type: string, analyzer: string, ignore_malformed?: boolean, properties: array }[],
@@ -112,6 +119,7 @@ class Index
 
         $this->search_class = $properties['search_class'];
         $this->name = $properties['name'];
+        $this->section_id = $properties['section_id'] ?? 0;
         $this->label = $properties['label'];
         $this->match_fields = $properties['match_fields'];
         $this->field_mapping = $properties['field_mapping'];
