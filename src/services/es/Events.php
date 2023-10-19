@@ -69,7 +69,7 @@ class Events
             // for the section specific index
             $section_job = new ElasticSearchUpdate([
                 'delete_index_first' => false,
-                'index' => $index->indexName(),
+                'index' => $index->indexName(false),
                 'element_ids' => [ $entry->id ],
                 'refresh_index' => true
             ]);
