@@ -6,6 +6,7 @@ use alanrogers\tools\queue\jobs\ElasticSearchUpdate;
 use alanrogers\tools\services\es\ESException;
 use Craft;
 use craft\helpers\Console;
+use Exception;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -61,7 +62,11 @@ class ElasticSearchController extends Controller
             $es_update->setDeleteIndexFirst(true);
         }
 
-        $total_entries = $es_update->getTotalEntries();
+        try {
+            $total_entries = $es_update->getTotalEntries();
+        } catch (Exception $e) {
+            throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+        }
 
         if ($total_entries > 0) {
 

@@ -14,6 +14,7 @@ use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
 use craft\queue\BaseJob;
 use craft\queue\QueueInterface;
+use Exception;
 use Throwable;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
@@ -124,6 +125,7 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
 
     /**
      * @throws ESException
+     * @throws Exception
      */
     public function start(): void
     {
@@ -246,10 +248,11 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
     /**
      * Gets the total number of entries we are working on.
      * @return int
+     * @throws Exception
      */
     public function getTotalEntries(): int
     {
-       return (int) $this->getEntriesQuery()->count();
+        return (int) $this->getEntriesQuery()->count();
     }
 
     /**
@@ -286,13 +289,19 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
 
     /**
      * @return EntryQuery
+     * @throws Exception
      */
     private function getEntriesQuery() : EntryQuery
     {
         $query = Entry::find()->withStructure(false);
 
-        if ($this->index && $this->index !== '*' && $this->index !== IndexType::SAYT->value) {
-            $query->section($this->index);
+        $index = Config::getInstance()->getIndexByName($this->index);
+        if (!$index) {
+            throw new Exception(sprintf('Cannot update ES index, index "%s" not found', $this->index));
+        }
+
+        if (!in_array($index->type->value, [ IndexType::SAYT->value, IndexType::ALL->value ], true)) {
+            $query->sectionId($index->section_id);
         }
 
         return $query;
