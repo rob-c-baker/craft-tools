@@ -7,6 +7,7 @@ use alanrogers\tools\helpers\BaseHelper;
 use alanrogers\tools\helpers\HelperInterface;
 use alanrogers\tools\services\errors\ErrorHandler;
 use alanrogers\tools\services\es\ElasticSearch;
+use alanrogers\tools\services\jwt\JWTAuth;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator as YiiServiceLocator;
 
@@ -18,6 +19,7 @@ use yii\di\ServiceLocator as YiiServiceLocator;
  * @property AlanRogersCache $cache
  * @property-read YiiServiceLocator $helpers
  * @property ElasticSearch $elastic_search
+ * @property JWTAuth $jwt_auth
  */
 class ServiceLocator extends YiiServiceLocator
 {
@@ -49,7 +51,8 @@ class ServiceLocator extends YiiServiceLocator
             'error' => Error::class,
             'error_handler' => ErrorHandler::class,
             'elastic_search' => ElasticSearch::class,
-            'config' => Config::class
+            'config' => Config::class,
+            'jwt_auth' => JWTAuth::class
         ]);
     }
 

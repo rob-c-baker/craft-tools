@@ -43,6 +43,7 @@
         "giggsey/libphonenumber-for-php": "^8.12",
         "google/analytics-data": "^0.11.2",
         "guzzlehttp/guzzle": "^7.2.0",
+        "lcobucci/jwt": "^4.0",
         "marionnewlevant/twig-perversion": "^3.0",
         "nystudio107/craft-seomatic": "^4.0",
         "putyourlightson/craft-elements-panel": "^2.0",

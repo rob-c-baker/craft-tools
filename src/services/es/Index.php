@@ -236,19 +236,54 @@ class Index
     }
 
     /**
-     * Returns eager load array for Craft entry query
+     * Returns eager load array for Craft entry query. If index is of type "ALL" then gets a merged array of all eager
+     * loads from all "SECTION" indexes.
      * @param array $options
      * @return array
      */
     public function eagerLoads(array $options=[]) : array
     {
         $eager_map = [];
+
         if ($this->type === IndexType::SECTION) {
             $eager_map = $this->eager_loading['loads'] ?? [];
             if (is_callable($this->eager_loading['modifier'] ?? null)) {
-                $eager_map = $this->eager_loading['modifier']($eager_map, $options);
+                $tmp_map = ($this->eager_loading['modifier'])($eager_map, $options);
+                if (is_array($tmp_map) && $tmp_map) {
+                    $eager_map = [...$eager_map, ...$tmp_map ];
+                }
             }
         }
+
+        if ($this->type === IndexType::ALL) {
+            foreach (Config::getInstance()->getIndexes() as $index) {
+                if ($index->type === IndexType::SECTION) {
+                    $tmp_map = [];
+                    if ($index->eager_loading['loads'] ?? null) {
+                        $tmp_map = $index->eager_loading['loads'];
+                    }
+                    if (is_callable($index->eager_loading['modifier'] ?? null)) {
+                        $tmp_map = ($index->eager_loading['modifier'])($tmp_map, $options);
+                    }
+                    if ($tmp_map) {
+                        $eager_map = [ ...$eager_map, ...$tmp_map ];
+                    }
+                }
+            }
+            // After collection of eager loads from all section based indexes, execute the modifier, if present on the current
+            if (is_callable($this->eager_loading['modifier'] ?? null)) {
+                $tmp_map = ($this->eager_loading['modifier'])($eager_map, $options);
+                if (is_array($tmp_map) && $tmp_map) {
+                    $eager_map = [ ...$eager_map, ...$tmp_map ];
+                }
+            }
+        }
+
+        // Remove duplicates
+        foreach ($eager_map as $candidate) {
+
+        }
+
         return $eager_map;
     }
 }
