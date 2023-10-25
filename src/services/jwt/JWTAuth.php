@@ -61,10 +61,16 @@ class JWTAuth
         $algorithm = new Sha384();
 
         if ($params->signing_key === null) {
-            $params->signing_key = Craft::$app->getConfig()->getGeneral()->securityKey;
+            // Key must be at least 48 chars / 384 bits
+            $length = strlen($_SERVER['JWT_SIGNING_KEY']);
+            if (isset($_SERVER['JWT_SIGNING_KEY']) && strlen($_SERVER['JWT_SIGNING_KEY']) >= 48) {
+                $params->signing_key = $_SERVER['JWT_SIGNING_KEY'];
+            } elseif ($length < 48) {
+                throw new JWTException('Signing key must be at least 48 chars / 384 bits.');
+            }
         }
 
-        $signing_key = InMemory::plainText($params->signing_key);
+        $signing_key = InMemory::plainText($_SERVER['JWT_SIGNING_KEY'] ?? $params->signing_key);
 
         // Required params
         $builder->issuedBy($params->issued_by)

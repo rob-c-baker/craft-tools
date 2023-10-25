@@ -9,7 +9,7 @@ class Params extends BaseObject
 {
     /**
      * The secret key used to sign the token.
-     * @var string|null (Optional) Default: `securityKey` in Craft general config.
+     * @var string|null (Optional) Default: `JWT_SIGNING_KEY` env variable.
      */
     public ?string $signing_key = null;
 
