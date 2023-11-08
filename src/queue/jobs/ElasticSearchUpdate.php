@@ -168,7 +168,6 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
 
             $mapping = $index->fieldMapping();
             $settings = Config::getInstance()->getGlobalIndexSettings();
-            $success = false;
 
             if (!$es->indexExists($index_name)) {
                 $success = $es->createIndex($index_name, $mapping, $settings);
@@ -180,7 +179,7 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
                 $msg = sprintf(
                     'ES reported failure when updating mapping for index "%s": %s',
                     $this->index,
-                    implode(",\n", $es->getErrors())
+                    json_encode($es->getErrors())
                 );
                 $es_log->error($msg);
                 throw new ESException($msg);
@@ -236,7 +235,6 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
                         if ($this->refresh_index) {
                             $override_params['refresh'] = 'wait_for';
                         }
-                        $success = false;
                         if ($es->existsInIndex($index_name, $id)) {
                             $success = $es->updateInIndex($index_name, $id, $data, $override_params);
                         } else {
@@ -263,7 +261,7 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
                     'ES reported failure(s) when updating documents with ids "%s" for index "%s": %s',
                     implode(',', $failures),
                     $this->index,
-                    implode(",\n", $es->getErrors())
+                    json_encode($es->getErrors())
                 );
                 $es_log->error($msg);
                 throw new ESException($msg);
