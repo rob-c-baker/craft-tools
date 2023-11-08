@@ -3,6 +3,7 @@
 namespace alanrogers\tools\services\es;
 
 use alanrogers\tools\services\ServiceLocator;
+use alanrogers\tools\traits\ErrorManagementTrait;
 use craft\log\MonologTarget;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\ClientBuilder;
@@ -18,9 +19,13 @@ use yii\base\Component;
 /**
  * Class ElasticSearch
  * @package modules\ar\services\es
+ * @property-read Client $client
+ * @property-read string $lastQuery
  */
 class ElasticSearch extends Component
 {
+    use ErrorManagementTrait;
+
     /**
      * @var Client|null
      */
@@ -59,7 +64,10 @@ class ElasticSearch extends Component
                 self::$_client = $builder->build();
 
             } catch (AuthenticationException $e) {
-                throw new ESException('Could not authenticate with ES instance.', (int) $e->getCode(), $e);
+                $msg = 'Could not authenticate with ES instance.';
+                $this->addError($msg, 'getClient');
+                $this->addError($e->getMessage(), 'getClient');
+                throw new ESException($msg, (int) $e->getCode(), $e);
             }
         }
         return self::$_client;
@@ -76,6 +84,7 @@ class ElasticSearch extends Component
         try {
             return SearchFactory::getSearch($index_name);
         } catch (ESException $e) {
+            $this->addError($e->getMessage(), 'getSearch');
             ServiceLocator::getInstance()->error->reportBackendException($e);
         }
         return null;
@@ -110,7 +119,8 @@ class ElasticSearch extends Component
                 ]
             ]);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            ServiceLocator::getInstance()->error->reportBackendException($e);
+            $this->addError($e->getMessage(), 'createIndex');
             return false;
         }
 
@@ -143,7 +153,8 @@ class ElasticSearch extends Component
             $indices->open([ 'index' => $index ]);
             $index_open = true;
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            ServiceLocator::getInstance()->error->reportBackendException($e);
+            $this->addError($e->getMessage(), 'updateIndexMapping');
             return false;
         } finally {
             if (!$index_open) {
@@ -170,7 +181,10 @@ class ElasticSearch extends Component
                 'index' => $index
             ]);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
-            throw new RuntimeException('Could not establish if index exists.', (int) $e->getCode(), $e);
+            $msg = 'Could not establish if index exists.';
+            $this->addError($msg, 'indexExists');
+            $this->addError($e->getMessage(), 'indexExists');
+            throw new RuntimeException($msg, (int) $e->getCode(), $e);
         }
 
         return $response->asBool();
@@ -188,6 +202,7 @@ class ElasticSearch extends Component
                 'index' => $index
             ]);
         } catch (ClientResponseException $e) {
+            $this->addError($e->getMessage(), 'deleteIndex');
             if ($e->getCode() === 404) {
                 // when the index is already deleted
                 return true;
@@ -195,6 +210,7 @@ class ElasticSearch extends Component
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
             return false;
         } catch (MissingParameterException|ServerResponseException|ESException $e) {
+            $this->addError($e->getMessage(), 'deleteIndex');
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
             return false;
         }
@@ -225,6 +241,7 @@ class ElasticSearch extends Component
         try {
             $response = $this->getClient()->index($params);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
+            $this->addError($e->getMessage(), 'addToIndex');
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
             return false;
         }
@@ -253,6 +270,7 @@ class ElasticSearch extends Component
         try {
             $response = $this->getClient()->exists($params);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
+            $this->addError($e->getMessage(), 'existsInIndex');
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
             return false;
         }
@@ -285,6 +303,7 @@ class ElasticSearch extends Component
         try {
             $response = $this->getClient()->update($params);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
+            $this->addError($e->getMessage(), 'updateInIndex');
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
             return false;
         }
@@ -312,6 +331,7 @@ class ElasticSearch extends Component
         try {
             $response = $this->getClient()->delete($params);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
+            $this->addError($e->getMessage(), 'deleteFromIndex');
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
             return false;
         }
@@ -374,6 +394,7 @@ class ElasticSearch extends Component
         try {
             $response = $this->getClient()->search($params);
         } catch (ClientResponseException|ServerResponseException|ESException $e) {
+            $this->addError($e->getMessage(), 'searchInFields');
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
             return SearchResponse::build(null, $e->getMessage());
         }
@@ -425,6 +446,7 @@ class ElasticSearch extends Component
         try {
             $response = $this->getClient()->search($params);
         } catch (ClientResponseException|ServerResponseException|ESException $e) {
+            $this->addError($e->getMessage(), 'fullTextSearch');
             ServiceLocator::getInstance()->error->reportBackendException($e, true);
             return SearchResponse::build(null, $e->getMessage());
         }

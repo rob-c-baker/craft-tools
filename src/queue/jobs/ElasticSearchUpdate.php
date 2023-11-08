@@ -168,12 +168,25 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
 
             $mapping = $index->fieldMapping();
             $settings = Config::getInstance()->getGlobalIndexSettings();
+            $success = false;
 
             if (!$es->indexExists($index_name)) {
-                $es->createIndex($index_name, $mapping, $settings);
+                $success = $es->createIndex($index_name, $mapping, $settings);
             } else {
-                $es->updateIndexMapping($index_name, $mapping, $settings);
+                $success = $es->updateIndexMapping($index_name, $mapping, $settings);
             }
+
+            if (!$success) {
+                $msg = sprintf(
+                    'ES reported failure when updating mapping for index "%s": %s',
+                    $this->index,
+                    implode(",\n", $es->getErrors())
+                );
+                $es_log->error($msg);
+                throw new ESException($msg);
+            }
+
+            $es->clearErrors();
 
             $eager_fields = $index->eagerLoads([
                 'index_disabled_related_categories' => $this->index_disabled_related_categories
@@ -188,6 +201,8 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
             }
 
             $es_log->info(sprintf($log_msg, implode(',', $ids)));
+
+            $failures = [];
 
             foreach ($ids as $id) {
 
@@ -221,10 +236,14 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
                         if ($this->refresh_index) {
                             $override_params['refresh'] = 'wait_for';
                         }
+                        $success = false;
                         if ($es->existsInIndex($index_name, $id)) {
-                            $es->updateInIndex($index_name, $id, $data, $override_params);
+                            $success = $es->updateInIndex($index_name, $id, $data, $override_params);
                         } else {
-                            $es->addToIndex($index_name, $id, $data, $override_params);
+                            $success = $es->addToIndex($index_name, $id, $data, $override_params);
+                        }
+                        if (!$success) {
+                            $failures[] = $id;
                         }
                     }
                 }
@@ -237,6 +256,17 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
                 } else {
                     $this->setProgress($this->queue, (float) $count, 'Updating Elastic Search');
                 }
+            }
+
+            if ($failures) {
+                $msg = sprintf(
+                    'ES reported failure(s) when updating documents with ids "%s" for index "%s": %s',
+                    implode(',', $failures),
+                    $this->index,
+                    implode(",\n", $es->getErrors())
+                );
+                $es_log->error($msg);
+                throw new ESException($msg);
             }
 
             $es_log->info(
