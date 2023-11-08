@@ -4,11 +4,10 @@ namespace alanrogers\tools\services\es;
 
 use alanrogers\tools\queue\jobs\ElasticSearchDelete;
 use alanrogers\tools\queue\jobs\ElasticSearchUpdate;
-use alanrogers\tools\services\ServiceLocator;
 use Craft;
 use craft\base\Element;
 use craft\elements\Entry;
-use craft\events\DeleteElementEvent;
+use craft\events\ElementEvent;
 use craft\events\ModelEvent;
 use craft\helpers\ElementHelper;
 use craft\services\Elements;
@@ -38,14 +37,17 @@ class Events
         });
 
         // before delete
-        Event::on(Entry::class, Elements::EVENT_BEFORE_DELETE_ELEMENT, function(DeleteElementEvent $e)
+        Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT, function(ElementEvent $e)
         {
-            /** @var Entry $entry */
-            $entry = $e->element;
+            /** @var $element */
+            $element = $e->element;
+            if (!($element instanceof Entry)) {
+                return;
+            }
 
             // NOTE: If something gets into ElasticSearch, there are no conditions for this, so it will get deleted there too.
 
-            self::beforeEntryDelete($entry);
+            self::beforeEntryDelete($element);
         });
     }
 
@@ -135,16 +137,22 @@ class Events
         }
 
         // delete from the sayt index(es)
+        $sayt_jobs = [];
         foreach (Config::getInstance()->getIndexes() as $index) {
             if ($index->type === IndexType::SAYT && $index->auto_index) {
-                $job = new ElasticSearchDelete([
+                $sayt_jobs[] = new ElasticSearchDelete([
                     'index' => $index->indexName(false),
                     'id' => $el->id
                 ]);
+            }
+        }
+
+        if ($sayt_jobs) {
+            foreach ($sayt_jobs as $sayt_job) {
                 if ($dev_mode) {
-                    $job->execute(Craft::$app->getQueue());
+                    $sayt_job->execute(Craft::$app->getQueue());
                 } else {
-                    Craft::$app->getQueue()->delay(0)->ttr(300)->priority(100)->push($job);
+                    Craft::$app->getQueue()->delay(0)->ttr(300)->priority(100)->push($sayt_job);
                 }
             }
         }
