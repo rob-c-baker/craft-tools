@@ -279,11 +279,6 @@ class Index
             }
         }
 
-        // Remove duplicates
-        foreach ($eager_map as $candidate) {
-
-        }
-
         return $eager_map;
     }
 }
