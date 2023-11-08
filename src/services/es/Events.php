@@ -2,6 +2,7 @@
 
 namespace alanrogers\tools\services\es;
 
+use alanrogers\tools\queue\jobs\ElasticSearchDelete;
 use alanrogers\tools\queue\jobs\ElasticSearchUpdate;
 use alanrogers\tools\services\ServiceLocator;
 use Craft;
@@ -110,6 +111,7 @@ class Events
     /**
      * Should be called when an element is deleted, so it can be removed from index
      * @param Entry $el
+     * @throws ESException
      */
     private static function beforeEntryDelete(Entry $el): void
     {
@@ -118,16 +120,32 @@ class Events
             return;
         }
 
-        $es = ServiceLocator::getInstance()->elastic_search;
+        $dev_mode = Craft::$app->getConfig()->getGeneral()->devMode;
 
         if ($index->auto_index) {
-            $es->deleteFromIndex($index->indexName(), $el->id);
+            $job = new ElasticSearchDelete([
+                'index' => $index->indexName(false),
+                'id' => $el->id
+            ]);
+            if ($dev_mode) {
+                $job->execute(Craft::$app->getQueue());
+            } else {
+                Craft::$app->getQueue()->delay(0)->ttr(300)->priority(100)->push($job);
+            }
         }
 
         // delete from the sayt index(es)
         foreach (Config::getInstance()->getIndexes() as $index) {
             if ($index->type === IndexType::SAYT && $index->auto_index) {
-                $es->deleteFromIndex($index->indexName(), $el->id);
+                $job = new ElasticSearchDelete([
+                    'index' => $index->indexName(false),
+                    'id' => $el->id
+                ]);
+                if ($dev_mode) {
+                    $job->execute(Craft::$app->getQueue());
+                } else {
+                    Craft::$app->getQueue()->delay(0)->ttr(300)->priority(100)->push($job);
+                }
             }
         }
     }
