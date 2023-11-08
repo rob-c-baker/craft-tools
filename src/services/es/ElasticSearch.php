@@ -131,10 +131,9 @@ class ElasticSearch extends Component
      * Updates the mapping on an existing index
      * @param string $index
      * @param array $mapping
-     * @param array|null $settings defaults to settings in `searches\Base::settings()`
      * @return bool
      */
-    public function updateIndexMapping(string $index, array $mapping, ?array $settings=null) : bool
+    public function updateIndexMapping(string $index, array $mapping) : bool
     {
         $index_open = true;
         try {
@@ -147,7 +146,6 @@ class ElasticSearch extends Component
                 'index' => $index,
                 'body' => [
                     'properties' => $mapping,
-                    'settings' => $settings ?? Config::getInstance()->getGlobalIndexSettings()
                 ]
             ]);
             $indices->open([ 'index' => $index ]);
@@ -161,7 +159,41 @@ class ElasticSearch extends Component
                 try {
                     $this->getClient()->indices()->open([ 'index' => $index ]);
                 } catch (Throwable $e) {
-                    throw new RuntimeException('ES: Could not re-open index on failed settings / mapping update.', (int) $e->getCode(), $e);
+                    throw new RuntimeException('ES: Could not re-open index on failed mapping update.', (int) $e->getCode(), $e);
+                }
+            }
+        }
+
+        return $response->asBool();
+    }
+
+    public function updateIndexSettings(string $index, array $settings) : bool
+    {
+        $index_open = true;
+        try {
+            // see https://www.elastic.co/guide/en/elasticsearch/reference/7.17/indices-update-settings.html
+            // cannot update analysers on "open" indexes - they need to be closed, updated and then opened again.
+            $indices = $this->getClient()->indices();
+            $indices->close([ 'index' => $index ]);
+            $index_open = false;
+            $response = $this->getClient()->indices()->putSettings([
+                'index' => $index,
+                'body' => [
+                    'settings' => $settings,
+                ]
+            ]);
+            $indices->open([ 'index' => $index ]);
+            $index_open = true;
+        } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
+            ServiceLocator::getInstance()->error->reportBackendException($e);
+            $this->addError($e->getMessage(), 'updateIndexSettings');
+            return false;
+        } finally {
+            if (!$index_open) {
+                try {
+                    $this->getClient()->indices()->open([ 'index' => $index ]);
+                } catch (Throwable $e) {
+                    throw new RuntimeException('ES: Could not re-open index on failed settings update.', (int) $e->getCode(), $e);
                 }
             }
         }

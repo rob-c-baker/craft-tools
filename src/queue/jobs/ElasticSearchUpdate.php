@@ -170,9 +170,10 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
             $settings = Config::getInstance()->getGlobalIndexSettings();
 
             if (!$es->indexExists($index_name)) {
-                $success = $es->createIndex($index_name, $mapping, $settings);
+                $success = $es->createIndex($index_name, $mapping, Config::getInstance()->getGlobalIndexSettings());
             } else {
-                $success = $es->updateIndexMapping($index_name, $mapping, $settings);
+                $success = $es->updateIndexMapping($index_name, $mapping)
+                    && $es->updateIndexSettings($index_name, $settings);
             }
 
             if (!$success) {
