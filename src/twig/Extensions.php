@@ -5,6 +5,7 @@ namespace alanrogers\tools\twig;
 
 use alanrogers\tools\twig\extensions\Dumper;
 use alanrogers\tools\twig\extensions\Image64;
+use alanrogers\tools\twig\extensions\TwigURLHelper;
 use alanrogers\tools\twig\extensions\VariableTools;
 use Craft;
 use Exception;
@@ -89,5 +90,8 @@ class Extensions
 
         // ability to unset()
         $view->registerTwigExtension(new Dumper());
+
+        // URL Helper
+        $view->registerTwigExtension(new TwigURLHelper());
     }
 }
