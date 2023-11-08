@@ -11,7 +11,6 @@ use Craft;
 use craft\console\Application as Console;
 use craft\queue\BaseJob;
 use craft\queue\QueueInterface;
-use Exception;
 use Throwable;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
@@ -48,12 +47,17 @@ class ElasticSearchDelete extends BaseJob implements RetryableJobInterface
     public function execute($queue) : void
     {
         $this->queue = $queue;
-        $this->start();
+
+        try {
+            $this->start();
+        } catch (ESException $e) {
+            ServiceLocator::getInstance()->error->reportBackendException($e);
+            throw $e;
+        }
     }
 
     /**
      * @throws ESException
-     * @throws Exception
      */
     public function start(): void
     {
@@ -78,7 +82,6 @@ class ElasticSearchDelete extends BaseJob implements RetryableJobInterface
         }
 
         $message = sprintf('Elastic Search: Deleting item with id: %d from index: %s ...', $this->id, $this->index);
-
         $es_log->info('[Start] ' . $message);
 
         if (!Craft::$app instanceof Console) {
@@ -86,6 +89,7 @@ class ElasticSearchDelete extends BaseJob implements RetryableJobInterface
         }
 
         $es = ServiceLocator::getInstance()->elastic_search;
+        $es->setThrowExceptions(true);
 
         if ($index->auto_index) {
             $es->deleteFromIndex($index->indexName(), $this->id);

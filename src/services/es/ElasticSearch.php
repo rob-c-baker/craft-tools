@@ -2,7 +2,6 @@
 
 namespace alanrogers\tools\services\es;
 
-use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\traits\ErrorManagementTrait;
 use craft\log\MonologTarget;
 use Elastic\Elasticsearch\Client;
@@ -27,11 +26,29 @@ class ElasticSearch extends Component
     use ErrorManagementTrait;
 
     /**
+     * Whether to throw exceptions
+     * @var bool
+     */
+    private bool $throw_exceptions = false;
+
+    /**
      * @var Client|null
      */
     private static ?Client $_client = null;
 
     /**
+     * @param bool $state
+     * @return $this
+     */
+    public function setThrowExceptions(bool $state) : ElasticSearch
+    {
+        $this->throw_exceptions = $state;
+        return $this;
+    }
+
+    /**
+     * Note: this will always throw an exception if there is an error as nothing can be done without a connection to
+     * the ES instance.
      * @return Client
      * @throws ESException
      */
@@ -75,7 +92,7 @@ class ElasticSearch extends Component
 
     /**
      * Gets an instance of a service class for section based searching.
-     * Used from templates or via the ServiceLocator
+     * Used from templates or via the `ServiceLocator`.
      * @param string $index_name
      * @return Search|null
      */
@@ -85,7 +102,6 @@ class ElasticSearch extends Component
             return SearchFactory::getSearch($index_name);
         } catch (ESException $e) {
             $this->addError($e->getMessage(), 'getSearch');
-            ServiceLocator::getInstance()->error->reportBackendException($e);
         }
         return null;
     }
@@ -105,6 +121,7 @@ class ElasticSearch extends Component
      * @param array $mapping
      * @param array|null $settings defaults to settings in `searches\Base::settings()`
      * @return bool
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function createIndex(string $index, array $mapping, ?array $settings=null): bool
     {
@@ -119,8 +136,10 @@ class ElasticSearch extends Component
                 ]
             ]);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
-            ServiceLocator::getInstance()->error->reportBackendException($e);
             $this->addError($e->getMessage(), 'createIndex');
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            }
             return false;
         }
 
@@ -132,6 +151,7 @@ class ElasticSearch extends Component
      * @param string $index
      * @param array $mapping
      * @return bool
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function updateIndexMapping(string $index, array $mapping) : bool
     {
@@ -151,8 +171,10 @@ class ElasticSearch extends Component
             $indices->open([ 'index' => $index ]);
             $index_open = true;
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
-            ServiceLocator::getInstance()->error->reportBackendException($e);
             $this->addError($e->getMessage(), 'updateIndexMapping');
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            }
             return false;
         } finally {
             if (!$index_open) {
@@ -167,6 +189,9 @@ class ElasticSearch extends Component
         return $response->asBool();
     }
 
+    /**
+     * @throws ESException When `$this->throw_exceptions` is `true`
+     */
     public function updateIndexSettings(string $index, array $settings) : bool
     {
         $index_open = true;
@@ -185,8 +210,10 @@ class ElasticSearch extends Component
             $indices->open([ 'index' => $index ]);
             $index_open = true;
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
-            ServiceLocator::getInstance()->error->reportBackendException($e);
             $this->addError($e->getMessage(), 'updateIndexSettings');
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            }
             return false;
         } finally {
             if (!$index_open) {
@@ -203,8 +230,10 @@ class ElasticSearch extends Component
 
     /**
      * Determines if specified index exists.
+     * Note: always throws exceptions when something goes wrong
      * @param string $index
      * @return bool
+     * @throws ESException
      */
     public function indexExists(string $index) : bool
     {
@@ -216,7 +245,7 @@ class ElasticSearch extends Component
             $msg = 'Could not establish if index exists.';
             $this->addError($msg, 'indexExists');
             $this->addError($e->getMessage(), 'indexExists');
-            throw new RuntimeException($msg, (int) $e->getCode(), $e);
+            throw new ESException($msg, (int) $e->getCode(), $e);
         }
 
         return $response->asBool();
@@ -226,6 +255,7 @@ class ElasticSearch extends Component
      * Delete an index completely
      * @param string $index
      * @return bool
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function deleteIndex(string $index) : bool
     {
@@ -239,11 +269,15 @@ class ElasticSearch extends Component
                 // when the index is already deleted
                 return true;
             }
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            }
             return false;
         } catch (MissingParameterException|ServerResponseException|ESException $e) {
             $this->addError($e->getMessage(), 'deleteIndex');
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            }
             return false;
         }
 
@@ -257,6 +291,7 @@ class ElasticSearch extends Component
      * @param array $data
      * @param array $override_params (Optional) Any additional $params to supply to ES call
      * @return bool
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function addToIndex(string $index, int $id, array $data, array $override_params=[]) : bool
     {
@@ -274,7 +309,9 @@ class ElasticSearch extends Component
             $response = $this->getClient()->index($params);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
             $this->addError($e->getMessage(), 'addToIndex');
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            }
             return false;
         }
 
@@ -287,6 +324,7 @@ class ElasticSearch extends Component
      * @param int $id
      * @param array $override_params (Optional) Any additional $params to supply to ES call
      * @return bool
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function existsInIndex(string $index, int $id, array $override_params=[]) : bool
     {
@@ -303,7 +341,9 @@ class ElasticSearch extends Component
             $response = $this->getClient()->exists($params);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
             $this->addError($e->getMessage(), 'existsInIndex');
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            }
             return false;
         }
 
@@ -317,6 +357,7 @@ class ElasticSearch extends Component
      * @param array $data
      * @param array $override_params (Optional) Any additional $params to supply to ES call
      * @return bool
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function updateInIndex(string $index, int $id, array $data, array $override_params=[]) : bool
     {
@@ -336,7 +377,9 @@ class ElasticSearch extends Component
             $response = $this->getClient()->update($params);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
             $this->addError($e->getMessage(), 'updateInIndex');
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            }
             return false;
         }
 
@@ -348,6 +391,7 @@ class ElasticSearch extends Component
      * @param int $id
      * @param array $override_params (Optional) Any additional $params to supply to ES call
      * @return bool
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function deleteFromIndex(string $index, int $id, array $override_params=[]) : bool
     {
@@ -364,7 +408,9 @@ class ElasticSearch extends Component
             $response = $this->getClient()->delete($params);
         } catch (ClientResponseException|MissingParameterException|ServerResponseException|ESException $e) {
             $this->addError($e->getMessage(), 'deleteFromIndex');
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            }
             return false;
         }
 
@@ -379,6 +425,7 @@ class ElasticSearch extends Component
      * @param int $from (Default: 0)
      * @param string[] $select Fields to return
      * @return SearchResponse
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function searchInField(string $index, string $field, string $query, int $size=10, int $from=0, array $select=[]) : SearchResponse
     {
@@ -397,6 +444,7 @@ class ElasticSearch extends Component
      * @param string[] $select Fields to return
      * @param array $additional_root_params
      * @return SearchResponse
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function searchInFields(string $index, array $query_criteria, int $size=10, int $from=0, array $select=[], array $additional_root_params=[]) : SearchResponse
     {
@@ -427,8 +475,11 @@ class ElasticSearch extends Component
             $response = $this->getClient()->search($params);
         } catch (ClientResponseException|ServerResponseException|ESException $e) {
             $this->addError($e->getMessage(), 'searchInFields');
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
-            return SearchResponse::build(null, $e->getMessage());
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            } else {
+                return SearchResponse::build(null, $e->getMessage());
+            }
         }
 
         return SearchResponse::build($response);
@@ -442,6 +493,7 @@ class ElasticSearch extends Component
      * @param int $size (Default: 10)
      * @param int $from (Default: 0)
      * @return SearchResponse
+     * @throws ESException When `$this->throw_exceptions` is `true`
      */
     public function fullTextSearch(string $index, array $fields, array $includes, string $query, int $size=10, int $from=0) : SearchResponse
     {
@@ -479,8 +531,11 @@ class ElasticSearch extends Component
             $response = $this->getClient()->search($params);
         } catch (ClientResponseException|ServerResponseException|ESException $e) {
             $this->addError($e->getMessage(), 'fullTextSearch');
-            ServiceLocator::getInstance()->error->reportBackendException($e, true);
-            return SearchResponse::build(null, $e->getMessage());
+            if ($this->throw_exceptions) {
+                throw new ESException($e->getMessage(), (int) $e->getCode(), $e);
+            } else {
+                return SearchResponse::build(null, $e->getMessage());
+            }
         }
 
         return SearchResponse::build($response);

@@ -89,7 +89,13 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
     public function execute($queue) : void
     {
         $this->queue = $queue;
-        $this->start();
+
+        try {
+            $this->start();
+        } catch (ESException $e) {
+            ServiceLocator::getInstance()->error->reportBackendException($e);
+            throw $e;
+        }
     }
 
     /**
@@ -125,7 +131,6 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
 
     /**
      * @throws ESException
-     * @throws Exception
      */
     public function start(): void
     {
@@ -161,6 +166,7 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
 
             $index_name = $index->indexName();
             $es = $search->getES();
+            $es->setThrowExceptions(true);
 
             if ($this->delete_index_first) {
                 $es->deleteIndex($index_name);
@@ -318,7 +324,7 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
 
     /**
      * @return EntryQuery
-     * @throws Exception
+     * @throws ESException
      */
     private function getEntriesQuery() : EntryQuery
     {
@@ -326,7 +332,7 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
 
         $index = Config::getInstance()->getIndexByName($this->index);
         if (!$index) {
-            throw new Exception(sprintf('Cannot update ES index, index "%s" not found', $this->index));
+            throw new ESException(sprintf('Cannot update ES index, index "%s" not found', $this->index));
         }
 
         if (!in_array($index->type->value, [ IndexType::SAYT->value, IndexType::ALL->value ], true)) {
