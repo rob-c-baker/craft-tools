@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace alanrogers\tools\traits;
 
+use alanrogers\tools\services\es\ElasticSearch;
+use alanrogers\tools\services\jwt\JWTAuth;
+use alanrogers\tools\validator\Base;
+
 const __DEFAULT_ERROR_TRAIT_KEY = '__no_key__';
 
 trait ErrorManagementTrait
@@ -42,10 +46,14 @@ trait ErrorManagementTrait
     }
 
     /**
+     * @param string|null $key If supplied, will check ony for errors within this `key`
      * @return bool
      */
-    public function hasErrors() : bool
+    public function hasErrors(?string $key=null) : bool
     {
+        if ($key !== null) {
+            return (bool) ($this->errors[$key] ?? false);
+        }
         return !empty($this->errors);
     }
 
@@ -91,10 +99,20 @@ trait ErrorManagementTrait
         return $this;
     }
 
-    public function clearErrors() : self
+    /**
+     * Clears all errors, or errors just for a specific `key` if supplied
+     * @param string|null $key
+     * @return ErrorManagementTrait|ElasticSearch|JWTAuth|Base
+     */
+    public function clearErrors(?string $key=null) : self
     {
-        $this->uses_keys = false;
-        $this->errors = [];
+        if ($key !== null) {
+            $this->uses_keys = true;
+            $this->errors[$key] = [];
+        } else {
+            $this->uses_keys = false;
+            $this->errors = [];
+        }
         return $this;
     }
 }
