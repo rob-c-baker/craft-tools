@@ -142,7 +142,8 @@ class Events
             if ($index->type === IndexType::SAYT && $index->auto_index) {
                 $sayt_jobs[] = new ElasticSearchDelete([
                     'index' => $index->indexName(false),
-                    'id' => $el->id
+                    'id' => $el->id,
+                    'ignore_404' => true
                 ]);
             }
         }

@@ -29,6 +29,12 @@ class ElasticSearchDelete extends BaseJob implements RetryableJobInterface
     public ?string $index = null;
 
     /**
+     * Whether to ignore a 404 error from ES when deleting
+     * @var bool
+     */
+    public bool $ignore_404 = false;
+
+    /**
      * @var int|null
      */
     public ?int $id = null;
@@ -92,13 +98,25 @@ class ElasticSearchDelete extends BaseJob implements RetryableJobInterface
         $es->setThrowExceptions(true);
 
         if ($index->auto_index) {
-            $es->deleteFromIndex($index->indexName(), $this->id);
+            try {
+                $es->deleteFromIndex($index->indexName(), $this->id);
+            } catch (ESException $e) {
+                if ($this->ignore_404 && !str_contains($e->getMessage(), '404 Not Found')) {
+                    throw $e;
+                }
+            }
         }
 
         // delete from the sayt index(es)
         foreach (Config::getInstance()->getIndexes() as $index) {
             if ($index->type === IndexType::SAYT && $index->auto_index) {
-                $es->deleteFromIndex($index->indexName(), $this->id);
+                try {
+                    $es->deleteFromIndex($index->indexName(), $this->id);
+                } catch (ESException $e) {
+                    if ($this->ignore_404 && !str_contains($e->getMessage(), '404 Not Found')) {
+                        throw $e;
+                    }
+                }
             }
         }
 
