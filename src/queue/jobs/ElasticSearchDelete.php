@@ -101,7 +101,7 @@ class ElasticSearchDelete extends BaseJob implements RetryableJobInterface
             try {
                 $es->deleteFromIndex($index->indexName(), $this->id);
             } catch (ESException $e) {
-                if ($this->ignore_404 && !str_contains($e->getMessage(), '404 Not Found')) {
+                if (!$this->ignore_404 && !str_contains($e->getMessage(), '404 Not Found')) {
                     throw $e;
                 }
             }
@@ -113,7 +113,7 @@ class ElasticSearchDelete extends BaseJob implements RetryableJobInterface
                 try {
                     $es->deleteFromIndex($index->indexName(), $this->id);
                 } catch (ESException $e) {
-                    if ($this->ignore_404 && !str_contains($e->getMessage(), '404 Not Found')) {
+                    if (!$this->ignore_404 && !str_contains($e->getMessage(), '404 Not Found')) {
                         throw $e;
                     }
                 }
