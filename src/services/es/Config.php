@@ -63,7 +63,7 @@ class Config
     {
         return $this->config->configExists() && $this->config->getItem('enabled');
     }
-    
+
     /**
      * @return array{ protocol: string, host: string, port: string, username: string|null, password: string|null }
      */
@@ -78,7 +78,7 @@ class Config
      */
     public function getIndexPrefix(): ?string
     {
-       return strtolower($this->config->getItem('index_prefix')) ?? null;
+        return strtolower($this->config->getItem('index_prefix')) ?? null;
     }
 
     public function getGlobalFieldMapping(): array
@@ -149,14 +149,18 @@ class Config
     }
 
     /**
+     * @param bool $just_sections
+     * @param bool $add_prefix Default: true
      * @return string[]
      */
-    public function getAllSectionIndexNames() : array
+    public function getAllIndexNames(bool $just_sections, bool $add_prefix=true) : array
     {
         $names = [];
         foreach ($this->getIndexes() as $index) {
-            if ($index->type === IndexType::SECTION) {
-                $names[] = $index->indexName();
+            if ($just_sections && $index->type === IndexType::SECTION) {
+                $names[] = $index->indexName($add_prefix);
+            } elseif (!$just_sections && $index->type !== IndexType::ALL) {
+                $names[] = $index->indexName($add_prefix);
             }
         }
         return $names;

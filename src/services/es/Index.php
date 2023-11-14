@@ -161,10 +161,9 @@ class Index
     {
         $name = $this->name;
         if ($this->type === IndexType::ALL) {
-            // When this is an "all" indexes search, index name should be a comma separated list of all
-            // section type index names:
-            $names = $this->config->getAllSectionIndexNames();
-            $name = implode(',', $names);
+            // When this is an "all" indexes search, index name should be a comma separated list of all index names:
+            $names = $this->config->getAllIndexNames(true, $add_prefix);
+            return implode(',', $names);
         }
         return $this->config->normaliseIndexName($name, $add_prefix);
     }
