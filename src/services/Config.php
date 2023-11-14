@@ -146,4 +146,20 @@ class Config extends Component
         }
         return $this->config_data[$config_name] ?? null;
     }
+
+    /**
+     * Primarily for injecting a config for testing purposes, sets all loaded config items for specific config name or
+     * default if not set.
+     * @param array $items
+     * @param string|null $config_name
+     * @return void
+     */
+    public function setAllItems(array $items, ?string $config_name=null) : void
+    {
+        if ($config_name === null) {
+            $config_name = $this->default_config_name;
+        }
+        $this->config_data[$config_name] = $items;
+        $this->loaded[$config_name] = true;
+    }
 }

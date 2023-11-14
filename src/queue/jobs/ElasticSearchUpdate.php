@@ -169,27 +169,19 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
             $es->setThrowExceptions(true);
 
             if ($this->delete_index_first) {
-                $es->deleteIndex($index_name);
+                $delete_job = new ElasticSearchIndex([
+                    'index' => $this->index,
+                    'action' => ElasticSearchIndex::ACTION_DELETE_INDEX
+                ]);
+                $delete_job->execute($this->queue);
             }
-
-            $mapping = $index->fieldMapping();
-            $settings = Config::getInstance()->getGlobalIndexSettings();
 
             if (!$es->indexExists($index_name)) {
-                $success = $es->createIndex($index_name, $mapping, Config::getInstance()->getGlobalIndexSettings());
-            } else {
-                $success = $es->updateIndexMapping($index_name, $mapping)
-                    && $es->updateIndexSettings($index_name, $settings);
-            }
-
-            if (!$success) {
-                $msg = sprintf(
-                    'ES reported failure when updating mapping for index "%s": %s',
-                    $this->index,
-                    json_encode($es->getErrors())
-                );
-                $es_log->error($msg);
-                throw new ESException($msg);
+                $create_job = new ElasticSearchIndex([
+                    'index' => $this->index,
+                    'action' => ElasticSearchIndex::ACTION_CREATE_INDEX
+                ]);
+                $create_job->execute($this->queue);
             }
 
             $es->clearErrors();
@@ -222,10 +214,20 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
                     continue;
                 }
 
+                $doc_exists = $es->existsInIndex($index_name, $entry->id);
+
                 if (!$search->isAllowedInIndex($entry)) {
-                    if ($es->existsInIndex($index_name, $entry->id)) {
+                    if ($doc_exists) {
                         // not allowed but present. Remove from index.
-                        $es->deleteFromIndex($index_name, $entry->id);
+                        $delete_job = new ElasticSearchDelete([
+                            'id' => $entry->id,
+                            'index' => $this->index
+                        ]);
+                        try {
+                            $delete_job->execute($this->queue);
+                        } catch (ESException) {
+                            continue; // any logging etc handled in job
+                        }
                     }
                 } else {
 
@@ -242,7 +244,7 @@ class ElasticSearchUpdate extends BaseJob implements RetryableJobInterface
                         if ($this->refresh_index) {
                             $override_params['refresh'] = 'wait_for';
                         }
-                        if ($es->existsInIndex($index_name, $id)) {
+                        if ($doc_exists) {
                             $success = $es->updateInIndex($index_name, $id, $data, $override_params);
                         } else {
                             $success = $es->addToIndex($index_name, $id, $data, $override_params);

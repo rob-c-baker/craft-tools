@@ -89,6 +89,8 @@ class Index
      */
     public bool $auto_index = false;
 
+    private Config $config;
+
     /**
      * @param string|IndexType $type The `IndexType` ENUM itself or one of the string values of it
      * @param array{
@@ -106,8 +108,10 @@ class Index
      *     } $properties
      * @throws ESException
      */
-    public function __construct(string|IndexType $type, array $properties)
+    public function __construct(string|IndexType $type, array $properties, Config $config)
     {
+        $this->config = $config;
+
         $this->type = ($type instanceof IndexType) ? $type : IndexType::from($type);
 
         // check for existence and throw exceptions if necessary
@@ -159,38 +163,10 @@ class Index
         if ($this->type === IndexType::ALL) {
             // When this is an "all" indexes search, index name should be a comma separated list of all
             // section type index names:
-            $names = Config::getInstance()->getAllSectionIndexNames();
+            $names = $this->config->getAllSectionIndexNames();
             $name = implode(',', $names);
         }
-        return self::normaliseIndexName($name, $add_prefix);
-    }
-
-    /**
-     * Produces an ES compatible index name from the string input.
-     * Optionally adds an index prefix from the config for this site.
-     * (ES needs a lower-case, slug-like string).
-     * @param string $index_identifier
-     * @param bool $add_prefix Default: true
-     * @return string
-     */
-    public static function normaliseIndexName(string $index_identifier, bool $add_prefix=true) : string
-    {
-        if ($add_prefix) {
-            $prefix = Config::getInstance()->getIndexPrefix() ?? '';
-        } else {
-            $prefix = '';
-        }
-        if ($prefix && str_starts_with($index_identifier, $prefix)) {
-            // prefix already present
-            return $index_identifier;
-        }
-        return $prefix . strtolower(
-            preg_replace( // convert to a slug-like format
-                '/(?<=\d)(?=[A-Za-z])|(?<=[A-Za-z])(?=\d)|(?<=[a-z])(?=[A-Z])/',
-                '-',
-                $index_identifier
-            )
-        );
+        return $this->config->normaliseIndexName($name, $add_prefix);
     }
 
     /**
@@ -200,7 +176,7 @@ class Index
     public function fieldMapping() : array
     {
         return array_filter([
-            ...(Config::getInstance()->getGlobalFieldMapping()[$this->type->value] ?? []),
+            ...($this->config->getGlobalFieldMapping()[$this->type->value] ?? []),
             ...$this->field_mapping
         ]);
     }
@@ -211,7 +187,7 @@ class Index
     public function getMatchFields() : array
     {
         if ($this->type === IndexType::ALL) {
-            $indexes = Config::getInstance()->getIndexes();
+            $indexes = $this->config->getIndexes();
             $fields = [];
             foreach ($indexes as $index) {
                 if ($index->type === IndexType::SECTION) {
@@ -232,7 +208,7 @@ class Index
      */
     public function getFieldBoosts() : array
     {
-        return array_filter([ ...Config::getInstance()->getGlobalFieldBoosts(), ...$this->field_boosts ]);
+        return array_filter([ ...$this->config->getGlobalFieldBoosts(), ...$this->field_boosts ]);
     }
 
     /**
@@ -256,7 +232,7 @@ class Index
         }
 
         if ($this->type === IndexType::ALL) {
-            foreach (Config::getInstance()->getIndexes() as $index) {
+            foreach ($this->config->getIndexes() as $index) {
                 if ($index->type === IndexType::SECTION) {
                     $tmp_map = [];
                     if ($index->eager_loading['loads'] ?? null) {

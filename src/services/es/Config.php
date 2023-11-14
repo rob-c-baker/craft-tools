@@ -1,14 +1,16 @@
 <?php declare(strict_types=1);
 
 namespace alanrogers\tools\services\es;
+
 use alanrogers\tools\services\ServiceLocator;
+use alanrogers\tools\services\Config as ConfigStore;
 use Exception;
 
 class Config
 {
     private static ?Config $instance = null;
 
-    private \alanrogers\tools\services\Config $config;
+    private ConfigStore $config;
 
     /**
      * An array of all indexes available
@@ -16,19 +18,41 @@ class Config
      */
     private ?array $indexes = null;
 
-    public static function getInstance(): Config
+    /**
+     * Optionally pass in an instance to read the stored config from for easier testing
+     * @param ConfigStore|null $config_store
+     * @return Config
+     */
+    public static function getInstance(ConfigStore $config_store=null): Config
     {
         if (self::$instance === null) {
-            self::$instance = new Config();
+            self::$instance = new Config($config_store);
         }
         return self::$instance;
     }
 
-    private function __construct()
+    /**
+     * Resets to fresh state - for testing.
+     * @return void
+     */
+    public static function resetInstance() : void
     {
-        $this->config = new \alanrogers\tools\services\Config([
-            'default_config_name' => 'elastic-search'
-        ]);
+        self::$instance = null;
+    }
+
+    /**
+     * Public for testing
+     * @param ConfigStore|null $config_store
+     */
+    public function __construct(ConfigStore $config_store=null)
+    {
+        if ($config_store) {
+            $this->config = $config_store;
+        } else {
+            $this->config = new ConfigStore([
+                'default_config_name' => 'elastic-search'
+            ]);
+        }
     }
 
     /**
@@ -48,9 +72,13 @@ class Config
         return $this->config->getItem('connection');
     }
 
+    /**
+     * Gets any defined index prefix - note: converts to lowercase because indexes in ES have to be lowercase.
+     * @return string|null
+     */
     public function getIndexPrefix(): ?string
     {
-       return $this->config->getItem('index_prefix') ?? null;
+       return strtolower($this->config->getItem('index_prefix')) ?? null;
     }
 
     public function getGlobalFieldMapping(): array
@@ -95,7 +123,7 @@ class Config
     {
         foreach ($this->config->getItem('indexes') as $index_data) {
             try {
-                $this->indexes[] = new Index($index_data['type'], $index_data);
+                $this->indexes[] = new Index($index_data['type'], $index_data, $this);
             } catch (Exception $e) {
                 ServiceLocator::getInstance()->error->reportBackendException($e, true);
             }
@@ -110,30 +138,10 @@ class Config
     public function getIndexByName(string $name, bool $normalise_name=true) : ?Index
     {
         if ($normalise_name) {
-            $name = Index::normaliseIndexName($name, false);
+            $name = $this->normaliseIndexName($name, false);
         }
         foreach ($this->getIndexes() as $index) {
             if ($index->name === $name) {
-                return $index;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param string $handle
-     * @param bool $normalise_name If true (default), will convert name to an ES compatible name
-     * @return Index|null
-     */
-    public function getIndexBySectionHandle(string $handle, bool $normalise_name=true) : ?Index
-    {
-        if ($normalise_name) {
-            $name = Index::normaliseIndexName($handle, false);
-        } else {
-            $name = $handle;
-        }
-        foreach ($this->getIndexes() as $index) {
-            if ($index->type === IndexType::SECTION && $index->name === $name) {
                 return $index;
             }
         }
@@ -152,5 +160,29 @@ class Config
             }
         }
         return $names;
+    }
+
+    /**
+     * Produces an ES compatible index name from the string input.
+     * Optionally adds an index prefix from the config for this site.
+     * (ES needs a lower-case, slug-like string).
+     * @param string $index_identifier
+     * @param bool $add_prefix Default: true (if false and the prefix is found then it will be removed from the name)
+     * @return string
+     */
+    public function normaliseIndexName(string $index_identifier, bool $add_prefix=true) : string
+    {
+        $prefix = $this->getIndexPrefix() ?? '';
+
+        if ($prefix && str_starts_with($index_identifier, $prefix)) {
+            // prefix already present so remove it (before possibly adding it again below)
+            $index_identifier = substr($index_identifier, strlen($prefix));
+        }
+
+        return mb_strtolower(preg_replace( // convert to a slug-like format
+            '/(?<=\d)(?=[A-Za-z])|(?<=[A-Za-z])(?=\d)|(?<=[a-z])(?=[A-Z])/',
+            '-',
+            ($add_prefix ? $prefix : '') . $index_identifier
+        ));
     }
 }
