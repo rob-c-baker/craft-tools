@@ -7,6 +7,7 @@ use alanrogers\tools\validator\validators\ARRef;
 use alanrogers\tools\validator\validators\CountryISOCode;
 use alanrogers\tools\validator\validators\Email;
 use alanrogers\tools\validator\validators\Integer;
+use alanrogers\tools\validator\validators\ISBN;
 use alanrogers\tools\validator\validators\Latitude;
 use alanrogers\tools\validator\validators\Longitude;
 use alanrogers\tools\validator\validators\MaxLength;
@@ -241,5 +242,30 @@ class ValidatorTest extends \Codeception\Test\Unit
 
         $this->assertFalse($validator->setValue('asLdkffh')->isValid(), 'Invalid min length');
         $this->assertFalse($validator->setValue('asLdkafhpHddddd')->isValid(), 'Invalid max length');
+    }
+
+    public function testISBNValidator()
+    {
+        // Examples from @link https://en.wikipedia.org/wiki/ISBN
+
+        // Basic examples
+        $validator = Factory::create(ISBN::class);
+        $this->assertFalse($validator->setValue('')->isValid(), 'Check empty string is invalid.');
+
+        // 10 digit
+        $validator_10 = Factory::create(ISBN::class, null, [
+            'variant' => ISBN::VARIANT_10_DIGIT
+        ]);
+        $this->assertTrue($validator_10->setValue('0-306-40615-2')->isValid(), 'Check valid ISBN 10 digit.');
+        $this->assertFalse($validator_10->setValue('0-306-40614-2')->isValid(), 'Check invalid ISBN 10 digit.');
+        $this->assertFalse($validator_10->setValue('978-0-306-40615-7')->isValid(), 'Check valid ISBN 13 digit (with 10 digit validator).');
+
+        // 13 digit
+        $validator_13 = Factory::create(ISBN::class, null, [
+            'variant' => ISBN::VARIANT_13_DIGIT
+        ]);
+        $this->assertTrue($validator_13->setValue('978-0-306-40615-7')->isValid(), 'Check valid ISBN 13 digit.');
+        $this->assertFalse($validator_13->setValue('978-0-306-40616-7')->isValid(), 'Check invalid ISBN 13 digit.');
+        $this->assertFalse($validator_13->setValue('0-306-40615-2')->isValid(), 'Check valid ISBN 10 digit (with 13 digit validator).');
     }
 }

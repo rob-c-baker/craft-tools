@@ -40,6 +40,7 @@
         "beberlei/assert": "^3.2",
         "craftcms/cms": "^4.2.0",
         "elasticsearch/elasticsearch": "^8.7.0",
+        "fale/isbn": "^3.1",
         "giggsey/libphonenumber-for-php": "^8.12",
         "google/analytics-data": "^0.11.2",
         "guzzlehttp/guzzle": "^7.2.0",
