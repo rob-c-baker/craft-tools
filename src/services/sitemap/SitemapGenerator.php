@@ -17,12 +17,12 @@ use yii\base\InvalidConfigException;
 
 class SitemapGenerator
 {
-    public const CACHE_KEY_PREFIX = 'xml-sitemap-';
+    public const string CACHE_KEY_PREFIX = 'xml-sitemap-';
 
     /**
      * Number of seconds until cache expires
      */
-    private const CACHE_TTL = 172800; // 172800 == 2 days in seconds
+    private const int CACHE_TTL = 172800; // 172800 == 2 days in seconds
 
     /**
      * @var XMLSitemapModel|null
@@ -63,6 +63,8 @@ class SitemapGenerator
 
     /**
      * @param string $identifier
+     * @param int|null $start
+     * @param int|null $end
      * @return string
      */
     public static function getCacheKey(string $identifier, ?int $start = null, ?int $end = null) : string
@@ -91,7 +93,7 @@ class SitemapGenerator
             }
         }
 
-        if ($this->config->use_queue) {
+        if ($this->config->shouldQueue()) {
 
             // Not generated yet, return something empty for now:
             $this->model->generated = false;

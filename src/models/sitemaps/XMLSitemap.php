@@ -7,6 +7,7 @@ use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\services\sitemap\SitemapConfig;
 use craft\base\Element;
 use craft\base\ElementInterface;
+use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
@@ -14,6 +15,7 @@ use craft\helpers\StringHelper;
 use DateTime;
 use nystudio107\seomatic\models\MetaBundle;
 use yii\base\Model;
+use yii\db\Expression;
 
 /**
  * Model based on an XML sitemap containing entries.
@@ -23,7 +25,7 @@ class XMLSitemap extends Model
     const int DEFAULT_MAX_IMAGE_COUNT = 5;
 
     /**
-     * @var SitemapConfig 
+     * @var SitemapConfig
      */
     public SitemapConfig $config;
 
@@ -201,21 +203,33 @@ class XMLSitemap extends Model
     }
 
     /**
+     * @param int|null $from
+     * @param int|null $to
      * @return DateTime|null
      */
-    public function getIndexModifiedDate() : ?DateTime
+    public function getIndexModifiedDate(?int $from=null, ?int $to=null) : ?DateTime
     {
         if ($this->config->index_modified_date !== null) {
-            return ($this->config->index_modified_date)($this);
+            return ($this->config->index_modified_date)($this, $from, $to);
         }
-        $entry = Entry::find()
-            ->section(StringHelper::camelCase($this->config->name))
-            ->withStructure(false)
+        $query = $this->_elementQuery()
+            ->select([ 'dateUpdated' ])
             ->structureId()
-            ->orderBy('dateUpdated DESC')
-            ->limit(1)
-            ->one();
-        return $entry?->dateUpdated;
+            ->withStructure(false)
+            ->orderBy('dateUpdated DESC');
+        if ($from !== null) {
+            $query->offset($from > 0 ? $from - 1 : 0);
+        }
+        if ($to !== null) {
+            $query->limit($to);
+        }
+
+        $max_query = (new Query())
+            ->select(new Expression('MAX(dateUpdated) as dateUpdated'))
+            ->from($query);
+
+        $row = $max_query->one();
+        return DateTime::createFromFormat('Y-m-d H:i:s', $row['dateUpdated']);
     }
 
     /**

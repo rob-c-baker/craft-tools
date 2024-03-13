@@ -6,6 +6,7 @@ use alanrogers\tools\models\sitemaps\SitemapURL;
 use alanrogers\tools\models\sitemaps\XMLSitemap;
 use alanrogers\tools\services\ServiceLocator;
 use Closure;
+use Craft;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\ArrayHelper;
@@ -17,7 +18,7 @@ class SitemapConfig extends Component
     /**
      * When the count of entries in a sitemap exceeds this number, it will be split into multiple sitemaps.
      */
-    public const int MAX_SIZE = 2000;
+    public const int MAX_SIZE = 1500;
 
     /**
      * Cache the whole sitemap config here:
@@ -70,6 +71,12 @@ class SitemapConfig extends Component
      * @var bool
      */
     public bool $use_queue = true;
+
+    /**
+     * Whether to force use of queue.
+     * @var bool
+     */
+    public bool $force_queue = false;
 
     /**
      * @var bool
@@ -125,6 +132,7 @@ class SitemapConfig extends Component
             'image_field' => $this->image_field,
             'image_transform' => $this->image_transform,
             'use_queue' => $this->use_queue,
+            'force_queue' => $this->force_queue,
             'use_cache' => $this->use_cache,
             'cache_key' => $this->cache_key
         ];
@@ -140,6 +148,7 @@ class SitemapConfig extends Component
         $this->image_field     = $data['image_field'];
         $this->image_transform = $data['image_transform'];
         $this->use_queue       = $data['use_queue'];
+        $this->force_queue     = $data['force_queue'];
         $this->use_cache       = $data['use_cache'];
         $this->cache_key       = $data['cache_key'];
 
@@ -149,6 +158,15 @@ class SitemapConfig extends Component
         $this->index_modified_date = $config->index_modified_date;
         $this->max_image_count = $config->max_image_count;
         $this->element_url = $config->element_url;
+    }
+
+    /**
+     * Determines if the sitemap should be queued or generated straight away
+     * @return bool
+     */
+    public function shouldQueue() : bool
+    {
+        return $this->force_queue || $this->use_queue;
     }
 
     private static function loadAllConfig() : void
@@ -167,6 +185,9 @@ class SitemapConfig extends Component
         }
         foreach (self::$sitemap_config['sitemaps'] ?? [] as $name => $config) {
             $config['name'] = $name;
+            $config['use_cache'] = self::$sitemap_config['use_cache'] ?? true;
+            $config['use_queue'] = self::$sitemap_config['use_queue'] ?? true;
+            $config['force_queue'] = self::$sitemap_config['force_queue'] ?? false;
             $configs[] = new SitemapConfig($config);
         }
         return $configs;

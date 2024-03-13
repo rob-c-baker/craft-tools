@@ -98,7 +98,6 @@ class SitemapsController extends Controller
         $is_dev = Craft::$app->getConfig()->getGeneral()->devMode;
 
         $sitemap_config->use_cache = SitemapConfig::isCacheEnabled(); // only cache if enabled
-        $sitemap_config->use_queue = !$is_dev; // only use queue in live
 
         $service = new SitemapGenerator($sitemap_config);
         try {

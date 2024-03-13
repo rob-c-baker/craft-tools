@@ -62,7 +62,7 @@ class SitemapIndexGenerator
         $base_url = $_SERVER['SITE_URL'] . '/sitemaps/';
         $totals = [];
 
-        foreach ($this->sitemap_configs as $idx => $config) {
+        foreach ($this->sitemap_configs as $config) {
 
             /** @var XMLSitemap $model */
             $model = new $config->model_class($config);
@@ -77,7 +77,7 @@ class SitemapIndexGenerator
                 }
             }
 
-            $modified = $model->getIndexModifiedDate();
+            $modified = $model->getIndexModifiedDate($config->start, $config->end);
             $totals[$config->name] = $model->totalItems();
 
             if ($totals[$config->name] > SitemapConfig::MAX_SIZE) {
@@ -133,23 +133,5 @@ class SitemapIndexGenerator
             }
         }
         return implode("\n", $this->xml);
-    }
-
-    /**
-     * Gets the date for when the last edit was made to any entry in the specified section
-     * @param string $section_handle
-     * @return DateTime|null
-     */
-    private function getSectionModifiedDate(string $section_handle) : ?DateTime
-    {
-        $entry = Entry::find()
-            ->section($section_handle)
-            ->withStructure(false)
-            ->structureId()
-            ->orderBy('dateUpdated DESC')
-            ->limit(1)
-            ->one();
-
-        return $entry?->dateUpdated;
     }
 }
