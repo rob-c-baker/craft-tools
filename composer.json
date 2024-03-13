@@ -32,7 +32,7 @@
         "docs": "https://gitlab.alanrogers.com/web-dev/craft-tools/-/wikis/home"
     },
     "require": {
-        "php": "^8.1",
+        "php": "^8.3",
         "ext-curl": "*",
         "ext-dom": "*",
         "ext-zlib": "*",
@@ -68,7 +68,7 @@
             "gitlab.alanrogers.com"
         ],
         "platform": {
-            "php": "8.1"
+            "php": "8.3"
         },
         "allow-plugins": {
             "yiisoft/yii2-composer": false,
