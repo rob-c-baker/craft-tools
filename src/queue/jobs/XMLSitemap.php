@@ -42,7 +42,7 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
 
     /**
      * @inheritDoc
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|SitemapException
      */
     public function execute($queue) : void
     {

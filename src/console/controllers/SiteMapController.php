@@ -7,6 +7,7 @@ use alanrogers\tools\queue\jobs\XMLSitemap as XMLSitemapJob;
 use alanrogers\tools\services\AlanRogersCache;
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\services\sitemap\SitemapConfig;
+use alanrogers\tools\services\sitemap\SitemapException;
 use alanrogers\tools\services\sitemap\SitemapType;
 use Craft;
 use yii\base\InvalidConfigException;
@@ -21,6 +22,7 @@ class SiteMapController extends Controller
      * @param string $identifier The handle for the section that is being generated
      * @param bool $use_queue Whether to send jobs to the queue or run them straight away. (default: false)
      * @throws InvalidConfigException
+     * @throws SitemapException
      */
     public function actionGenerate(string $identifier, bool $use_queue=false) : int
     {
@@ -69,7 +71,7 @@ class SiteMapController extends Controller
     }
 
     /**
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|SitemapException
      */
     private function generateSitemap(SitemapConfig $config, AlanRogersCache $cache, string $cache_key, bool $use_queue): void
     {
@@ -97,7 +99,7 @@ class SiteMapController extends Controller
      * Generates ALL sitemaps for all sections that have them.
      * @param bool $use_queue Whether to send jobs to the queue or run them straight away. (default: false)
      * @return int
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|SitemapException
      */
     public function actionGenerateAll(bool $use_queue=false) : int
     {
