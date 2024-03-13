@@ -15,6 +15,11 @@ use yii\base\Component;
 class SitemapConfig extends Component
 {
     /**
+     * When the count of entries in a sitemap exceeds this number, it will be split into multiple sitemaps.
+     */
+    public const int MAX_SIZE = 2000;
+
+    /**
      * Cache the whole sitemap config here:
      * @var array|null
      */
@@ -25,6 +30,18 @@ class SitemapConfig extends Component
      * @var string
      */
     public string $name;
+
+    /**
+     * When rendering a batch of URLs, this is the first of the batch
+     * @var int|null
+     */
+    public ?int $start = null;
+
+    /**
+     * When rendering a batch of URLs, this is the last of the batch
+     * @var int|null
+     */
+    public ?int $end = null;
 
     /**
      * The FQ class name of the sitemap model class to use
@@ -101,6 +118,8 @@ class SitemapConfig extends Component
     {
         return [
             'name' => $this->name,
+            'start' => $this->start,
+            'end' => $this->end,
             'model_class' => $this->model_class,
             'type' => $this->type,
             'image_field' => $this->image_field,
@@ -114,6 +133,8 @@ class SitemapConfig extends Component
     public function __unserialize(array $data)
     {
         $this->name            = $data['name'];
+        $this->start           = $data['start'];
+        $this->end             = $data['end'];
         $this->model_class     = $data['model_class'];
         $this->type            = $data['type'];
         $this->image_field     = $data['image_field'];

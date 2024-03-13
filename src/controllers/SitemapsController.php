@@ -64,10 +64,31 @@ class SitemapsController extends Controller
      */
     public function actionXml(string $identifier) : Response
     {
+        // No chunking by default
+        $start = null;
+        $end = null;
+
+        // spot filenames that have ranges in - so we can render just the right bits
+        if (preg_match('/([a-z0-9\-_]+)-([0-9]+)-([0-9]+)$/', $identifier, $matches)) {
+            $identifier = $matches[1];
+            $start = (int) $matches[2];
+            $end = (int) $matches[3];
+            if ($start > $end) {
+                throw new NotFoundHttpException('Start cannot be greater than end.');
+            }
+            if ($end - ($start - 1) > SitemapConfig::MAX_SIZE) {
+                throw new NotFoundHttpException('Difference between start and end cannot be greater than ' . SitemapConfig::MAX_SIZE);
+            }
+        }
+
         $sitemap_config = SitemapConfig::getConfig($identifier);
         if (!SitemapConfig::isEnabled() || !$sitemap_config) {
-            throw new NotFoundHttpException();
+            throw new NotFoundHttpException('Sitemap not enabled.');
         }
+
+        // add in chunking vars, if set above
+        $sitemap_config->start = $start;
+        $sitemap_config->end = $end;
 
         if ($sitemap_config->type === SitemapType::SECTION) {
             // transform the `$section` from slug to camel case

@@ -20,7 +20,7 @@ use yii\base\Model;
  */
 class XMLSitemap extends Model
 {
-    const DEFAULT_MAX_IMAGE_COUNT = 5;
+    const int DEFAULT_MAX_IMAGE_COUNT = 5;
 
     /**
      * @var SitemapConfig 
@@ -77,22 +77,40 @@ class XMLSitemap extends Model
     }
 
     /**
+     * @param int|null $start
+     * @param int|null $end
      * @return int
      */
-    public function totalItems() : int
+    public function totalItems(?int $start=null, ?int $end=null) : int
     {
-        return (int) $this->loadElementQuery()->count();
+        $query = $this->loadElementQuery();
+        if ($start !== null) {
+            $query->offset($start > 0 ? $start - 1 : 0);
+        }
+        if ($end !== null) {
+            $query->limit($end);
+        }
+        return (int) $query->count();
     }
 
     /**
      * Gets the URLs for the generator
      * @param array $with
+     * @param int|null $start
+     * @param int|null $end
      * @return SitemapURL[]
      */
-    public function getURLs(array $with=[]) : array
+    public function getURLs(array $with=[], ?int $start=null, ?int $end=null) : array
     {
         $batch = [];
-        foreach ($this->loadElementQuery($with)->all() as $item) {
+        $query = $this->loadElementQuery($with);
+        if ($start !== null) {
+            $query->offset($start > 0 ? $start - 1 : 0);
+        }
+        if ($end !== null) {
+            $query->limit($end);
+        }
+        foreach ($query->all() as $item) {
             $batch[] = new SitemapURL([
                 'element' => $item,
                 'image_field' => $this->config->image_field ? $item->{$this->config->image_field} : null,

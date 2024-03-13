@@ -12,12 +12,12 @@ use DateTimeInterface;
 
 class SitemapIndexGenerator
 {
-    public const CACHE_KEY = 'xml-sitemap-index';
+    public const string CACHE_KEY = 'xml-sitemap-index';
 
     /**
      * Number of seconds until cache expires
      */
-    private const CACHE_TTL = 172800; // 172800 == 2 days in seconds
+    private const int CACHE_TTL = 172800; // 172800 == 2 days in seconds
 
     /**
      * Array containing `SitemapConfig`s to render
@@ -60,8 +60,9 @@ class SitemapIndexGenerator
         $this->xml[] = '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
         $base_url = $_SERVER['SITE_URL'] . '/sitemaps/';
+        $totals = [];
 
-        foreach ($this->sitemap_configs as $config) {
+        foreach ($this->sitemap_configs as $idx => $config) {
 
             /** @var XMLSitemap $model */
             $model = new $config->model_class($config);
@@ -77,15 +78,21 @@ class SitemapIndexGenerator
             }
 
             $modified = $model->getIndexModifiedDate();
+            $totals[$config->name] = $model->totalItems();
 
-            $url = $base_url . $config->name . '.xml';
-
-            $this->xml[] = '<sitemap>';
-            $this->xml[] = '<loc>' . htmlspecialchars($url, ENT_XML1, 'UTF-8') . '</loc>';
-            if ($modified) {
-                $this->xml[] = '<lastmod>' . htmlspecialchars($modified->format(DateTimeInterface::W3C), ENT_XML1, 'UTF-8') . '</lastmod>';
+            if ($totals[$config->name] > SitemapConfig::MAX_SIZE) {
+                // we need to split this sitemap
+                $number_of_sitemaps = ceil($totals[$config->name] / SitemapConfig::MAX_SIZE);
+                for ($i = 1; $i <= $number_of_sitemaps; $i++) {
+                    $start = ($i - 1) * SitemapConfig::MAX_SIZE + 1;
+                    $end = min($i * SitemapConfig::MAX_SIZE, $totals[$config->name]);
+                    $url = $base_url . $config->name . '-' . $start . '-' . $end . '.xml';
+                    $this->addSitemapToXML($url, $modified);
+                }
+            } else {
+                $url = $base_url . $config->name . '.xml';
+                $this->addSitemapToXML($url, $modified);
             }
-            $this->xml[] = '</sitemap>';
         }
 
         $this->xml[] = '</sitemapindex>';
@@ -94,6 +101,16 @@ class SitemapIndexGenerator
         if ($this->use_cache) {
             ServiceLocator::getInstance()->cache->set(self::CACHE_KEY, $this->xml, self::CACHE_TTL);
         }
+    }
+
+    private function addSitemapToXML(string $url, ?DateTime $modified=null) : void
+    {
+        $this->xml[] = '<sitemap>';
+        $this->xml[] = '<loc>' . htmlspecialchars($url, ENT_XML1, 'UTF-8') . '</loc>';
+        if ($modified) {
+            $this->xml[] = '<lastmod>' . htmlspecialchars($modified->format(DateTimeInterface::W3C), ENT_XML1, 'UTF-8') . '</lastmod>';
+        }
+        $this->xml[] = '</sitemap>';
     }
 
     /**

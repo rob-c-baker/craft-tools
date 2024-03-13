@@ -17,8 +17,8 @@ use yii\queue\RetryableJobInterface;
  */
 class XMLSitemap extends BaseJob implements RetryableJobInterface
 {
-    public const TTR = 21600; // 6 hours
-    public const MAX_ATTEMPTS = 3;
+    public const int TTR = 21600; // 6 hours
+    public const int MAX_ATTEMPTS = 3;
 
     /**
      * @var SitemapConfig
@@ -51,7 +51,14 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
 
     public function getDescription(): string
     {
-        return 'Generating XML sitemap identified by: ' . $this->config->name;
+        $desc = 'Generating XML sitemap identified by: ' . $this->config->name;
+        if ($this->config->start) {
+            $desc .= ' : ' . $this->config->start;
+        }
+        if ($this->config->end) {
+            $desc .= ' - ' . $this->config->end;
+        }
+        return $desc;
     }
 
     /**

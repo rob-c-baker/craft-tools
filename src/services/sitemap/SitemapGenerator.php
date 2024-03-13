@@ -58,15 +58,21 @@ class SitemapGenerator
 
         $this->model = new $this->config->model_class($this->config);
 
-        $this->config->cache_key = self::getCacheKey($this->config->name);
+        $this->config->cache_key = self::getCacheKey($this->config->name, $this->config->start, $this->config->end);
     }
 
     /**
      * @param string $identifier
      * @return string
      */
-    public static function getCacheKey(string $identifier) : string
+    public static function getCacheKey(string $identifier, ?int $start = null, ?int $end = null) : string
     {
+        if ($start) {
+            $identifier .= '-' . $start;
+        }
+        if ($end) {
+            $identifier .= '-' . $end;
+        }
         return self::CACHE_KEY_PREFIX . $identifier;
     }
 
@@ -137,7 +143,7 @@ class SitemapGenerator
      */
     public function generate() : array
     {
-        $total_items = $this->model->totalItems();
+        $total_items = $this->model->totalItems($this->config->start, $this->config->end);
         $dev_mode = Craft::$app->getConfig()->getGeneral()->devMode;
 
         /** @noinspection HttpUrlsUsage */
@@ -150,6 +156,9 @@ class SitemapGenerator
 
         if ($total_items === 0) {
             $msg = 'Zero entries found while generating XML sitemap for: ' . $this->config->name;
+            if ($this->config->start !== null) {
+                $msg .= ' (from ' . $this->config->start . ' to ' . ($this->config->end ?? '?' ) . ')';
+            }
             if ($dev_mode) {
                 throw new SitemapException($msg);
             } else {
@@ -184,7 +193,7 @@ class SitemapGenerator
             $main_img_transform = $main_img_transform['transform'];
         }
 
-        $urls = $this->model->getURLs($with);
+        $urls = $this->model->getURLs($with, $this->config->start, $this->config->end);
         $this->model->filterURLs($urls);
 
         foreach ($urls as $url) {
@@ -208,7 +217,7 @@ class SitemapGenerator
                 $count = 0;
 
                 /** @var Asset $image */
-                foreach ($url->image_field as $image) {
+                foreach ($url->image_field as $idx => $image) {
 
                     if ($main_img_transform) { // transforming?
                         try {
@@ -235,6 +244,7 @@ class SitemapGenerator
                         }
                         $lines[] = '</image:image>';
                         $count++;
+                        unset($image, $url->image_field[$idx], $transformed); // free some memory
                     }
 
                     if ($max_count !== null && $max_count > -1 && $count >= $max_count) {
@@ -303,6 +313,12 @@ class SitemapGenerator
         $queue = Craft::$app->getQueue();
         $cache = ServiceLocator::getInstance()->cache;
         $cache_key = 'site-map-generating-' . $config->name;
+        if ($config->start !== null) {
+            $cache_key .= '-' . $config->start;
+        }
+        if ($config->end) {
+            $cache_key .= '-' . $config->end;
+        }
         $job_id = $cache->get($cache_key);
 
         if ($job_id === false) {
@@ -313,7 +329,6 @@ class SitemapGenerator
                 }
                 $cache->delete($cache_key);
             }
-            $config->cache_key = $cache_key;
             $job = new XMLSitemap($config);
             $job_id = $queue->push($job);
             $cache->set($cache_key, $job_id, $job->getTtr());
