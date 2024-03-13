@@ -52,13 +52,13 @@ class SitemapGenerator
     {
         $this->config = $config;
 
-        if (!$this->config->name) {
+        if (!$this->config->getName()) {
             throw new InvalidArgumentException('You must pass an identifier string in the "identifier" key of the config array.');
         }
 
         $this->model = new $this->config->model_class($this->config);
 
-        $this->config->cache_key = self::getCacheKey($this->config->name, $this->config->start, $this->config->end);
+        $this->config->cache_key = self::getCacheKey($this->config->getName(), $this->config->start, $this->config->end);
     }
 
     /**
@@ -157,7 +157,7 @@ class SitemapGenerator
         ];
 
         if ($total_items === 0) {
-            $msg = 'Zero entries found while generating XML sitemap for: ' . $this->config->name;
+            $msg = 'Zero entries found while generating XML sitemap for: ' . $this->config->getName();
             if ($this->config->start !== null) {
                 $msg .= ' (from ' . $this->config->start . ' to ' . ($this->config->end ?? '?' ) . ')';
             }
@@ -185,7 +185,7 @@ class SitemapGenerator
         if ($this->config->image_transform) {
             $main_img_transform = ARImager::$plugin->transforms::getTransform($this->config->image_transform);
             if (empty($main_img_transform['transform'])) {
-                $msg = sprintf('Cannot find image transformation "%s" while generating XML sitemap for "%s".', $this->config->image_transform, $this->config->name);
+                $msg = sprintf('Cannot find image transformation "%s" while generating XML sitemap for "%s".', $this->config->image_transform, $this->config->getName());
                 if ($dev_mode) {
                     throw new SitemapException($msg);
                 } else {
@@ -314,7 +314,7 @@ class SitemapGenerator
     {
         $queue = Craft::$app->getQueue();
         $cache = ServiceLocator::getInstance()->cache;
-        $cache_key = 'site-map-generating-' . $config->name;
+        $cache_key = 'site-map-generating-' . $config->getName();
         if ($config->start !== null) {
             $cache_key .= '-' . $config->start;
         }

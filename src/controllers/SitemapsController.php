@@ -7,9 +7,7 @@ use alanrogers\tools\services\sitemap\SitemapConfig;
 use alanrogers\tools\services\sitemap\SitemapException;
 use alanrogers\tools\services\sitemap\SitemapGenerator;
 use alanrogers\tools\services\sitemap\SitemapIndexGenerator;
-use alanrogers\tools\services\sitemap\SitemapType;
 use Craft;
-use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\Response;
 use yii\web\NotFoundHttpException;
@@ -90,14 +88,7 @@ class SitemapsController extends Controller
         $sitemap_config->start = $start;
         $sitemap_config->end = $end;
 
-        if ($sitemap_config->type === SitemapType::SECTION) {
-            // transform the `$section` from slug to camel case
-            $sitemap_config->name = StringHelper::camelCase($sitemap_config->name);
-        }
-
         $is_dev = Craft::$app->getConfig()->getGeneral()->devMode;
-
-        $sitemap_config->use_cache = SitemapConfig::isCacheEnabled(); // only cache if enabled
 
         $service = new SitemapGenerator($sitemap_config);
         try {

@@ -11,7 +11,6 @@ use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
-use craft\helpers\StringHelper;
 use DateTime;
 use nystudio107\seomatic\models\MetaBundle;
 use yii\base\Model;
@@ -58,7 +57,7 @@ class XMLSitemap extends Model
      */
     public function getQueryOrderingIds() : array
     {
-        $cache_key = 'sitemap_query_order_' . $this->config->name;
+        $cache_key = 'sitemap_query_order_' . $this->config->getName();
         if (ServiceLocator::getInstance()->cache->exists($cache_key)) {
             return ServiceLocator::getInstance()->cache->get($cache_key);
         }
@@ -75,7 +74,7 @@ class XMLSitemap extends Model
      */
     public function clearQueryOrderingIds() : void
     {
-        ServiceLocator::getInstance()->cache->delete('sitemap_query_order_' . $this->config->name);
+        ServiceLocator::getInstance()->cache->delete('sitemap_query_order_' . $this->config->getName());
     }
 
     /**
@@ -242,7 +241,7 @@ class XMLSitemap extends Model
             return ($this->config->element_query)($this);
         }
         return Entry::find()
-            ->section(StringHelper::camelCase($this->config->name))
+            ->section($this->config->getName(true))
             ->withStructure(false);
     }
 }

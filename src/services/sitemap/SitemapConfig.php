@@ -6,10 +6,10 @@ use alanrogers\tools\models\sitemaps\SitemapURL;
 use alanrogers\tools\models\sitemaps\XMLSitemap;
 use alanrogers\tools\services\ServiceLocator;
 use Closure;
-use Craft;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\ArrayHelper;
+use craft\helpers\StringHelper;
 use DateTime;
 use yii\base\Component;
 
@@ -158,6 +158,14 @@ class SitemapConfig extends Component
         $this->index_modified_date = $config->index_modified_date;
         $this->max_image_count = $config->max_image_count;
         $this->element_url = $config->element_url;
+    }
+    
+    public function getName(bool $camel_case = false) : string
+    {
+        if ($camel_case) {
+            return StringHelper::camelCase($this->name);
+        }
+        return $this->name;
     }
 
     /**

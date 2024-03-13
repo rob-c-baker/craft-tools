@@ -4,6 +4,7 @@ namespace alanrogers\tools\queue\jobs;
 
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\services\sitemap\SitemapConfig;
+use alanrogers\tools\services\sitemap\SitemapException;
 use alanrogers\tools\services\sitemap\SitemapGenerator;
 use Craft;
 use craft\console\Application as Console;
@@ -51,7 +52,7 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
 
     public function getDescription(): string
     {
-        $desc = 'Generating XML sitemap identified by: ' . $this->config->name;
+        $desc = 'Generating XML sitemap identified by: ' . $this->config->getName();
         if ($this->config->start) {
             $desc .= ' : ' . $this->config->start;
         }
@@ -62,7 +63,7 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
     }
 
     /**
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|SitemapException
      */
     private function start(): void
     {

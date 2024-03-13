@@ -5,8 +5,6 @@ namespace alanrogers\tools\services\sitemap;
 use alanrogers\tools\models\sitemaps\XMLSitemap;
 use alanrogers\tools\services\ServiceLocator;
 use Craft;
-use craft\elements\Entry;
-use craft\helpers\StringHelper;
 use DateTime;
 use DateTimeInterface;
 
@@ -69,7 +67,7 @@ class SitemapIndexGenerator
 
             if ($config->type === SitemapType::SECTION) {
 
-                $section_handle = StringHelper::camelCase($config->name);
+                $section_handle = $config->getName(true);
                 $section = Craft::$app->getSections()->getSectionByHandle($section_handle);
 
                 if (!$section) {
@@ -77,20 +75,21 @@ class SitemapIndexGenerator
                 }
             }
 
-            $modified = $model->getIndexModifiedDate($config->start, $config->end);
-            $totals[$config->name] = $model->totalItems();
+            $modified = $model->getIndexModifiedDate();
+            $config_name = $config->getName();
+            $totals[$config_name] = $model->totalItems();
 
-            if ($totals[$config->name] > SitemapConfig::MAX_SIZE) {
+            if ($totals[$config_name] > SitemapConfig::MAX_SIZE) {
                 // we need to split this sitemap
-                $number_of_sitemaps = ceil($totals[$config->name] / SitemapConfig::MAX_SIZE);
+                $number_of_sitemaps = ceil($totals[$config_name] / SitemapConfig::MAX_SIZE);
                 for ($i = 1; $i <= $number_of_sitemaps; $i++) {
                     $start = ($i - 1) * SitemapConfig::MAX_SIZE + 1;
-                    $end = min($i * SitemapConfig::MAX_SIZE, $totals[$config->name]);
-                    $url = $base_url . $config->name . '-' . $start . '-' . $end . '.xml';
+                    $end = min($i * SitemapConfig::MAX_SIZE, $totals[$config_name]);
+                    $url = $base_url . $config_name . '-' . $start . '-' . $end . '.xml';
                     $this->addSitemapToXML($url, $modified);
                 }
             } else {
-                $url = $base_url . $config->name . '.xml';
+                $url = $base_url . $config_name . '.xml';
                 $this->addSitemapToXML($url, $modified);
             }
         }

@@ -2,12 +2,13 @@
 
 namespace alanrogers\tools\console\controllers;
 
+use alanrogers\tools\models\sitemaps\XMLSitemap;
 use alanrogers\tools\queue\jobs\XMLSitemap as XMLSitemapJob;
+use alanrogers\tools\services\AlanRogersCache;
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\services\sitemap\SitemapConfig;
 use alanrogers\tools\services\sitemap\SitemapType;
 use Craft;
-use craft\helpers\StringHelper;
 use yii\base\InvalidConfigException;
 use yii\console\Controller;
 use yii\console\ExitCode;
@@ -29,38 +30,67 @@ class SiteMapController extends Controller
             return ExitCode::UNSPECIFIED_ERROR;
         }
 
+        /** @var XMLSitemap $model */
+        $model = new $config->model_class($config);
+
         if ($config->type === SitemapType::SECTION) {
-            $section_handle = StringHelper::camelCase($config->name);
+            $section_handle = $config->getName(true);
             if (!Craft::$app->getSections()->getSectionByHandle($section_handle)) {
-                Console::error(sprintf('Attempted section sitemap generation, but no section found for: %s', $config->name));
+                Console::error(sprintf('Attempted section sitemap generation, but no section found for: %s', $config->getName()));
                 return ExitCode::UNSPECIFIED_ERROR;
             }
         }
 
         $cache = ServiceLocator::getInstance()->cache;
-        $cache_key = 'site-map-generating-' . $config->name;
-
+        $cache_key = 'site-map-generating-' . $config->getName();
         $existing_job_id = $cache->get($cache_key);
 
         if ($existing_job_id) {
-            Console::error(sprintf('Sitemap already being generated for: %s.', $config->name));
+            Console::error(sprintf('Sitemap already being generated for: %s.', $config->getName()));
             return ExitCode::UNSPECIFIED_ERROR;
         }
 
-        $job = new XMLSitemapJob($config);
+        $total_items = $model->totalItems();
 
-        $cache->set($cache_key, '__COMMAND-LINE-INVOCATION__', $job->getTtr());
-
-        if ($use_queue) {
-            Console::output(sprintf('Sitemap job added to the queue for: %s...', $config->name));
-            Craft::$app->getQueue()->delay(0)->push($job);
+        if ($total_items > SitemapConfig::MAX_SIZE) {
+            // we need to split this sitemap
+            $number_of_sitemaps = ceil($total_items / SitemapConfig::MAX_SIZE);
+            for ($i = 1; $i <= $number_of_sitemaps; $i++) {
+                $config->start = ($i - 1) * SitemapConfig::MAX_SIZE + 1;
+                $config->end = min($i * SitemapConfig::MAX_SIZE, $total_items);
+                $this->generateSitemap($config, $cache, $cache_key, $use_queue);
+            }
         } else {
-            Console::output(sprintf('Sitemap generating for: %s...', $config->name));
-            $job->execute(Craft::$app->getQueue());
+            $this->generateSitemap($config, $cache, $cache_key, $use_queue);
         }
 
-        Console::output(sprintf('...Sitemap generation complete for %s.', $config->name));
+        Console::output(sprintf('...Sitemap generation complete for %s.', $config->getName()));
         return ExitCode::OK;
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    private function generateSitemap(SitemapConfig $config, AlanRogersCache $cache, string $cache_key, bool $use_queue): void
+    {
+        $job = new XMLSitemapJob($config);
+        $cache->set($cache_key, '__COMMAND-LINE-INVOCATION__', $job->getTtr());
+
+        $config_name = $config->getName();
+        if ($config->start) {
+            $config_name .= ' : ' . $config->start;
+        }
+        if ($config->end) {
+            $config_name .= ' - ' . $config->end;
+        }
+
+        if ($use_queue) {
+            Console::output(sprintf('Sitemap job added to the queue for: %s...', $config_name));
+            Craft::$app->getQueue()->delay(0)->push($job);
+        } else {
+            Console::output(sprintf('Sitemap generating for: %s...', $config_name));
+            $job->execute(Craft::$app->getQueue());
+        }
     }
 
     /**
@@ -81,7 +111,7 @@ class SiteMapController extends Controller
         $ok_count = 0;
 
         foreach ($sitemap_configs as $config) {
-            $result = $this->actionGenerate($config->name, $use_queue);
+            $result = $this->actionGenerate($config->getName(), $use_queue);
             if ($result === ExitCode::OK) {
                 $ok_count++;
             }
