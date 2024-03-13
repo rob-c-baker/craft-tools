@@ -37,9 +37,19 @@ run_tests:
     - docker-php-ext-enable bcmath intl zip exif gd
 
     # Need imagick for ARImager...
-    - curl https://pecl.php.net/get/imagick-3.7.0.tgz --insecure --output imagick-3.7.0.tgz
-    - pecl install imagick-3.7.0.tgz
-    - docker-php-ext-enable imagick
+#    - curl https://pecl.php.net/get/imagick-3.7.0.tgz --insecure --output imagick-3.7.0.tgz
+#    - pecl install imagick-3.7.0.tgz
+#    - docker-php-ext-enable imagick
+
+    # Alternate install routine for Imagick on PHP 8.3 due to https://github.com/Imagick/imagick/issues/643
+    - curl -L -o /tmp/imagick.tar.gz https://github.com/Imagick/imagick/archive/7088edc353f53c4bc644573a79cdcd67a726ae16.tar.gz
+    - tar --strip-components=1 -xf /tmp/imagick.tar.gz
+    - phpize
+    - ./configure
+    - make
+    - make install
+    - echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini
+    - rm -rf /tmp/*
 
     # Install composer
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
