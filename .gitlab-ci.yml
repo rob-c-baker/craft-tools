@@ -5,7 +5,7 @@ stages:
 # Runs out codeception test suite (just unit tests implemented for now)
 run_tests:
 
-  image: php:8.1
+  image: php:8.3
 
   tags:
     - docker
