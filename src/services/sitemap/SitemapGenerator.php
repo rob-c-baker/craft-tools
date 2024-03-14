@@ -306,11 +306,10 @@ class SitemapGenerator
 
     /**
      * Wrapped in a function, so it only tries to generate one sitemap per identifier at a time.
-     * Returns the queue job id already running or the one it just pushed.
      * @param SitemapConfig $config the config to pass to the job and then the XML generator
      * @return int
      */
-    public static function maybeAddQueueJob(SitemapConfig $config) : int
+    public static function maybeAddQueueJob(SitemapConfig $config) : void
     {
         $queue = Craft::$app->getQueue();
         $cache = ServiceLocator::getInstance()->cache;
@@ -318,24 +317,14 @@ class SitemapGenerator
         if ($config->start !== null) {
             $cache_key .= '-' . $config->start;
         }
-        if ($config->end) {
+        if ($config->end !== null) {
             $cache_key .= '-' . $config->end;
         }
-        $job_id = $cache->get($cache_key);
-
-        if ($job_id === false) {
-            $existing_job_id = $cache->get($cache_key);
-            if ($existing_job_id) {
-                if (is_callable([ $queue, 'release'])) {
-                    $queue->release($existing_job_id);
-                }
-                $cache->delete($cache_key);
-            }
-            $job = new XMLSitemap($config);
-            $job_id = $queue->push($job);
-            $cache->set($cache_key, $job_id, $job->getTtr());
+        $generating = $cache->get($cache_key);
+        if (!$generating) {
+            $cache->set($cache_key, true, XMLSitemap::TTR);
+            $job = new XMLSitemap($config, $cache_key);
+            $queue->push($job);
         }
-
-        return (int) $job_id;
     }
 }

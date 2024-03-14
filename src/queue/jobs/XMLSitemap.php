@@ -22,21 +22,18 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
     public const int MAX_ATTEMPTS = 3;
 
     /**
-     * @var SitemapConfig
-     */
-    public SitemapConfig $config;
-
-    /**
      * @var QueueInterface
      */
     public QueueInterface $queue;
 
     /**
      * @param SitemapConfig $config
+     * @param string|null $generating_cache_key the cache key to unset when finished
      */
-    public function __construct(SitemapConfig $config)
-    {
-        $this->config = $config;
+    public function __construct(
+        public SitemapConfig $config,
+        public ?string $generating_cache_key = null
+    ) {
         parent::__construct();
     }
 
@@ -78,7 +75,7 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
             }
         };
 
-        register_shutdown_function([ self::class, 'releaseCacheKey'], $this->config->cache_key);
+        register_shutdown_function([ self::class, 'releaseCacheKey'], (string) $this->generating_cache_key);
 
         $service = new SitemapGenerator($this->config);
 
