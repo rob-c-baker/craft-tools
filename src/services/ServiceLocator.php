@@ -20,6 +20,7 @@ use yii\di\ServiceLocator as YiiServiceLocator;
  * @property-read YiiServiceLocator $helpers
  * @property ElasticSearch $elastic_search
  * @property JWTAuth $jwt_auth
+ * @property SEO $seo
  */
 class ServiceLocator extends YiiServiceLocator
 {
@@ -52,7 +53,8 @@ class ServiceLocator extends YiiServiceLocator
             'error_handler' => ErrorHandler::class,
             'elastic_search' => ElasticSearch::class,
             'config' => Config::class,
-            'jwt_auth' => JWTAuth::class
+            'jwt_auth' => JWTAuth::class,
+            'seo' => SEO::class
         ]);
     }
 

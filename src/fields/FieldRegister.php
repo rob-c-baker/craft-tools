@@ -19,6 +19,7 @@ class FieldRegister
                 $event->types[] = TemplateSelectField::class;
                 $event->types[] = SectionField::class;
                 $event->types[] = CategoryGroupsField::class;
+                $event->types[] = SEOField::class;
             }
         );
     }
