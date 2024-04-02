@@ -2,6 +2,7 @@
 
 namespace alanrogers\tools\services;
 
+use craft\helpers\ArrayHelper;
 use InvalidArgumentException;
 use yii\base\Component;
 
@@ -51,27 +52,39 @@ class Config extends Component
         }
     }
 
-    private function ensureConfigPath(string $name): void
+    private function ensureConfigPath(string $name, bool $check_file = true): void
     {
-        if (!isset($this->config_paths[$name])) {
+        if (!$this->getConfigPath($name)) {
             $path = $this->base_path . $name . '.php';
-            if (!file_exists($path)) {
+            if ($check_file && !file_exists($path)) {
                 throw new InvalidArgumentException(sprintf('Config "%s" not found.', $name));
             }
-            $this->config_paths[$name] = $path;
+            $this->setConfigPath($name, $path);
         }
+    }
+
+    public function getConfigPath(string $name): ?string
+    {
+        return $this->config_paths[$name] ?? null;
+    }
+
+    public function setConfigPath(string $config_name, string $path) : static
+    {
+        $this->config_paths[$config_name] = $path;
+        return $this;
     }
 
     /**
      * Whether this named config (file usually) exists
      * @param string|null $name (matches the filename before the .php prefix)
+     * @param bool $check_file
      * @return bool
      */
-    public function configExists(?string $name=null) : bool
+    public function configExists(?string $name=null, bool $check_file = true) : bool
     {
         try {
             $name_to_check = $name ?? $this->default_config_name;
-            $this->ensureConfigPath($name_to_check);
+            $this->ensureConfigPath($name_to_check, $check_file);
             return isset($this->config_paths[$name_to_check]);
         } catch (InvalidArgumentException) {
             return false;
@@ -147,19 +160,42 @@ class Config extends Component
         return $this->config_data[$config_name] ?? null;
     }
 
+    public function hasConfig(string $config_name) : bool
+    {
+        return isset($this->loaded[$config_name]);
+    }
+
     /**
      * Primarily for injecting a config for testing purposes, sets all loaded config items for specific config name or
      * default if not set.
      * @param array $items
      * @param string|null $config_name
-     * @return void
+     * @return static
      */
-    public function setAllItems(array $items, ?string $config_name=null) : void
+    public function setAllItems(array $items, ?string $config_name=null) : static
     {
         if ($config_name === null) {
             $config_name = $this->default_config_name;
         }
         $this->config_data[$config_name] = $items;
         $this->loaded[$config_name] = true;
+        return $this;
+    }
+
+    /**
+     * Will merge named loaded configs into a new config with the precedence order as specified in `$config_names` named
+     * according to `$merged_name`
+     * @param array $config_names
+     * @param string $merged_name
+     * @return $this
+     */
+    public function mergeNamedConfigs(array $config_names, string $merged_name='merged') : static
+    {
+        $items = [];
+        foreach ($config_names as $config_name) {
+            $items = ArrayHelper::merge($items, $this->getAllItems($config_name));
+        }
+        $this->setAllItems($items, $merged_name);
+        return $this;
     }
 }

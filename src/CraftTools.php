@@ -126,10 +126,6 @@ class CraftTools extends Plugin
             ]);
 
             self::registerUserRules();
-
-            Craft::$app->getView()->hook('seo-fields', function(array &$context) {
-                return ServiceLocator::getInstance()->seo->renderHead($context);
-            });
         });
 
         // Need front-end templates (cp template root gets registered in parent class)
