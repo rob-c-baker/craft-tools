@@ -162,7 +162,7 @@ class CategoryGroupCollection extends ArrayObject
         $groups = $this->_groups;
 
         if (!empty($this->_settings['inReverse']) && $this->_inReverse) {
-            $groups = array_reverse($groups, false);
+            $groups = array_reverse($groups);
         }
 
         return $groups;

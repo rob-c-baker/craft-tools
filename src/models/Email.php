@@ -7,7 +7,7 @@ use yii\base\Model;
 
 class Email extends Model
 {
-    public const DEFAULT_FROM = 'no-reply@alanrogers.com';
+    public const string DEFAULT_FROM = 'no-reply@alanrogers.com';
 
     /**
      * From email field

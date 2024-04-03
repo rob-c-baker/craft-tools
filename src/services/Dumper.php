@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace alanrogers\tools\services;
 
+use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\VarDumper\VarDumper;
 
 class Dumper
@@ -20,7 +21,7 @@ class Dumper
     /**
      * @param mixed ...$items
      */
-    public function d(...$items)
+    public function d(...$items): void
     {
         foreach ($items as $item) {
             echo dump($item);
@@ -31,13 +32,14 @@ class Dumper
     /**
      * @param mixed ...$items
      */
-    public function dd(...$items)
+    #[NoReturn]
+    public function dd(...$items): void
     {
         echo '<style>pre.sf-dump { z-index: 0; !important} </style>';
         dd(...$items);
     }
 
-    public function dump(...$items) : void
+    public function dump(...$items): void
     {
         ob_start();
         foreach ($items as $item) {

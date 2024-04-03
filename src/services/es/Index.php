@@ -6,7 +6,7 @@ use alanrogers\tools\services\ServiceLocator;
 
 class Index
 {
-    private const REQUIRED_PROPERTIES = [
+    private const array REQUIRED_PROPERTIES = [
         'type',
         'search_class',
         'name'

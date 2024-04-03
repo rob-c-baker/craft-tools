@@ -7,8 +7,8 @@ use yii\caching\CacheInterface;
 
 class Maintenance
 {
-    private const MUTEX_KEY = 'es_maintenance_mutex_';
-    private const MUTEX_CACHE_KEY = 'es_maintenance_active_';
+    private const string MUTEX_KEY = 'es_maintenance_mutex_';
+    private const string MUTEX_CACHE_KEY = 'es_maintenance_active_';
 
     private string $index;
     private CacheInterface $cache;

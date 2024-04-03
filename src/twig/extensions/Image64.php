@@ -49,7 +49,7 @@ class Image64 extends AbstractExtension
     public static function asset64(Asset $asset, bool $inline = false) : ?string
     {
         // Make sure the mime type is an image.
-        if (0 !== strpos($asset->getMimeType(), 'image/')) {
+        if (!str_starts_with($asset->getMimeType(), 'image/')) {
             // Die quietly.
             return null;
         }

@@ -18,5 +18,4 @@ class URL extends Base
         }
         return $result !== false;
     }
-
 }

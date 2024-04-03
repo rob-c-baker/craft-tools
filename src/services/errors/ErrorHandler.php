@@ -18,7 +18,7 @@ class ErrorHandler extends Component
      * @event ErrorHandlerInit The event that is triggered when the error handler is initialised, can be used for
      * configuration and other modifications.
      */
-    const EVENT_ERROR_HANDLER_INIT = 'errorHandlerInit';
+    const string EVENT_ERROR_HANDLER_INIT = 'errorHandlerInit';
 
     public bool $enabled = true;
 

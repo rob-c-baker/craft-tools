@@ -41,7 +41,7 @@ class ARQueue extends Queue
         return $id;
     }
 
-    protected function addEvent()
+    protected function addEvent(): void
     {
         Event::on(
             Application::class,

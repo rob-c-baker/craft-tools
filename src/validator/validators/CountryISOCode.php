@@ -7,8 +7,8 @@ use alanrogers\tools\validator\Base;
 
 class CountryISOCode extends Base
 {
-    public const STANDARD_ISO2 = 'iso2';
-    public const STANDARD_ISO3 = 'iso3';
+    public const string STANDARD_ISO2 = 'iso2';
+    public const string STANDARD_ISO3 = 'iso3';
 
     /**
      * @var string[]

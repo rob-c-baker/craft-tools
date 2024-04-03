@@ -8,12 +8,12 @@ use alanrogers\tools\services\PwnedPassword;
 
 class Password extends Base
 {
-    private const DEFAULT_MIN_LENGTH = 8;
-    private const DEFAULT_MAX_LENGTH = 1024;
-    private const DEFAULT_CHECK_CASE = true;
-    private const DEFAULT_CHECK_NUMBERS = true;
-    private const DEFAULT_CHECK_SYMBOLS = true;
-    private const DEFAULT_CHECK_PWNED_DB = true;
+    private const int DEFAULT_MIN_LENGTH = 8;
+    private const int DEFAULT_MAX_LENGTH = 1024;
+    private const bool DEFAULT_CHECK_CASE = true;
+    private const bool DEFAULT_CHECK_NUMBERS = true;
+    private const bool DEFAULT_CHECK_SYMBOLS = true;
+    private const bool DEFAULT_CHECK_PWNED_DB = true;
 
     // Note any of the below properties can be overridden in the $options array passed to the constructor.
 

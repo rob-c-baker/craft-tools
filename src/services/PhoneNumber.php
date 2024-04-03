@@ -11,9 +11,9 @@ use yii\base\Component;
 
 class PhoneNumber extends Component
 {
-    public const FORMAT_E164 = PhoneNumberFormat::E164;
-    public const FORMAT_NATIONAL = PhoneNumberFormat::NATIONAL;
-    public const FORMAT_INTERNATIONAL = PhoneNumberFormat::INTERNATIONAL;
+    public const int FORMAT_E164 = PhoneNumberFormat::E164;
+    public const int FORMAT_NATIONAL = PhoneNumberFormat::NATIONAL;
+    public const int FORMAT_INTERNATIONAL = PhoneNumberFormat::INTERNATIONAL;
 
     private PhoneNumberUtil $phone_util;
 
@@ -65,7 +65,7 @@ class PhoneNumber extends Component
     }
 
     /**
-     * Gets an ISO 2 characte rcountry code from the numeric country dialing code
+     * Gets an ISO 2 character country code from the numeric country dialing code
      * @param int $country_code
      * @return string|null
      */

@@ -10,11 +10,11 @@ use RuntimeException;
 
 class IconLibrary
 {
-    public const TYPE_SVG = 'svg';
-    public const TYPE_PNG = 'png';
-    public const TYPE_GIF = 'gif';
+    public const string TYPE_SVG = 'svg';
+    public const string TYPE_PNG = 'png';
+    public const string TYPE_GIF = 'gif';
 
-    const ALLOWED_TYPES = [
+    const array ALLOWED_TYPES = [
         self::TYPE_SVG,
         self::TYPE_PNG,
         self::TYPE_GIF

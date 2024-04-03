@@ -13,7 +13,7 @@ class IP implements HelperInterface
      */
     public static function isIPLocal(string $ip) : bool
     {
-        if (strpos($ip, '127.0.') === 0) {
+        if (str_starts_with($ip, '127.0.')) {
             return true;
         }
 

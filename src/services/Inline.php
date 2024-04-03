@@ -44,7 +44,7 @@ class Inline extends Component
         }
 
         if ($remote) {
-            if (strpos($filename, '//') === 0) {
+            if (str_starts_with($filename, '//')) {
                 $protocol = \Craft::$app->request->isSecureConnection ? 'https://' : 'http://';
                 $filename = $protocol . $filename;
             }

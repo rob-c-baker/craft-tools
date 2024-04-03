@@ -32,7 +32,7 @@ class JWTAuth
      * Keys that are valid for use when creating constraints.
      * These might be keys in `Params` object or that describe time based validity.
      */
-    public const CONSTRAINT_KEYS = [
+    public const array CONSTRAINT_KEYS = [
         'identified_by',
         'issued_by',
         'permitted_for',

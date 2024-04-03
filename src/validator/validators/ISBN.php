@@ -9,9 +9,9 @@ use Isbn\Exception;
 
 class ISBN extends Base
 {
-    public const VARIANT_13_DIGIT = 'ISBN-13';
-    public const VARIANT_10_DIGIT = 'ISBN-10';
-    public const VARIANT_BOTH = 'ISBN-10-&-ISBN-13';
+    public const string VARIANT_13_DIGIT = 'ISBN-13';
+    public const string VARIANT_10_DIGIT = 'ISBN-10';
+    public const string VARIANT_BOTH = 'ISBN-10-&-ISBN-13';
 
     protected function validate(mixed $value): bool
     {

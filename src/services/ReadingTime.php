@@ -4,11 +4,11 @@ namespace alanrogers\tools\services;
 
 class ReadingTime
 {
-    private const SECONDS_PER_MINUTE = 60;
-    private const SECONDS_PER_HOUR = 60 * 60;
-    private const SECONDS_PER_DAY = 60 * 60 * 24;
+    private const int SECONDS_PER_MINUTE = 60;
+    private const int|float SECONDS_PER_HOUR = 60 * 60;
+    private const int|float SECONDS_PER_DAY = 60 * 60 * 24;
 
-    private const DEFAULT_OPTIONS = [
+    private const array DEFAULT_OPTIONS = [
         'strip_tags' => true,
         'wpm' => 200,
         'format' => '%d %h %m %s',

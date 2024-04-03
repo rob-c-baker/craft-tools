@@ -14,12 +14,12 @@ class RateLimiter
     /**
      * Maximum number of hits within `self::TIME_PERIOD_DEFAULT`
      */
-    private const MAX_HITS_DEFAULT = 5;
+    private const int MAX_HITS_DEFAULT = 5;
 
     /**
      * Time in seconds before the rate limiter is reset
      */
-    private const TIME_PERIOD_DEFAULT = 60;
+    private const int TIME_PERIOD_DEFAULT = 60;
 
     /**
      * The maximum number of hits before rate limiting happens

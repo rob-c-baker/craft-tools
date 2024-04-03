@@ -31,7 +31,7 @@ class DeepMerge extends AbstractExtension
                 if (self::isAssoc($value)) {
                     $merged[$key] = self::deepMerge($merged[$key], $value);
                 } else {
-                    $merged[$key] = array_merge($merged[$key], $value);
+                    $merged[$key] =  [ ...$merged[$key], ...$value ];
                 }
             } else {
                 $merged[$key] = $value;

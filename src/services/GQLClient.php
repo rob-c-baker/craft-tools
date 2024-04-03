@@ -15,7 +15,7 @@ use yii\base\Component;
  */
 class GQLClient extends Component
 {
-    public const DEFAULT_TTL = 3600;
+    public const int DEFAULT_TTL = 3600;
 
     /**
      * @var int
@@ -55,7 +55,7 @@ class GQLClient extends Component
     /**
      * @var null|bool|array
      */
-    private $response = null;
+    private array|bool|null $response = null;
 
     /**
      * @param bool $state
@@ -115,7 +115,7 @@ class GQLClient extends Component
     /**
      * @return mixed
      */
-    public function execute()
+    public function execute(): mixed
     {
         if ($this->cache_enabled) {
             $cache_key = self::getCacheKey(

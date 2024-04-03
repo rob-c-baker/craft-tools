@@ -10,7 +10,7 @@ use alanrogers\tools\validator\Base;
  */
 class NoURLBBCode extends Base
 {
-    public const BB_CODE_URL_REGEX = '/\[url(?:\=("|\'|)?(.*)?\1)?\](.*)\[\/url\]/';
+    public const string BB_CODE_URL_REGEX = '/\[url(?:\=("|\'|)?(.*)?\1)?\](.*)\[\/url\]/';
 
     protected function validate(mixed $value): bool
     {

@@ -20,13 +20,13 @@ class GoogleAnalytics extends Component
 {
     private ?BetaAnalyticsDataClient $client = null;
 
-    const ORDER_UNSPECIFIED = DimensionOrderBy\OrderType::ORDER_TYPE_UNSPECIFIED;
-    const ORDER_ALPHANUMERIC = DimensionOrderBy\OrderType::ALPHANUMERIC;
-    const ORDER_CASE_INSENSITIVE_ALPHANUMERIC = DimensionOrderBy\OrderType::CASE_INSENSITIVE_ALPHANUMERIC;
-    const ORDER_NUMERIC = DimensionOrderBy\OrderType::NUMERIC;
+    const int ORDER_UNSPECIFIED = DimensionOrderBy\OrderType::ORDER_TYPE_UNSPECIFIED;
+    const int ORDER_ALPHANUMERIC = DimensionOrderBy\OrderType::ALPHANUMERIC;
+    const int ORDER_CASE_INSENSITIVE_ALPHANUMERIC = DimensionOrderBy\OrderType::CASE_INSENSITIVE_ALPHANUMERIC;
+    const int ORDER_NUMERIC = DimensionOrderBy\OrderType::NUMERIC;
 
-    const ORDER_BY_TYPE_METRIC = 'metric';
-    const ORDER_BY_TYPE_DIMENSION = 'dimension';
+    const string ORDER_BY_TYPE_METRIC = 'metric';
+    const string ORDER_BY_TYPE_DIMENSION = 'dimension';
 
     /**
      * @throws GAException

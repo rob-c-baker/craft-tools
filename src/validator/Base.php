@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace alanrogers\tools\validator;
 
 use alanrogers\tools\traits\ErrorManagementTrait;
-use RuntimeException;
 
 abstract class Base implements ValidatorInterface
 {

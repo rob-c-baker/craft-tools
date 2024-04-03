@@ -26,7 +26,7 @@ class CategoryGroupsField extends Field implements PreviewableFieldInterface
     /**
      * @var string|string[]
      */
-    public $allowedGroups = '*';
+    public string|array $allowedGroups = '*';
 
     /**
      * @var bool Whether this field is limited to selecting one category group

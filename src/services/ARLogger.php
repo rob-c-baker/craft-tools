@@ -10,8 +10,8 @@ use Psr\Log\LogLevel;
 
 class ARLogger
 {
-    public const DEFAULT_MAX_FILES = 10;
-    public const DEFAULT_LOG_NAME = 'ar';
+    public const int DEFAULT_MAX_FILES = 10;
+    public const string DEFAULT_LOG_NAME = 'ar';
 
     /**
      * @var array<string, ARLogger>

@@ -136,10 +136,10 @@ class ArrayHelper implements HelperInterface
     {
         $modified = false;
         foreach ($array as $k => $v) {
-            if (strpos($k, '.') !== false) {
+            if (str_contains($k, '.')) {
                 $parts = explode('.', $k);
                 for ($p_idx = 0; $p_idx < count($parts); $p_idx++) {
-                    if (strpos($parts[$p_idx], '[') !== false) {
+                    if (str_contains($parts[$p_idx], '[')) {
                         preg_match('/(.+)\[(\d+)]/', $parts[$p_idx], $matches);
                         if (isset($matches[1], $matches[2])) {
                             $parts[$p_idx] = $matches[1];

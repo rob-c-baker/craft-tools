@@ -20,7 +20,7 @@ class CacheControlBehavior extends Behavior
      * @param string $key   The Cache-Control directive name
      * @param mixed  $value The Cache-Control directive value
      */
-    public function addCacheControlDirective(string $key, $value = true) : void
+    public function addCacheControlDirective(string $key, bool|string|int|float $value = true) : void
     {
         $this->cache_control[$key] = $value;
         $this->owner->getHeaders()->set('Cache-Control', $this->getCacheControlHeader());
@@ -50,9 +50,9 @@ class CacheControlBehavior extends Behavior
     /**
      * Returns a Cache-Control directive value by name.
      * @param string $key The directive name
-     * @return mixed|null The directive value if defined, null otherwise
+     * @return bool|string|int|float|null The directive value if defined, null otherwise
      */
-    public function getCacheControlDirective(string $key)
+    public function getCacheControlDirective(string $key): bool|string|int|float|null
     {
         return $this->cache_control[$key] ?? null;
     }
@@ -67,10 +67,10 @@ class CacheControlBehavior extends Behavior
     public function getMaxAge() : ?int
     {
         if ($this->hasCacheControlDirective('s-maxage')) {
-            return (int)$this->getCacheControlDirective('s-maxage');
+            return (int) $this->getCacheControlDirective('s-maxage');
         }
         if ($this->hasCacheControlDirective('max-age')) {
-            return (int)$this->getCacheControlDirective('max-age');
+            return (int) $this->getCacheControlDirective('max-age');
         }
 
         return null;
