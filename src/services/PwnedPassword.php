@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace alanrogers\tools\services;
 
 use Craft;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Request;
 use yii\base\Component;
 
 /**
@@ -18,9 +21,9 @@ use yii\base\Component;
  */
 class PwnedPassword extends Component
 {
-    private const CACHE_TTL = 86400;
+    private const int CACHE_TTL = 86400;
 
-    private const API_URL = 'https://api.pwnedpasswords.com/range/%.5s';
+    private const string API_URL = 'https://api.pwnedpasswords.com/range/%.5s';
 
     /**
      * Returns zero for not pwned or an integer greater than zero to indicate how many times it has been pwned.
@@ -68,31 +71,34 @@ class PwnedPassword extends Component
     {
         $url = sprintf(self::API_URL, $short_hash);
 
-        // need to use curl for this (basic `file_get_contents()` approach with an HTTP stream does not work over TLS)
-        $c = curl_init();
+        $request = new Request(
+            'GET',
+            $url,
+            [
+                'User-Agent' => 'AlanRogersWebSite v1.0.0',
+                'Add-Padding' => 'true'
+            ]
+        );
 
-        curl_setopt($c, CURLOPT_URL, $url);
-        curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($c, CURLOPT_TIMEOUT, 5);
-        curl_setopt($c, CURLOPT_HTTPHEADER, [
-            'User-Agent: AlanRogersWebSite v1.0.0',
-            'Add-Padding: true'
+        $client = new Client([
+            'timeout' => 5
         ]);
 
-        // The contents of the "Accept-Encoding: " header. This enables decoding of the response. Supported encodings
-        // are "identity", "deflate", and "gzip". If an empty string, "", is set, a header containing all supported
-        // encoding types is sent.
-        curl_setopt($c, CURLOPT_ENCODING, '');
+        try {
+            $response = $client->send($request);
+        } catch (GuzzleException $e) {
+            ServiceLocator::getInstance()->error->reportBackendException($e);
+            return '';
+        }
 
-        $response = curl_exec($c);
-        $http_code = (int) curl_getinfo($c,CURLINFO_HTTP_CODE);
-        curl_close($c);
+        $raw_response = $response->getBody()->getContents();
+        $http_code = $response->getStatusCode();
 
         if ($http_code !== 200) {
             return '';
         }
 
-        return $response;
+        return $raw_response;
     }
 
     /**
