@@ -8,6 +8,7 @@ use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\base\PreviewableFieldInterface;
 use craft\errors\InvalidFieldException;
+use craft\fieldlayoutelements\CustomField;
 use craft\helpers\Json;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -116,8 +117,18 @@ class SectionField extends Field implements PreviewableFieldInterface
         $sections = $this->getSections(); // Get all sections available to the current user.
         $whitelist = array_flip($this->whitelistedSections); // Get all whitelisted sections.
         $whitelist[''] = true; // Add a blank entry in, in case the field's options allow a 'None' selection.
-        if (!$this->allowMultiple && !$this->required) { // Add a 'None' option specifically for optional, single value fields.
-            $sections = ['' => 'None'] + $sections;
+
+        // required state is handled by the field layout's custom field
+        $custom_fields = [];
+        if ($element) {
+            $custom_fields = array_filter(
+                $element->getFieldLayout()->getCustomFieldElements(),
+                fn (CustomField $custom_field) => $custom_field->attribute() === $this->handle
+            );
+        }
+
+        if (!$this->allowMultiple && (!$custom_fields || $custom_fields[0]->required)) { // Add a 'None' option specifically for optional, single value fields.
+            $sections = [ '' => 'None' ] + $sections;
         }
         $whitelist = array_intersect_key($sections, $whitelist); // Discard any sections not available within the whitelist.
 
@@ -163,7 +174,7 @@ class SectionField extends Field implements PreviewableFieldInterface
 
         foreach ($value as $section) {
             if (!isset($sections[$section])) {
-                $element->addError($this->handle, Craft::t('section-field', 'Invalid section selected.'));
+                $element->addError($this->handle, 'Invalid section selected.');
             }
         }
     }
