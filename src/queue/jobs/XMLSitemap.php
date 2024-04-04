@@ -68,7 +68,7 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
         // Set a memory limit as this is invoked by the command line either directly or as a queue job
         // and by default memory limit is disabled on the command line, so we don't want to exhaust the
         // server's memory
-        ini_set('memory_limit', '256M');
+        ini_set('memory_limit', '128M');
 
         $count = 0;
 
