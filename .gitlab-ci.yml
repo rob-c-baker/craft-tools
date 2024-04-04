@@ -12,6 +12,10 @@ run_tests:
 
   stage: test
 
+  rules:
+    # If changes are pushed to any branch.
+    - if: $CI_COMMIT_BRANCH
+
   cache:
     paths:
       - vendor/
@@ -76,6 +80,7 @@ composer_package:
     - docker
 
   rules:
+    # If a tag has just been made
     - if: $CI_COMMIT_TAG
 
   stage: package
