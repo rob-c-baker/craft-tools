@@ -11,7 +11,9 @@ use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
+use craft\helpers\Db;
 use DateTime;
+use Generator;
 use nystudio107\seomatic\models\MetaBundle;
 use yii\base\Model;
 use yii\db\Expression;
@@ -100,11 +102,10 @@ class XMLSitemap extends Model
      * @param array $with
      * @param int|null $start
      * @param int|null $end
-     * @return SitemapURL[]
+     * @return Generator<SitemapURL>
      */
-    public function getURLs(array $with=[], ?int $start=null, ?int $end=null) : array
+    public function getURLs(array $with=[], ?int $start=null, ?int $end=null) : Generator
     {
-        $batch = [];
         $query = $this->loadElementQuery($with);
         if ($start !== null) {
             $query->offset($start > 0 ? $start - 1 : 0);
@@ -112,8 +113,13 @@ class XMLSitemap extends Model
         if ($end !== null) {
             $query->limit($end);
         }
-        foreach ($query->all() as $item) {
-            $batch[] = new SitemapURL([
+        // Note: the `Db::each()` method creates a new unbuffered MySQL connection toi stream results row by row
+        /** @var Element $item */
+        foreach (Db::each($query) as $item) {
+            if ($item && !SitemapHelper::isElementAllowedOnSiteMap($item)) {
+                continue;
+            }
+            yield new SitemapURL([
                 'element' => $item,
                 'image_field' => $this->config->image_field ? $item->{$this->config->image_field} : null,
                 'date_updated' => $item->dateUpdated,
@@ -121,7 +127,6 @@ class XMLSitemap extends Model
                 'url' => $this->getElementURL($item)
             ]);
         }
-        return $batch;
     }
 
     protected function getElementURL(ElementInterface $element) : string
@@ -163,19 +168,6 @@ class XMLSitemap extends Model
         /** @var MetaBundle $seo_options */
         $seo_options = $element->$seomatic_field_handle;
         return $seo_options->metaSitemapVars->sitemapAssets === null || (bool) $seo_options->metaSitemapVars->sitemapAssets;
-    }
-
-    /**
-     * Filter an array of entries by some criteria optionally defined in extended classes
-     * @param SitemapURL[] $urls
-     */
-    public function filterURLs(array &$urls) : void
-    {
-        foreach ($urls as $idx => $url) {
-            if ($url->element && !SitemapHelper::isElementAllowedOnSiteMap($url->element)) {
-                unset($urls[$idx]);
-            }
-        }
     }
 
     /**

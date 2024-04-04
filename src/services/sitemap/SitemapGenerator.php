@@ -199,11 +199,13 @@ class SitemapGenerator
             $main_img_transform = $main_img_transform['transform'];
         }
 
-        $urls = $this->model->getURLs($with, $this->config->start, $this->config->end);
-        $this->model->filterURLs($urls);
         $now = new DateTime();
 
-        foreach ($urls as $url) {
+        foreach ($this->model->getURLs($with, $this->config->start, $this->config->end) as $url) {
+
+            if ($dev_mode) {
+                echo 'Memory Usage: ' . (memory_get_usage() / 1024 / 1024) . ' MBs' . PHP_EOL;
+            }
 
             $date_updated = $url->date_updated ?? $url->date_created ?? $now;
 
