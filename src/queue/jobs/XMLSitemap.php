@@ -31,7 +31,10 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
     /**
      * @param SitemapConfig $config
      */
-    public function __construct(public SitemapConfig $config) {
+    public function __construct(
+        public SitemapConfig $config,
+        private ?string $cache_key=null
+    ) {
         parent::__construct();
     }
 
@@ -101,9 +104,9 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
             return;
         }
         $this->finished = true;
-        // only set this if it's the last sitemap chunk
-        if ($this->config->chunk_count === ($this->config->chunk_index + 1)) {
-            $generator->setSitemapGenerating(false);
+        $generator->setSitemapGenerating(false);
+        if ($this->cache_key !== null) {
+            ServiceLocator::getInstance()->cache->delete($this->cache_key);
         }
     }
 

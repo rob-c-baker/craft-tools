@@ -78,7 +78,7 @@ class SiteMapController extends Controller
      */
     private function generateSitemap(SitemapConfig $config, AlanRogersCache $cache, string $cache_key, bool $use_queue): void
     {
-        $job = new XMLSitemapJob($config);
+        $job = new XMLSitemapJob($config, $cache_key);
         $cache->set($cache_key, '__COMMAND-LINE-INVOCATION__', $job->getTtr());
 
         $config_name = $config->getName();
