@@ -204,7 +204,7 @@ class SitemapGenerator
         foreach ($this->model->getURLs($with, $this->config->start, $this->config->end) as $url) {
 
             if ($dev_mode) {
-                echo 'Memory Usage: ' . (memory_get_usage() / 1024 / 1024) . ' MBs' . PHP_EOL;
+                echo 'Memory Usage: ' . round(memory_get_usage() / 1024 / 1024, 2) . ' MBs' . PHP_EOL;
             }
 
             $date_updated = $url->date_updated ?? $url->date_created ?? $now;
