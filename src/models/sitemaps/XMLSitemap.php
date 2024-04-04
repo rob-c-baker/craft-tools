@@ -91,7 +91,8 @@ class XMLSitemap extends Model
         if ($end !== null) {
             $query->limit($end);
         }
-        return (int) $query->count();
+        // Can use the cache for this query as we may make several calls to this method in a short time-span.
+        return (int) $query->cache(300)->count();
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace alanrogers\tools\controllers;
 
 use alanrogers\tools\helpers\CacheControlHelper;
+use alanrogers\tools\helpers\SitemapHelper;
 use alanrogers\tools\services\sitemap\SitemapConfig;
 use alanrogers\tools\services\sitemap\SitemapException;
 use alanrogers\tools\services\sitemap\SitemapGenerator;
@@ -10,6 +11,7 @@ use alanrogers\tools\services\sitemap\SitemapIndexGenerator;
 use Craft;
 use craft\web\Controller;
 use craft\web\Response;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response as YiiResponse;
 use yii\web\ServerErrorHttpException;
@@ -59,27 +61,18 @@ class SitemapsController extends Controller
      * @return Response
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
+     * @throws BadRequestHttpException
      */
     public function actionXml(string $identifier) : Response
     {
-        // No chunking by default
-        $start = null;
-        $end = null;
 
-        // spot filenames that have ranges in - so we can render just the right bits
-        if (preg_match('/([a-z0-9\-_]+)-([0-9]+)-([0-9]+)$/', $identifier, $matches)) {
-            $identifier = $matches[1];
-            $start = (int) $matches[2];
-            $end = (int) $matches[3];
-            if ($start > $end) {
-                throw new NotFoundHttpException('Start cannot be greater than end.');
-            }
-            if ($end - ($start - 1) > SitemapConfig::MAX_SIZE) {
-                throw new NotFoundHttpException('Difference between start and end cannot be greater than ' . SitemapConfig::MAX_SIZE);
-            }
+        try {
+            [ $start, $end, $modified_identifier ] = SitemapHelper::getChunkRangesFromIdentifier($identifier);
+        } catch (SitemapException $e) {
+            throw new BadRequestHttpException($e->getMessage(), (int) $e->getCode(), $e);
         }
 
-        $sitemap_config = SitemapConfig::getConfig($identifier);
+        $sitemap_config = SitemapConfig::getConfig($modified_identifier);
         if (!SitemapConfig::isEnabled() || !$sitemap_config) {
             throw new NotFoundHttpException('Sitemap not enabled.');
         }
@@ -88,9 +81,15 @@ class SitemapsController extends Controller
         $sitemap_config->start = $start;
         $sitemap_config->end = $end;
 
-        $is_dev = Craft::$app->getConfig()->getGeneral()->devMode;
-
         $service = new SitemapGenerator($sitemap_config);
+
+        // bits needed to identify first / last chunks in queue job:
+        if ($sitemap_config->start !== null &&  $sitemap_config->end !== null) {
+            $total_items = $service->getModel()->totalItems();
+            $sitemap_config->chunk_count = (int) ceil($total_items / SitemapConfig::MAX_SIZE);
+            $sitemap_config->chunk_index = (int) floor($start / ($end - $start)) - 1;
+        }
+
         try {
             $xml_model = $service->getXML();
         } catch (SitemapException $e) {
@@ -100,6 +99,8 @@ class SitemapsController extends Controller
 
         $this->response->format = YiiResponse::FORMAT_RAW;
         $this->response->getHeaders()->set('Content-Type', 'application/xml; charset="UTF-8"');
+
+        $is_dev = Craft::$app->getConfig()->getGeneral()->devMode;
 
         if (!$xml_model->generated) {
 

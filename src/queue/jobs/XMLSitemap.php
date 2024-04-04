@@ -21,6 +21,8 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
     public const int TTR = 21600; // 6 hours
     public const int MAX_ATTEMPTS = 3;
 
+    private bool $finished = false;
+
     /**
      * @var QueueInterface
      */
@@ -28,12 +30,8 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
 
     /**
      * @param SitemapConfig $config
-     * @param string|null $generating_cache_key the cache key to unset when finished
      */
-    public function __construct(
-        public SitemapConfig $config,
-        public ?string $generating_cache_key = null
-    ) {
+    public function __construct(public SitemapConfig $config) {
         parent::__construct();
     }
 
@@ -64,6 +62,11 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
      */
     private function start(): void
     {
+        // Set a memory limit as this is invoked by the command line either directly or as a queue job
+        // and by default memory limit is disabled on the command line, so we don't want to exhaust the
+        // server's memory
+        ini_set('memory_limit', '256M');
+
         $count = 0;
 
         $this->config->progress_callback = function($total, $processed)
@@ -75,20 +78,33 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
             }
         };
 
-        register_shutdown_function([ self::class, 'releaseCacheKey'], (string) $this->generating_cache_key);
-
         $service = new SitemapGenerator($this->config);
+
+        // in case the queue job is stopped by the OS / user
+        register_shutdown_function([ $this, 'finishGenerating' ], $service);
+        pcntl_signal(SIGTERM, function(int $sig_no, mixed $sig_info) use ($service) {
+            $this->finishGenerating($service);
+        });
 
         if (!Craft::$app instanceof Console) {
             $this->setProgress($this->queue, (float) $count, $this->getDescription());
         }
 
         $service->generate();
+
+        $this->finishGenerating($service);
     }
 
-    public static function releaseCacheKey(string $cache_key) : void
+    public function finishGenerating(SitemapGenerator $generator) : void
     {
-        ServiceLocator::getInstance()->cache->delete($cache_key);
+        if ($this->finished) {
+            return;
+        }
+        $this->finished = true;
+        // only set this if it's the last sitemap chunk
+        if ($this->config->chunk_count === ($this->config->chunk_index + 1)) {
+            $generator->setSitemapGenerating(false);
+        }
     }
 
     /**

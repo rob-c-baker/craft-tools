@@ -2,6 +2,7 @@
 
 namespace alanrogers\tools\services\sitemap;
 
+use alanrogers\tools\helpers\SitemapHelper;
 use alanrogers\tools\models\sitemaps\XMLSitemap;
 use alanrogers\tools\services\ServiceLocator;
 use Craft;
@@ -85,7 +86,7 @@ class SitemapIndexGenerator
                 for ($i = 1; $i <= $number_of_sitemaps; $i++) {
                     $start = ($i - 1) * SitemapConfig::MAX_SIZE + 1;
                     $end = min($i * SitemapConfig::MAX_SIZE, $totals[$config_name]);
-                    $url = $base_url . $config_name . '-' . $start . '-' . $end . '.xml';
+                    $url = $base_url . SitemapHelper::sitemapFilename($config_name, $start, $end);
                     $this->addSitemapToXML($url, $modified);
                 }
             } else {

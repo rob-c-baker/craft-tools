@@ -4,6 +4,7 @@ namespace alanrogers\tools\services\sitemap;
 
 use alanrogers\arimager\ARImager;
 use alanrogers\arimager\models\TransformedImageInterface;
+use alanrogers\tools\helpers\SitemapHelper;
 use alanrogers\tools\queue\jobs\XMLSitemap;
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\models\sitemaps\XMLSitemap as XMLSitemapModel;
@@ -14,10 +15,13 @@ use DateTimeInterface;
 use InvalidArgumentException;
 use Throwable;
 use yii\base\InvalidConfigException;
+use yii\caching\Cache;
 
 class SitemapGenerator
 {
     public const string CACHE_KEY_PREFIX = 'xml-sitemap-';
+
+    public const string SITEMAP_GENERATING_CACHE_KEY = 'sitemaps-generating-now';
 
     /**
      * Number of seconds until cache expires
@@ -29,10 +33,6 @@ class SitemapGenerator
      */
     private ?XMLSitemapModel $model;
 
-    /**
-     * @var SitemapConfig
-     */
-    private SitemapConfig $config;
 
     /**
      * @var int
@@ -47,11 +47,12 @@ class SitemapGenerator
     /**
      * XMLSitemapGenerator constructor.
      * @param SitemapConfig $config
+     * @param Cache|null $cache
      */
-    public function __construct(SitemapConfig $config)
-    {
-        $this->config = $config;
-
+    public function __construct(
+        private readonly SitemapConfig $config,
+        private ?Cache $cache=null
+    ) {
         if (!$this->config->getName()) {
             throw new InvalidArgumentException('You must pass an identifier string in the "identifier" key of the config array.');
         }
@@ -59,6 +60,15 @@ class SitemapGenerator
         $this->model = new $this->config->model_class($this->config);
 
         $this->config->cache_key = self::getCacheKey($this->config->getName(), $this->config->start, $this->config->end);
+
+        if ($this->cache === null) {
+            $this->cache = ServiceLocator::getInstance()->cache;
+        }
+    }
+
+    public function getModel(): XMLSitemapModel
+    {
+        return $this->model;
     }
 
     /**
@@ -69,13 +79,7 @@ class SitemapGenerator
      */
     public static function getCacheKey(string $identifier, ?int $start = null, ?int $end = null) : string
     {
-        if ($start) {
-            $identifier .= '-' . $start;
-        }
-        if ($end) {
-            $identifier .= '-' . $end;
-        }
-        return self::CACHE_KEY_PREFIX . $identifier;
+        return self::CACHE_KEY_PREFIX . SitemapHelper::sitemapFilename($identifier, $start, $end);
     }
 
     /**
@@ -107,7 +111,7 @@ class SitemapGenerator
             ];
 
             // Also add job to generate sitemap to queue?
-            self::maybeAddQueueJob($this->config);
+            $this->maybeAddQueueJob();
 
         } else {
 
@@ -197,10 +201,11 @@ class SitemapGenerator
 
         $urls = $this->model->getURLs($with, $this->config->start, $this->config->end);
         $this->model->filterURLs($urls);
+        $now = new DateTime();
 
         foreach ($urls as $url) {
 
-            $date_updated = $url->date_updated ?? $url->date_created ?? new DateTime();
+            $date_updated = $url->date_updated ?? $url->date_created ?? $now;
 
             $lines[] = '<url>';
 
@@ -215,7 +220,6 @@ class SitemapGenerator
 
                 // limit image count
                 $max_count = $this->model->getMaxImageCount($url);
-
                 $count = 0;
 
                 /** @var Asset $image */
@@ -270,7 +274,7 @@ class SitemapGenerator
         $lines[] = '</urlset>';
 
         // Add a generated date/time
-        $lines[] = '<!-- Generated: ' . (new DateTime())->format(DateTimeInterface::W3C) . ' -->';
+        $lines[] = '<!-- Generated: ' . $now->format(DateTimeInterface::W3C) . ' -->';
 
         $this->model->xml = implode("\n", $lines);
         if ($this->config->use_cache) {
@@ -290,7 +294,7 @@ class SitemapGenerator
      */
     private function setCachedXML(string $xml) : void
     {
-        ServiceLocator::getInstance()->cache->set($this->config->cache_key, $xml, self::CACHE_TTL);
+        $this->cache->set($this->config->cache_key, $xml, self::CACHE_TTL);
     }
 
     /**
@@ -298,33 +302,54 @@ class SitemapGenerator
      */
     private function getCachedXML() : string
     {
-        if (ServiceLocator::getInstance()->cache->exists($this->config->cache_key)) {
-            return ServiceLocator::getInstance()->cache->get($this->config->cache_key);
+        if ($this->cache->exists($this->config->cache_key)) {
+            return $this->cache->get($this->config->cache_key);
         }
         return '';
     }
 
     /**
-     * Wrapped in a function, so it only tries to generate one sitemap per identifier at a time.
-     * @param SitemapConfig $config the config to pass to the job and then the XML generator
-     * @return int
+     * So we only generate a limited number of sitemaps at a time (due to server resources) we need to know which
+     * sitemaps are currently being generated. This sets the current sitemap's state (stored in Redis cache) to
+     * generating/true or not generating/false.
+     * @param bool $state
+     * @return void
      */
-    public static function maybeAddQueueJob(SitemapConfig $config) : void
+    public function setSitemapGenerating(bool $state) : void
     {
-        $queue = Craft::$app->getQueue();
-        $cache = ServiceLocator::getInstance()->cache;
-        $cache_key = 'site-map-generating-' . $config->getName();
-        if ($config->start !== null) {
-            $cache_key .= '-' . $config->start;
+        $currently_generating = $this->cache->get(self::SITEMAP_GENERATING_CACHE_KEY);
+        if (!is_array($currently_generating)) {
+            $currently_generating = [];
         }
-        if ($config->end !== null) {
-            $cache_key .= '-' . $config->end;
+        $key = SitemapHelper::sitemapFilename($this->config->getName(), $this->config->start, $this->config->end);
+        $currently_generating[$key] = $state;
+        $this->cache->set(self::SITEMAP_GENERATING_CACHE_KEY, $currently_generating, self::CACHE_TTL);
+    }
+
+    /**
+     * Determines if the current sitemap is currently being generated.
+     * @return bool
+     */
+    public function isSiteMapGenerating() : bool
+    {
+        $currently_generating = $this->cache->get(self::SITEMAP_GENERATING_CACHE_KEY);
+        if (!is_array($currently_generating)) {
+            return false;
         }
-        $generating = $cache->get($cache_key);
-        if (!$generating) {
-            $cache->set($cache_key, true, XMLSitemap::TTR);
-            $job = new XMLSitemap($config, $cache_key);
-            $queue->push($job);
+        $key = SitemapHelper::sitemapFilename($this->config->getName(), $this->config->start, $this->config->end);
+        return $currently_generating[$key] ?? false;
+    }
+
+    /**
+     * Wrapped in a function, so it only tries to generate one sitemap per identifier at a time.
+     */
+    public function maybeAddQueueJob() : void
+    {
+        if ($this->isSiteMapGenerating()) {
+            return;
         }
+        $this->setSitemapGenerating(true);
+        $job = new XMLSitemap($this->config);
+        Craft::$app->getQueue()->push($job);
     }
 }

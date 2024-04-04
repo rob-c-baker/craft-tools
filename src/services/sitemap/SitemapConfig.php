@@ -45,6 +45,18 @@ class SitemapConfig extends Component
     public ?int $end = null;
 
     /**
+     * How many chunks this sitemap is set to be split into
+     * @var int
+     */
+    public int $chunk_count = 1;
+
+    /**
+     * The zero based index of the current chunk
+     * @var int
+     */
+    public int $chunk_index = 0;
+
+    /**
      * The FQ class name of the sitemap model class to use
      * @var string
      */
@@ -127,6 +139,8 @@ class SitemapConfig extends Component
             'name' => $this->name,
             'start' => $this->start,
             'end' => $this->end,
+            'chunk_count' => $this->chunk_count,
+            'chunk_index' => $this->chunk_index,
             'model_class' => $this->model_class,
             'type' => $this->type,
             'image_field' => $this->image_field,
@@ -143,6 +157,8 @@ class SitemapConfig extends Component
         $this->name            = $data['name'];
         $this->start           = $data['start'];
         $this->end             = $data['end'];
+        $this->chunk_count     = $data['chunk_count'];
+        $this->chunk_index     = $data['chunk_index'];
         $this->model_class     = $data['model_class'];
         $this->type            = $data['type'];
         $this->image_field     = $data['image_field'];

@@ -56,11 +56,14 @@ class SiteMapController extends Controller
 
         if ($total_items > SitemapConfig::MAX_SIZE) {
             // we need to split this sitemap
-            $number_of_sitemaps = ceil($total_items / SitemapConfig::MAX_SIZE);
-            for ($i = 1; $i <= $number_of_sitemaps; $i++) {
-                $config->start = ($i - 1) * SitemapConfig::MAX_SIZE + 1;
-                $config->end = min($i * SitemapConfig::MAX_SIZE, $total_items);
-                $this->generateSitemap($config, $cache, $cache_key, $use_queue);
+            $config->chunk_count = (int) ceil($total_items / SitemapConfig::MAX_SIZE);
+            for ($i = 1; $i <= $config->chunk_count; $i++) {
+                // duplicate the config and set the bits relevant to the chunk
+                $c = clone $config;
+                $c->start = ($i - 1) * SitemapConfig::MAX_SIZE + 1;
+                $c->end = min($i * SitemapConfig::MAX_SIZE, $total_items);
+                $c->chunk_index = $i - 1;
+                $this->generateSitemap($c, $cache, $cache_key, $use_queue);
             }
         } else {
             $this->generateSitemap($config, $cache, $cache_key, $use_queue);
