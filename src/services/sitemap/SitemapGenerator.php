@@ -200,11 +200,25 @@ class SitemapGenerator
         }
 
         $now = new DateTime();
+        $max_memory_usage = memory_get_usage();
+        $url_count = 0;
 
         foreach ($this->model->getURLs($with, $this->config->start, $this->config->end) as $url) {
 
             if ($dev_mode) {
-                echo 'Memory Usage: ' . round(memory_get_usage() / 1024 / 1024, 2) . ' MBs' . PHP_EOL;
+                $url_count++;
+                $current_memory_usage = memory_get_usage();
+                if ($current_memory_usage > $max_memory_usage) {
+                    $max_memory_usage = $current_memory_usage;
+                }
+                if ($url_count % 100 === 0) {
+                    echo sprintf(
+                        "Processed: %d, Memory Usage: Current: %.2f Mb, Max: %.2f Mb\n",
+                        $url_count,
+                        $current_memory_usage / 1024 / 1024,
+                        $max_memory_usage / 1024 / 1024
+                    );
+                }
             }
 
             $date_updated = $url->date_updated ?? $url->date_created ?? $now;
