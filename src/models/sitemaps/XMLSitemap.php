@@ -2,6 +2,7 @@
 
 namespace alanrogers\tools\models\sitemaps;
 
+use alanrogers\tools\helpers\DBHelper;
 use alanrogers\tools\helpers\SitemapHelper;
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\services\sitemap\SitemapConfig;
@@ -11,7 +12,6 @@ use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
-use craft\helpers\Db;
 use DateTime;
 use Generator;
 use nystudio107\seomatic\models\MetaBundle;
@@ -98,13 +98,15 @@ class XMLSitemap extends Model
     }
 
     /**
-     * Gets the URLs for the generator
+     * Gets the URLs in a generator.
+     * Uses a separate unbuffered DB connection to get rows a few at a time to save on memory usage.
      * @param array $with
      * @param int|null $start
      * @param int|null $end
+     * @param int $db_timeout_seconds
      * @return Generator<SitemapURL>
      */
-    public function getURLs(array $with=[], ?int $start=null, ?int $end=null) : Generator
+    public function getURLs(array $with=[], ?int $start=null, ?int $end=null, int $db_timeout_seconds = 60 * 60 * 2) : Generator
     {
         $query = $this->loadElementQuery($with);
         if ($start !== null) {
@@ -113,9 +115,17 @@ class XMLSitemap extends Model
         if ($end !== null) {
             $query->limit($end);
         }
-        // Note: the `Db::each()` method creates a new unbuffered MySQL connection toi stream results row by row
+        // need to set a session var for MySQL so connection  less likely to timeout:
+        $init_sql = sprintf(
+            'SET SESSION wait_timeout = %d; SET SESSION net_read_timeout = %d; SET SESSION net_write_timeout = %d; SET SESSION interactive_timeout= %d;',
+            $db_timeout_seconds,
+            $db_timeout_seconds,
+            $db_timeout_seconds,
+            $db_timeout_seconds * 2
+        );
+        // Note: the `Db::each()` method creates a new unbuffered MySQL connection to stream results row by row
         /** @var Element $item */
-        foreach (Db::each($query) as $item) {
+        foreach (DBHelper::each($query, $init_sql) as $item) {
             if ($item && !SitemapHelper::isElementAllowedOnSiteMap($item)) {
                 continue;
             }
