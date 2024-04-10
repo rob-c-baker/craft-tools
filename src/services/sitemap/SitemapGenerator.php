@@ -67,6 +67,11 @@ class SitemapGenerator
         }
     }
 
+    public function setProgressCallback(callable $callback) : void
+    {
+        $this->progress_callback = $callback;
+    }
+
     public function getModel(): XMLSitemapModel
     {
         return $this->model;

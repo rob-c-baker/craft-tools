@@ -33,7 +33,7 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
      */
     public function __construct(
         public SitemapConfig $config,
-        private ?string $cache_key=null
+        private readonly ?string $cache_key=null
     ) {
         parent::__construct();
     }
@@ -89,6 +89,10 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
         if (!Craft::$app instanceof Console) {
             $this->setProgress($this->queue, (float) $count, $this->getDescription());
         }
+
+        $service->setProgressCallback(function(int $total, int $count) {
+            $this->setProgress($this->queue, $count / $total, $this->getDescription());
+        });
 
         $service->generate();
 
