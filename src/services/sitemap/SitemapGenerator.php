@@ -5,6 +5,7 @@ namespace alanrogers\tools\services\sitemap;
 use alanrogers\arimager\ARImager;
 use alanrogers\arimager\models\TransformedImageInterface;
 use alanrogers\tools\helpers\SitemapHelper;
+use alanrogers\tools\models\sitemaps\SitemapURL;
 use alanrogers\tools\queue\jobs\XMLSitemap;
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\models\sitemaps\XMLSitemap as XMLSitemapModel;
@@ -149,8 +150,17 @@ class SitemapGenerator
      */
     public function generate() : array
     {
-        $total_items = $this->model->totalItems($this->config->start, $this->config->end);
+        $process_total = $this->model->totalItems($this->config->start, $this->config->end);
         $dev_mode = Craft::$app->getConfig()->getGeneral()->devMode;
+
+        if ($dev_mode) {
+            echo sprintf(
+                "Sitemap generation started, from: %d to: %d count: %d \n",
+                $this->config->start,
+                $this->config->end,
+                $process_total
+            );
+        }
 
         /** @noinspection HttpUrlsUsage */
         /** @noinspection XmlUnusedNamespaceDeclaration */
@@ -160,7 +170,7 @@ class SitemapGenerator
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'
         ];
 
-        if ($total_items === 0) {
+        if ($process_total === 0) {
             $msg = 'Zero entries found while generating XML sitemap for: ' . $this->config->getName();
             if ($this->config->start !== null) {
                 $msg .= ' (from ' . $this->config->start . ' to ' . ($this->config->end ?? '?' ) . ')';
@@ -177,7 +187,7 @@ class SitemapGenerator
         $with = [];
 
         if ($this->progress_callback) {
-            call_user_func($this->progress_callback, $total_items, $this->processed_items);
+            call_user_func($this->progress_callback, $process_total, $this->processed_items);
         }
 
         if ($this->config->image_field) {
@@ -201,20 +211,20 @@ class SitemapGenerator
 
         $now = new DateTime();
         $max_memory_usage = memory_get_usage();
-        $url_count = 0;
+        $url_counter = $this->config->start;
 
         foreach ($this->model->getURLs($with, $this->config->start, $this->config->end) as $url) {
 
             if ($dev_mode) {
-                $url_count++;
+                $url_counter++;
                 $current_memory_usage = memory_get_usage();
                 if ($current_memory_usage > $max_memory_usage) {
                     $max_memory_usage = $current_memory_usage;
                 }
-                if ($url_count % 100 === 0) {
+                if ($url_counter % 100 === 0) {
                     echo sprintf(
                         "Processed: %d, Memory Usage: Current: %.2f Mb, Max: %.2f Mb\n",
-                        $url_count,
+                        $url_counter,
                         $current_memory_usage / 1024 / 1024,
                         $max_memory_usage / 1024 / 1024
                     );
@@ -233,46 +243,7 @@ class SitemapGenerator
             $lines[] = '</lastmod>';
 
             if ($url->image_field && $this->model->includeImages($url)) {
-
-                // limit image count
-                $max_count = $this->model->getMaxImageCount($url);
-                $count = 0;
-
-                /** @var Asset $image */
-                foreach ($url->image_field as $idx => $image) {
-
-                    if ($main_img_transform) { // transforming?
-                        try {
-                            /** @var TransformedImageInterface|null $transformed */
-                            $transformed = ARImager::getInstance()->imager->transformImage($image, $main_img_transform);
-                        } catch (Throwable $e) {
-                            // report and send email if not in DEV environment
-                            ServiceLocator::getInstance()->error->reportBackendException($e, !Craft::$app->getConfig()->getGeneral()->devMode);
-                            $transformed = null;
-                        }
-                    } else { // not transforming, use the existing Asset Url
-                        $transformed = $image;
-                    }
-
-                    if ($transformed) {
-                        $lines[] = '<image:image>';
-                        $lines[] = '<image:loc>';
-                        $lines[] = htmlspecialchars($transformed->getUrl(), ENT_XML1, 'UTF-8');
-                        $lines[] = '</image:loc>';
-                        if (!empty($image->imageCaption)) {
-                            $lines[] = '<image:caption>';
-                            $lines[] = htmlspecialchars($image->imageCaption, ENT_XML1, 'UTF-8');
-                            $lines[] = '</image:caption>';
-                        }
-                        $lines[] = '</image:image>';
-                        $count++;
-                        unset($image, $url->image_field[$idx], $transformed); // free some memory
-                    }
-
-                    if ($max_count !== null && $max_count > -1 && $count >= $max_count) {
-                        break;
-                    }
-                }
+                $this->generateImages($url, $main_img_transform, $lines);
             }
 
             $lines[] = '</url>';
@@ -280,7 +251,7 @@ class SitemapGenerator
             $this->processed_items++;
 
             if ($this->progress_callback && $this->processed_items % 10 === 0) {// update every 10 items
-                call_user_func($this->progress_callback, $total_items, $this->processed_items);
+                call_user_func($this->progress_callback, $process_total, $this->processed_items);
             }
         }
 
@@ -298,10 +269,53 @@ class SitemapGenerator
         }
 
         if ($this->progress_callback) { // indicate that we are done!
-            call_user_func($this->progress_callback, $total_items, $total_items);
+            call_user_func($this->progress_callback, $process_total, $process_total);
         }
 
         return $lines;
+    }
+
+    private function generateImages(SitemapURL $url, array $main_img_transform, array &$lines): void
+    {
+        // limit image count
+        $max_count = $this->model->getMaxImageCount($url);
+        $count = 0;
+
+        /** @var Asset $image */
+        foreach ($url->image_field as $idx => $image) {
+
+            if ($main_img_transform) { // transforming?
+                try {
+                    /** @var TransformedImageInterface|null $transformed */
+                    $transformed = ARImager::getInstance()->imager->transformImage($image, $main_img_transform);
+                } catch (Throwable $e) {
+                    // report and send email if not in DEV environment
+                    ServiceLocator::getInstance()->error->reportBackendException($e, !Craft::$app->getConfig()->getGeneral()->devMode);
+                    $transformed = null;
+                }
+            } else { // not transforming, use the existing Asset Url
+                $transformed = $image;
+            }
+
+            if ($transformed) {
+                $lines[] = '<image:image>';
+                $lines[] = '<image:loc>';
+                $lines[] = htmlspecialchars($transformed->getUrl(), ENT_XML1, 'UTF-8');
+                $lines[] = '</image:loc>';
+                if (!empty($image->imageCaption)) {
+                    $lines[] = '<image:caption>';
+                    $lines[] = htmlspecialchars($image->imageCaption, ENT_XML1, 'UTF-8');
+                    $lines[] = '</image:caption>';
+                }
+                $lines[] = '</image:image>';
+                $count++;
+                unset($image, $url->image_field[$idx], $transformed); // free some memory
+            }
+
+            if ($max_count !== null && $max_count > -1 && $count >= $max_count) {
+                break;
+            }
+        }
     }
 
     /**

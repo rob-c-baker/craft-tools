@@ -87,14 +87,15 @@ class XMLSitemap extends Model
     public function totalItems(?int $start=null, ?int $end=null) : int
     {
         $query = $this->loadElementQuery();
+        $count = (int) $query->cache(300)->count();
+        // Query::count() doesn't take the offset and limit into account
         if ($start !== null) {
-            $query->offset($start > 0 ? $start - 1 : 0);
+            $count = max($count - max($start - 1, 0), 0);
         }
         if ($end !== null) {
-            $query->limit($end);
+            $count = min($end - max($start - 1, 0), $count);
         }
-        // Can use the cache for this query as we may make several calls to this method in a short time-span.
-        return (int) $query->cache(300)->count();
+        return $count;
     }
 
     /**
@@ -110,10 +111,10 @@ class XMLSitemap extends Model
     {
         $query = $this->loadElementQuery($with);
         if ($start !== null) {
-            $query->offset($start > 0 ? $start - 1 : 0);
+            $query->offset(max($start - 1, 0));
         }
         if ($end !== null) {
-            $query->limit($end);
+            $query->limit($end - max($start - 1, 0));
         }
         // need to set a session var for MySQL so connection  less likely to timeout:
         $init_sql = sprintf(

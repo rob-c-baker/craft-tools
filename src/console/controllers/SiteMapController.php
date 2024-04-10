@@ -4,7 +4,6 @@ namespace alanrogers\tools\console\controllers;
 
 use alanrogers\tools\models\sitemaps\XMLSitemap;
 use alanrogers\tools\queue\jobs\XMLSitemap as XMLSitemapJob;
-use alanrogers\tools\services\AlanRogersCache;
 use alanrogers\tools\services\ServiceLocator;
 use alanrogers\tools\services\sitemap\SitemapConfig;
 use alanrogers\tools\services\sitemap\SitemapException;
@@ -43,9 +42,8 @@ class SiteMapController extends Controller
             }
         }
 
-        $cache = ServiceLocator::getInstance()->cache;
         $cache_key = 'site-map-generating-' . $config->getName();
-        $existing_job_id = $cache->get($cache_key);
+        $existing_job_id = ServiceLocator::getInstance()->cache->get($cache_key);
 
         if ($existing_job_id) {
             Console::error(sprintf('Sitemap already being generated for: %s.', $config->getName()));
@@ -63,10 +61,10 @@ class SiteMapController extends Controller
                 $c->start = ($i - 1) * SitemapConfig::MAX_SIZE + 1;
                 $c->end = min($i * SitemapConfig::MAX_SIZE, $total_items);
                 $c->chunk_index = $i - 1;
-                $this->generateSitemap($c, $cache, $cache_key, $use_queue);
+                $this->generateSitemap($c, $cache_key, $use_queue);
             }
         } else {
-            $this->generateSitemap($config, $cache, $cache_key, $use_queue);
+            $this->generateSitemap($config, $cache_key, $use_queue);
         }
 
         Console::output(sprintf('...Sitemap generation complete for %s.', $config->getName()));
@@ -76,10 +74,10 @@ class SiteMapController extends Controller
     /**
      * @throws InvalidConfigException|SitemapException
      */
-    private function generateSitemap(SitemapConfig $config, AlanRogersCache $cache, string $cache_key, bool $use_queue): void
+    private function generateSitemap(SitemapConfig $config,string $cache_key, bool $use_queue): void
     {
         $job = new XMLSitemapJob($config, $cache_key);
-        $cache->set($cache_key, '__COMMAND-LINE-INVOCATION__', $job->getTtr());
+        ServiceLocator::getInstance()->cache->set($cache_key, '__COMMAND-LINE-INVOCATION__', $job->getTtr());
 
         $config_name = $config->getName();
         if ($config->start) {

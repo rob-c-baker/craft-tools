@@ -85,9 +85,6 @@ class XMLSitemap extends BaseJob implements RetryableJobInterface
 
         // in case the queue job is stopped by the OS / user
         register_shutdown_function([ $this, 'finishGenerating' ], $service);
-        pcntl_signal(SIGTERM, function(int $sig_no, mixed $sig_info) use ($service) {
-            $this->finishGenerating($service);
-        });
 
         if (!Craft::$app instanceof Console) {
             $this->setProgress($this->queue, (float) $count, $this->getDescription());
