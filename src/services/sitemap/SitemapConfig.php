@@ -125,6 +125,13 @@ class SitemapConfig extends Component
     public string $cache_key = 'xml-sitemap-';
 
     /**
+     * Amount of time in seconds to set in a "Retry-After" header when the sitemap has not yet been generated.
+     * Set to -1 for no "Retry-After" header.
+     * @var int
+     */
+    public int $retry_after = 600;
+
+    /**
      * @var Closure|null
      */
     public ?Closure $progress_callback = null;
@@ -148,7 +155,8 @@ class SitemapConfig extends Component
             'use_queue' => $this->use_queue,
             'force_queue' => $this->force_queue,
             'use_cache' => $this->use_cache,
-            'cache_key' => $this->cache_key
+            'cache_key' => $this->cache_key,
+            'retry_after' => $this->retry_after
         ];
     }
 
@@ -167,6 +175,7 @@ class SitemapConfig extends Component
         $this->force_queue     = $data['force_queue'];
         $this->use_cache       = $data['use_cache'];
         $this->cache_key       = $data['cache_key'];
+        $this->retry_after     = $data['retry_after'];
 
         // add the callbacks back in:
         $config = self::getConfig($this->name);
@@ -212,6 +221,7 @@ class SitemapConfig extends Component
             $config['use_cache'] = self::$sitemap_config['use_cache'] ?? true;
             $config['use_queue'] = self::$sitemap_config['use_queue'] ?? true;
             $config['force_queue'] = self::$sitemap_config['force_queue'] ?? false;
+            $config['retry_after'] = self::$sitemap_config['retry_after'] ?? 600;
             $configs[] = new SitemapConfig($config);
         }
         return $configs;

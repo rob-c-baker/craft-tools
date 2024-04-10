@@ -105,7 +105,9 @@ class SitemapsController extends Controller
         if (!$xml_model->generated) {
 
             $this->response->setStatusCode(503);
-            $this->response->getHeaders()->add('Retry-After', 600);
+            if ($sitemap_config->retry_after > -1) {
+                $this->response->getHeaders()->add('Retry-After', $sitemap_config->retry_after);
+            }
 
             if (!$is_dev) {
                 // varnish should not cache this, nor should any other clients:
