@@ -87,7 +87,7 @@ class SitemapsController extends Controller
         if ($sitemap_config->start !== null &&  $sitemap_config->end !== null) {
             $total_items = $service->getModel()->totalItems();
             $sitemap_config->chunk_count = (int) ceil($total_items / SitemapConfig::MAX_SIZE);
-            $sitemap_config->chunk_index = (int) floor($start / ($end - $start)) - 1;
+            $sitemap_config->chunk_index = (int) floor( max(0, $start - 1) / SitemapConfig::MAX_SIZE);
         }
 
         try {
