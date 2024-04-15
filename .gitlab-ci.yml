@@ -37,8 +37,8 @@ run_tests:
     - apt-get update && apt-get install -qqy git unzip libicu-dev libzip-dev libpng-dev && apt-get install -y libmagickwand-dev --no-install-recommends
 
     # Extensions we need that are not included in image
-    - docker-php-ext-install -j$(nproc) bcmath intl zip exif gd
-    - docker-php-ext-enable bcmath intl zip exif gd
+    - docker-php-ext-install -j$(nproc) bcmath intl zip exif gd pcntl
+    - docker-php-ext-enable bcmath intl zip exif gd pcntl
 
     # Need imagick for ARImager...
 #    - curl https://pecl.php.net/get/imagick-3.7.0.tgz --insecure --output imagick-3.7.0.tgz
