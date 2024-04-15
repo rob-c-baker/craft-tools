@@ -51,6 +51,7 @@
         "putyourlightson/craft-elements-panel": "^2.0",
         "sentry/sdk": "^3.5",
         "symfony/var-dumper": "v5.4.6",
+        "topshelfcraft/wordsmith": "4.4.0",
         "yiisoft/yii2-redis": "~2.0.0"
     },
     "require-dev": {
