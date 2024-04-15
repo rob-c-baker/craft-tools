@@ -158,7 +158,7 @@ class SitemapGenerator
         $process_total = $this->model->totalItems($this->config->start, $this->config->end);
         $dev_mode = Craft::$app->getConfig()->getGeneral()->devMode;
 
-        if ($dev_mode) {
+        if ($dev_mode && Craft::$app->getRequest()->getIsConsoleRequest()) {
             echo sprintf(
                 "Sitemap generation started, from: %d to: %d count: %d \n",
                 $this->config->start,
@@ -199,7 +199,7 @@ class SitemapGenerator
             $with[] = $this->config->image_field;
         }
 
-        $main_img_transform = null;
+        $main_img_transform = [];
 
         if ($this->config->image_transform) {
             $main_img_transform = ARImager::$plugin->transforms::getTransform($this->config->image_transform);
