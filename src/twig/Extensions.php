@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace alanrogers\tools\twig;
 
@@ -7,12 +6,11 @@ use alanrogers\tools\twig\extensions\Dumper;
 use alanrogers\tools\twig\extensions\Image64;
 use alanrogers\tools\twig\extensions\TwigURLHelper;
 use alanrogers\tools\twig\extensions\VariableTools;
+use alanrogers\tools\twig\perversion\Extension;
 use Craft;
-use Exception;
 use alanrogers\tools\twig\extensions\DeepMerge;
 use alanrogers\tools\twig\extensions\Inline;
 use LogicException;
-use marionnewlevant\twigperversion\twigextensions\TwigPerversionTwigExtension;
 use Twig\TwigFilter;
 
 class Extensions
@@ -71,7 +69,7 @@ class Extensions
         }
 
         // Twig perversion plugin: https://github.com/marionnewlevant/craft-twig_perversion
-        $view->registerTwigExtension(new TwigPerversionTwigExtension());
+        $view->registerTwigExtension(new Extension());
 
         // Material Design icons
         $view->registerTwigExtension(new extensions\MaterialDesignIcons());
