@@ -15,6 +15,7 @@ use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\TwigTest;
 use yii\base\InvalidConfigException;
+use yii\helpers\Inflector;
 
 class TwigTools extends AbstractExtension
 {
@@ -80,7 +81,11 @@ class TwigTools extends AbstractExtension
             ),
             'chop' => new TwigFilter(
                 'chop',
-                [ self::class, 'chop']
+                [ self::class, 'chop' ]
+            ),
+            'slugify' => new TwigFilter(
+                'slugify',
+                [ self::class, 'slugify' ]
             )
         ];
     }
@@ -222,5 +227,16 @@ class TwigTools extends AbstractExtension
     public static function chop(string $content, int $limit=1, string $unit='p', ?string $append=null, ?array $allowed_tags=null): string
     {
         return (new Truncator($content, $limit, $unit, $append, $allowed_tags))->truncate();
+    }
+
+    /**
+     * @param string $string
+     * @param string $replacement
+     * @param bool $lowercase
+     * @return string
+     */
+    public static function slugify(string $string, string $replacement = '-', bool $lowercase = true): string
+    {
+        return Inflector::slug($string, $replacement, $lowercase);
     }
 }
