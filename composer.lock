@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "644ac02d7509fd8705843a07964f23a3",
+    "content-hash": "cd02d311c17bc123bb628f57f0ef98a3",
     "packages": [
         {
             "name": "alanrogers/arimager",
@@ -1871,107 +1871,6 @@
             "time": "2023-03-20T10:51:12+00:00"
         },
         {
-            "name": "erusev/parsedown",
-            "version": "1.7.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/erusev/parsedown.git",
-                "reference": "cb17b6477dfff935958ba01325f2e8a2bfa6dab3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/erusev/parsedown/zipball/cb17b6477dfff935958ba01325f2e8a2bfa6dab3",
-                "reference": "cb17b6477dfff935958ba01325f2e8a2bfa6dab3",
-                "shasum": ""
-            },
-            "require": {
-                "ext-mbstring": "*",
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8.35"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Parsedown": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Emanuil Rusev",
-                    "email": "hello@erusev.com",
-                    "homepage": "http://erusev.com"
-                }
-            ],
-            "description": "Parser for Markdown.",
-            "homepage": "http://parsedown.org",
-            "keywords": [
-                "markdown",
-                "parser"
-            ],
-            "support": {
-                "issues": "https://github.com/erusev/parsedown/issues",
-                "source": "https://github.com/erusev/parsedown/tree/1.7.x"
-            },
-            "time": "2019-12-30T22:54:17+00:00"
-        },
-        {
-            "name": "erusev/parsedown-extra",
-            "version": "0.8.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/erusev/parsedown-extra.git",
-                "reference": "91ac3ff98f0cea243bdccc688df43810f044dcef"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/erusev/parsedown-extra/zipball/91ac3ff98f0cea243bdccc688df43810f044dcef",
-                "reference": "91ac3ff98f0cea243bdccc688df43810f044dcef",
-                "shasum": ""
-            },
-            "require": {
-                "erusev/parsedown": "^1.7.4"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8.35"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "ParsedownExtra": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Emanuil Rusev",
-                    "email": "hello@erusev.com",
-                    "homepage": "http://erusev.com"
-                }
-            ],
-            "description": "An extension of Parsedown that adds support for Markdown Extra.",
-            "homepage": "https://github.com/erusev/parsedown-extra",
-            "keywords": [
-                "markdown",
-                "markdown extra",
-                "parsedown",
-                "parser"
-            ],
-            "support": {
-                "issues": "https://github.com/erusev/parsedown-extra/issues",
-                "source": "https://github.com/erusev/parsedown-extra/tree/0.8.x"
-            },
-            "time": "2019-12-30T23:20:37+00:00"
-        },
-        {
             "name": "ezyang/htmlpurifier",
             "version": "v4.17.0",
             "source": {
@@ -3049,70 +2948,6 @@
             "time": "2021-07-21T13:50:14+00:00"
         },
         {
-            "name": "icanboogie/inflector",
-            "version": "v2.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ICanBoogie/Inflector.git",
-                "reference": "0288676d1cd48899386f8bbe50643d3ade5dc13b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ICanBoogie/Inflector/zipball/0288676d1cd48899386f8bbe50643d3ade5dc13b",
-                "reference": "0288676d1cd48899386f8bbe50643d3ade5dc13b",
-                "shasum": ""
-            },
-            "require": {
-                "ext-mbstring": "*",
-                "php": ">=7.1"
-            },
-            "conflict": {
-                "icanboogie/common": "<2.0"
-            },
-            "require-dev": {
-                "icanboogie/common": "^2.0",
-                "phpstan/phpstan": "^0.12.92",
-                "phpunit/phpunit": "^7.5"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "lib/helpers.php"
-                ],
-                "psr-4": {
-                    "ICanBoogie\\": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Olivier Laviale",
-                    "email": "olivier.laviale@gmail.com",
-                    "homepage": "http://www.weirdog.com/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Multilingual inflector that transforms words from singular to plural, underscore to camel case, and more.",
-            "homepage": "http://icanboogie.org/",
-            "keywords": [
-                "camelize",
-                "hyphenate",
-                "inflect",
-                "multilingual",
-                "pluralize",
-                "singularize",
-                "underscore"
-            ],
-            "support": {
-                "issues": "https://github.com/ICanBoogie/Inflector/issues",
-                "source": "https://github.com/ICanBoogie/Inflector"
-            },
-            "time": "2023-03-12T18:39:52+00:00"
-        },
-        {
             "name": "illuminate/collections",
             "version": "v9.52.16",
             "source": {
@@ -3671,73 +3506,6 @@
             "time": "2021-09-28T19:18:28+00:00"
         },
         {
-            "name": "masterminds/html5",
-            "version": "2.9.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Masterminds/html5-php.git",
-                "reference": "f5ac2c0b0a2eefca70b2ce32a5809992227e75a6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/f5ac2c0b0a2eefca70b2ce32a5809992227e75a6",
-                "reference": "f5ac2c0b0a2eefca70b2ce32a5809992227e75a6",
-                "shasum": ""
-            },
-            "require": {
-                "ext-dom": "*",
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8.35 || ^5.7.21 || ^6 || ^7 || ^8 || ^9"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.7-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Masterminds\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Matt Butcher",
-                    "email": "technosophos@gmail.com"
-                },
-                {
-                    "name": "Matt Farina",
-                    "email": "matt@mattfarina.com"
-                },
-                {
-                    "name": "Asmir Mustafic",
-                    "email": "goetas@gmail.com"
-                }
-            ],
-            "description": "An HTML5 parser and serializer.",
-            "homepage": "http://masterminds.github.io/html5-php",
-            "keywords": [
-                "HTML5",
-                "dom",
-                "html",
-                "parser",
-                "querypath",
-                "serializer",
-                "xml"
-            ],
-            "support": {
-                "issues": "https://github.com/Masterminds/html5-php/issues",
-                "source": "https://github.com/Masterminds/html5-php/tree/2.9.0"
-            },
-            "time": "2024-03-31T07:05:07+00:00"
-        },
-        {
             "name": "mikehaertl/php-shellcommand",
             "version": "1.7.0",
             "source": {
@@ -3782,50 +3550,6 @@
                 "source": "https://github.com/mikehaertl/php-shellcommand/tree/1.7.0"
             },
             "time": "2023-04-19T08:25:22+00:00"
-        },
-        {
-            "name": "mofodojodino/profanity-filter",
-            "version": "1.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mofodojodino/ProfanityFilter.git",
-                "reference": "529d24adcdb5b9507a4622db6aba6e54c5bb82a9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mofodojodino/ProfanityFilter/zipball/529d24adcdb5b9507a4622db6aba6e54c5bb82a9",
-                "reference": "529d24adcdb5b9507a4622db6aba6e54c5bb82a9",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "phpspec/phpspec": "~2.0",
-                "phpunit/phpunit": "~4.8"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Dean Tedesco",
-                    "email": "dino@tedesco.net.au"
-                }
-            ],
-            "description": "Filters out profanities from strings.",
-            "support": {
-                "issues": "https://github.com/mofodojodino/ProfanityFilter/issues",
-                "source": "https://github.com/mofodojodino/ProfanityFilter/tree/master"
-            },
-            "time": "2016-05-11T00:19:07+00:00"
         },
         {
             "name": "moneyphp/money",
@@ -4016,75 +3740,6 @@
                 }
             ],
             "time": "2024-04-12T20:52:51+00:00"
-        },
-        {
-            "name": "mundschenk-at/php-typography",
-            "version": "v6.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mundschenk-at/php-typography.git",
-                "reference": "6b0414811f42e53e101f5ea5a8023c63eafd3dcb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mundschenk-at/php-typography/zipball/6b0414811f42e53e101f5ea5a8023c63eafd3dcb",
-                "reference": "6b0414811f42e53e101f5ea5a8023c63eafd3dcb",
-                "shasum": ""
-            },
-            "require": {
-                "ext-mbstring": "*",
-                "ext-pcre": "*",
-                "masterminds/html5": "^2.5.0",
-                "php": ">=7.4.0"
-            },
-            "require-dev": {
-                "brain/monkey": "^2.2.0",
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
-                "ext-curl": "*",
-                "mundschenk-at/phpunit-cross-version": "dev-master",
-                "phpbench/phpbench": "^0.17||^1.0@dev",
-                "phpcompatibility/php-compatibility": "^9.0",
-                "phpstan/extension-installer": "^1.2",
-                "phpstan/phpstan": "^1.9",
-                "phpstan/phpstan-mockery": "^1.1",
-                "phpunit/phpunit": "5.*||6.*||7.*|8.*|9.*",
-                "squizlabs/php_codesniffer": "^3",
-                "wp-coding-standards/wpcs": "^2.0"
-            },
-            "bin": [
-                "src/bin/update-patterns.php",
-                "src/bin/update-iana.php"
-            ],
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Peter Putzer",
-                    "email": "github@mundschenk.at",
-                    "homepage": "https://code.mundschenk.at",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Jeffrey D. King",
-                    "email": "jeff.king@weathersource.com",
-                    "homepage": "http://kingdesk.com",
-                    "role": "Original author"
-                }
-            ],
-            "description": "A PHP library for improving your web typography",
-            "support": {
-                "issues": "https://github.com/mundschenk-at/php-typography/issues",
-                "source": "https://github.com/mundschenk-at/php-typography/tree/v6.7.0"
-            },
-            "time": "2022-11-14T22:30:08+00:00"
         },
         {
             "name": "nystudio107/craft-code-editor",
@@ -8579,94 +8234,6 @@
             "time": "2019-11-14T14:08:48+00:00"
         },
         {
-            "name": "topshelfcraft/base",
-            "version": "4.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/TopShelfCraft/base.git",
-                "reference": "5e0376d39a2b84a0cc1b661c2ed2dd3742077f87"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/TopShelfCraft/base/zipball/5e0376d39a2b84a0cc1b661c2ed2dd3742077f87",
-                "reference": "5e0376d39a2b84a0cc1b661c2ed2dd3742077f87",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "TopShelfCraft\\base\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "description": "Base metal for Top Shelf Craft modules and plugins.",
-            "support": {
-                "issues": "https://github.com/TopShelfCraft/base/issues",
-                "source": "https://github.com/TopShelfCraft/base/tree/4.0.2"
-            },
-            "time": "2022-12-20T02:05:36+00:00"
-        },
-        {
-            "name": "topshelfcraft/wordsmith",
-            "version": "4.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/TopShelfCraft/Wordsmith.git",
-                "reference": "1599aa65d5d4b598f82ab288073652522e780547"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/TopShelfCraft/Wordsmith/zipball/1599aa65d5d4b598f82ab288073652522e780547",
-                "reference": "1599aa65d5d4b598f82ab288073652522e780547",
-                "shasum": ""
-            },
-            "require": {
-                "craftcms/cms": "^4.5",
-                "davechild/textstatistics": "^1.0.3",
-                "erusev/parsedown-extra": "^0.8",
-                "icanboogie/inflector": "^2.0",
-                "mofodojodino/profanity-filter": "^1.3",
-                "mundschenk-at/php-typography": "^6.0",
-                "topshelfcraft/base": "^4.0.1",
-                "voku/stringy": "^6.4.0"
-            },
-            "type": "craft-plugin",
-            "extra": {
-                "name": "Wordsmith",
-                "handle": "wordsmith",
-                "class": "TopShelfCraft\\Wordsmith\\Wordsmith"
-            },
-            "autoload": {
-                "psr-4": {
-                    "TopShelfCraft\\Wordsmith\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "proprietary"
-            ],
-            "authors": [
-                {
-                    "name": "Top Shelf Craft (Michael Rog)",
-                    "homepage": "https://topshelfcraft.com"
-                }
-            ],
-            "description": "...because you have the best words.",
-            "keywords": [
-                "Craft",
-                "cms",
-                "craft-plugin",
-                "craftcms",
-                "wordsmith"
-            ],
-            "support": {
-                "docs": "https://wordsmith.docs.topshelfcraft.com/",
-                "issues": "https://github.com/TopShelfCraft/Wordsmith/issues",
-                "source": "https://github.com/TopShelfCraft/Wordsmith/tree/4.4.0"
-            },
-            "time": "2023-12-21T02:39:35+00:00"
-        },
-        {
             "name": "twig/twig",
             "version": "v3.8.0",
             "source": {
@@ -10673,6 +10240,73 @@
                 }
             ],
             "time": "2023-11-12T22:16:48+00:00"
+        },
+        {
+            "name": "masterminds/html5",
+            "version": "2.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Masterminds/html5-php.git",
+                "reference": "f5ac2c0b0a2eefca70b2ce32a5809992227e75a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/f5ac2c0b0a2eefca70b2ce32a5809992227e75a6",
+                "reference": "f5ac2c0b0a2eefca70b2ce32a5809992227e75a6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7.21 || ^6 || ^7 || ^8 || ^9"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.7-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Masterminds\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Matt Butcher",
+                    "email": "technosophos@gmail.com"
+                },
+                {
+                    "name": "Matt Farina",
+                    "email": "matt@mattfarina.com"
+                },
+                {
+                    "name": "Asmir Mustafic",
+                    "email": "goetas@gmail.com"
+                }
+            ],
+            "description": "An HTML5 parser and serializer.",
+            "homepage": "http://masterminds.github.io/html5-php",
+            "keywords": [
+                "HTML5",
+                "dom",
+                "html",
+                "parser",
+                "querypath",
+                "serializer",
+                "xml"
+            ],
+            "support": {
+                "issues": "https://github.com/Masterminds/html5-php/issues",
+                "source": "https://github.com/Masterminds/html5-php/tree/2.9.0"
+            },
+            "time": "2024-03-31T07:05:07+00:00"
         },
         {
             "name": "myclabs/deep-copy",
