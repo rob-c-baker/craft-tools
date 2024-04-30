@@ -4,7 +4,6 @@ namespace alanrogers\tools\twig;
 
 use alanrogers\tools\twig\extensions\Dumper;
 use alanrogers\tools\twig\extensions\TwigTools;
-use alanrogers\tools\twig\extensions\VariableTools;
 use alanrogers\tools\twig\perversion\Extension;
 use Craft;
 use LogicException;
@@ -70,9 +69,6 @@ class Extensions
 
         // Material Design icons
         $view->registerTwigExtension(new extensions\MaterialDesignIcons());
-
-        // ability to unset(), set variables and other variable related stuff
-        $view->registerTwigExtension(new VariableTools());
 
         // Dumping tools
         $view->registerTwigExtension(new Dumper());

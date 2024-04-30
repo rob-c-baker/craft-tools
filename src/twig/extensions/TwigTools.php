@@ -2,17 +2,28 @@
 
 namespace alanrogers\tools\twig\extensions;
 
+use alanrogers\tools\services\Inline;
 use craft\elements\Asset;
 use craft\errors\ImageTransformException;
+use craft\helpers\ArrayHelper;
 use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
+use RuntimeException;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use Twig\TwigTest;
 use yii\base\InvalidConfigException;
 
 class TwigTools extends AbstractExtension
 {
+    public function getTests() : array
+    {
+        return [
+            'instanceof' => new TwigTest('instanceof', [ self::class, 'isInstanceof' ])
+        ];
+    }
+
     public function getFunctions(): array
     {
         return [
@@ -30,9 +41,19 @@ class TwigTools extends AbstractExtension
             ),
             'inline' => new TwigFunction(
                 'inline',
-                [ \alanrogers\tools\services\Inline::class, 'inline' ],
+                [ Inline::class, 'inline' ],
                 []
-            )
+            ),
+            'unset' => new TwigFunction(
+                'unset',
+                [ self::class, 'unset' ],
+                [ 'needs_context' => true ]
+            ),
+            'setKeyValue' => new TwigFunction(
+                'setKeyValue',
+                [ self::class, 'setKeyValue' ],
+                [ 'needs_context' => true ]
+            ),
         ];
     }
 
@@ -57,6 +78,11 @@ class TwigTools extends AbstractExtension
                 [ 'is_variadic' => true ]
             )
         ];
+    }
+
+    public static function isInstanceof(mixed $variable, string $classname) : bool
+    {
+        return $variable instanceof $classname;
     }
 
     /**
@@ -138,5 +164,45 @@ class TwigTools extends AbstractExtension
             return false;
         }
         return array_keys($arr) !== range(0, count($arr) - 1);
+    }
+
+    /**
+     * $context is a special array which holds all know variables inside
+     * If $key is not defined unset the whole variable inside context
+     * If $key is set test if $context[$variable] is defined if so unset $key inside multidimensional array
+     **/
+    public static function unset(&$context, $variable, $key = null): void
+    {
+        if ($key === null) {
+            unset($context[$variable]);
+        } else {
+            if (isset($context[$variable])) {
+                unset($context[$variable][$key]);
+            }
+        }
+    }
+
+    /**
+     * @param mixed $context
+     * @param string $variable_name The object / array name to set a key's value on (if not an array or object, this function is a noop)
+     * @param int|string|array $key the key to use (can be a dot separated string to indicate nested keys, but only if the target is an array)
+     * @param mixed $value the value to set
+     * @return void
+     */
+    public static function setKeyValue(array &$context, string $variable_name, $key, $value) : void
+    {
+        // we want to be sure we are altering a reference as we want to modify the variable in place
+        if (isset($context[$variable_name])) {
+            $target = &$context[$variable_name];
+            if (is_array($target)) {
+                // Using this helper means that we can have keys like "key1.key2.key3" referring to nested array values
+                // ...or a key like ['key1','key2','key3'] meaning the same thing
+                ArrayHelper::setValue($target, $key, $value);
+            } elseif (is_object($target)) {
+                $target->$key = $value;
+            }
+        } else {
+            throw new RuntimeException(sprintf('Cannot set a key on variable "%s" because it is undefined.', $variable_name));
+        }
     }
 }
