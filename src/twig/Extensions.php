@@ -3,13 +3,10 @@
 namespace alanrogers\tools\twig;
 
 use alanrogers\tools\twig\extensions\Dumper;
-use alanrogers\tools\twig\extensions\Image64;
-use alanrogers\tools\twig\extensions\TwigURLHelper;
+use alanrogers\tools\twig\extensions\TwigTools;
 use alanrogers\tools\twig\extensions\VariableTools;
 use alanrogers\tools\twig\perversion\Extension;
 use Craft;
-use alanrogers\tools\twig\extensions\DeepMerge;
-use alanrogers\tools\twig\extensions\Inline;
 use LogicException;
 use Twig\TwigFilter;
 
@@ -74,22 +71,13 @@ class Extensions
         // Material Design icons
         $view->registerTwigExtension(new extensions\MaterialDesignIcons());
 
-        // Deep merge ability
-        $view->registerTwigExtension(new DeepMerge());
-
-        // Our inline function
-        $view->registerTwigExtension(new Inline());
-
-        // Base 64 image encoding
-        $view->registerTwigExtension(new Image64());
-
         // ability to unset(), set variables and other variable related stuff
         $view->registerTwigExtension(new VariableTools());
 
-        // ability to unset()
+        // Dumping tools
         $view->registerTwigExtension(new Dumper());
 
-        // URL Helper
-        $view->registerTwigExtension(new TwigURLHelper());
+        // Our varied Twig Tools
+        $view->registerTwigExtension(new TwigTools());
     }
 }
