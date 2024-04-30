@@ -3,6 +3,7 @@
 namespace alanrogers\tools\twig\extensions;
 
 use alanrogers\tools\services\Inline;
+use alanrogers\tools\services\Truncator;
 use craft\elements\Asset;
 use craft\errors\ImageTransformException;
 use craft\helpers\ArrayHelper;
@@ -76,6 +77,10 @@ class TwigTools extends AbstractExtension
                 'deep_merge',
                 [ self::class, 'deepMerge'],
                 [ 'is_variadic' => true ]
+            ),
+            'chop' => new TwigFilter(
+                'chop',
+                [ self::class, 'chop']
             )
         ];
     }
@@ -204,5 +209,18 @@ class TwigTools extends AbstractExtension
         } else {
             throw new RuntimeException(sprintf('Cannot set a key on variable "%s" because it is undefined.', $variable_name));
         }
+    }
+
+    /**
+     * @param string $content
+     * @param int $limit
+     * @param string $unit
+     * @param string|null $append
+     * @param array|null $allowed_tags
+     * @return string
+     */
+    public static function chop(string $content, int $limit=1, string $unit='p', ?string $append=null, ?array $allowed_tags=null): string
+    {
+        return (new Truncator($content, $limit, $unit, $append, $allowed_tags))->truncate();
     }
 }
