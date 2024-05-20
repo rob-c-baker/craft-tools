@@ -25,6 +25,11 @@ class BrandIcons
                 'simple-icons/simple-icons/icons'
             );
         }
+        // We will usually want to have the current CSS colour applying to the SVG attributes
+        $attributes = [
+            'fill' => 'currentColor',
+            ...$attributes
+        ];
         return self::$icon_library->getIconData($name, IconLibrary::TYPE_SVG, $attributes);
     }
 }

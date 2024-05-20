@@ -148,7 +148,10 @@ class IconLibrary
         }
 
         if ($type === self::TYPE_SVG && !empty($attributes)) {
-            $data = $this->applyXMLAttributes($name, $data, $attributes);
+            $attributes = array_filter($attributes, fn($value) => $value !== null); // removes attributes set to null
+            if ($attributes) {
+                $data = $this->applyXMLAttributes($name, $data, $attributes);
+            }
         }
 
         return $data;
