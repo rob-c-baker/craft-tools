@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cd02d311c17bc123bb628f57f0ef98a3",
+    "content-hash": "cf5e6b7cd0914db8b42da85f4bcad217",
     "packages": [
         {
             "name": "alanrogers/arimager",
@@ -5988,6 +5988,44 @@
                 }
             ],
             "time": "2023-11-13T11:47:28+00:00"
+        },
+        {
+            "name": "simple-icons/simple-icons",
+            "version": "11.15.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/simple-icons/simple-icons.git",
+                "reference": "0af835e2949a9222965522780e5e0810d3c53382"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/simple-icons/simple-icons/zipball/0af835e2949a9222965522780e5e0810d3c53382",
+                "reference": "0af835e2949a9222965522780e5e0810d3c53382",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "CC0-1.0"
+            ],
+            "description": "SVG icons for popular brands",
+            "homepage": "https://simpleicons.org/",
+            "keywords": [
+                "icons",
+                "svg"
+            ],
+            "support": {
+                "docs": "https://github.com/simple-icons/simple-icons#php-usage-",
+                "issues": "https://github.com/simple-icons/simple-icons/issues",
+                "source": "https://github.com/simple-icons/simple-icons"
+            },
+            "funding": [
+                {
+                    "url": "https://opencollective.com/simple-icons",
+                    "type": "opencollective"
+                }
+            ],
+            "time": "2024-05-19T00:29:00+00:00"
         },
         {
             "name": "ssnepenthe/color-utils",
@@ -12387,9 +12425,9 @@
         "php": "^8.3",
         "ext-curl": "*",
         "ext-dom": "*",
-        "ext-zlib": "*",
         "ext-pcntl": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-zlib": "*"
     },
     "platform-dev": [],
     "platform-overrides": {

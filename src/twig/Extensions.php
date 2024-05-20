@@ -68,7 +68,7 @@ class Extensions
         $view->registerTwigExtension(new Extension());
 
         // Material Design icons
-        $view->registerTwigExtension(new extensions\MaterialDesignIcons());
+        $view->registerTwigExtension(new extensions\SVGIcons());
 
         // Dumping tools
         $view->registerTwigExtension(new Dumper());
