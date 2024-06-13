@@ -79,11 +79,6 @@
         }
     },
     "repositories": {
-        "gitlab.alanrogers.com/30": {
-            "type": "composer",
-            "url": "https://gitlab.alanrogers.com/api/v4/group/30/-/packages/composer/packages.json",
-            "canonical": false
-        },
         "gitlab.alanrogers.com/3": {
             "type": "composer",
             "url": "https://gitlab.alanrogers.com/api/v4/group/3/-/packages/composer/packages.json"
