@@ -5,7 +5,7 @@ stages:
 # Runs out codeception test suite (just unit tests implemented for now)
 run_tests:
 
-  image: php:8.3
+  image: gitlab.alanrogers.com:5050/web-dev/unit-test-docker-image
 
   tags:
     - docker
@@ -33,30 +33,6 @@ run_tests:
     COMPOSER_AUTH_JSON: "{\"gitlab-token\":{\"gitlab.alanrogers.com\":{\"username\":\"web-dev-deployment\",\"token\":\"$COMPOSER_TOKEN\"}}}"
 
   before_script:
-    # Install git and unzip (composer will need them) and dependencies for extensions etc
-    - apt-get update && apt-get install -qqy git unzip libicu-dev libzip-dev libpng-dev && apt-get install -y libmagickwand-dev --no-install-recommends
-
-    # Extensions we need that are not included in image
-    - docker-php-ext-install -j$(nproc) bcmath intl zip exif gd pcntl
-    - docker-php-ext-enable bcmath intl zip exif gd pcntl
-
-    # Need imagick for ARImager...
-#    - curl https://pecl.php.net/get/imagick-3.7.0.tgz --insecure --output imagick-3.7.0.tgz
-#    - pecl install imagick-3.7.0.tgz
-#    - docker-php-ext-enable imagick
-
-    # Alternate install routine for Imagick on PHP 8.3 due to https://github.com/Imagick/imagick/issues/643
-    - curl -L -o /tmp/imagick.tar.gz https://github.com/Imagick/imagick/archive/7088edc353f53c4bc644573a79cdcd67a726ae16.tar.gz
-    - tar --strip-components=1 -xf /tmp/imagick.tar.gz
-    - phpize
-    - ./configure
-    - make
-    - make install
-    - echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini
-    - rm -rf /tmp/*
-
-    # Install composer
-    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
     # Add our auth token (Gitlab secret) so we can fetch from local repositories
     - echo "$COMPOSER_AUTH_JSON" > auth.json
