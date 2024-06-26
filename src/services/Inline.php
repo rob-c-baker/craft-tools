@@ -26,7 +26,7 @@ class Inline extends Component
     /**
      * @param string $path
      */
-    protected static function setBasePath(string $path) : void
+    public static function setBasePath(string $path) : void
     {
         self::$base_path = rtrim($path, '/') . '/';
         self::$base_path_set = true;
