@@ -30,7 +30,7 @@ run_tests:
       junit: tests/_output/report.xml
 
   variables:
-    COMPOSER_AUTH_JSON: "{\"gitlab-token\":{\"gitlab.alanrogers.com\":\"$COMPOSER_TOKEN\"}}"
+    COMPOSER_AUTH_JSON: "{\"gitlab-token\":{\"gitlab.alanrogers.com\":{\"username\":\"web-dev-deployment\",\"token\":\"$COMPOSER_TOKEN\"}}}"
 
   before_script:
     # Install git and unzip (composer will need them) and dependencies for extensions etc
