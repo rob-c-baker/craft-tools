@@ -3,7 +3,6 @@
 namespace alanrogers\tools\services;
 
 use Craft;
-use Exception;
 use RuntimeException;
 
 class BrandIcons

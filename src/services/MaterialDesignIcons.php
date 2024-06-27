@@ -14,7 +14,7 @@ class MaterialDesignIcons extends Component
     private static ?IconLibrary $icon_library = null;
 
     /**
-     * Sets path relative to WEB_ROOT
+     * Sets path relative to `STATIC_PATH`
      * @param string $path
      * @throws Exception
      */
