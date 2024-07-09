@@ -59,6 +59,7 @@
         "codeception/codeception": "^5.0",
         "codeception/module-asserts": "*",
         "codeception/module-phpbrowser": "*",
+        "craftcms/phpstan": "dev-main",
         "vlucas/phpdotenv": "^5.0"
     },
     "scripts": {
@@ -83,5 +84,7 @@
             "type": "composer",
             "url": "https://gitlab.alanrogers.com/api/v4/group/3/-/packages/composer/packages.json"
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
