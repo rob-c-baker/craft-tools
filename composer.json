@@ -60,6 +60,7 @@
         "codeception/module-asserts": "*",
         "codeception/module-phpbrowser": "*",
         "craftcms/phpstan": "dev-main",
+        "craftcms/rector": "dev-main",
         "vlucas/phpdotenv": "^5.0"
     },
     "scripts": {
