@@ -65,7 +65,7 @@ class CategoryGroupsField extends Field implements PreviewableFieldInterface
      * @inheritdoc
      * @throws Exception
      */
-    public function getInputHtml($value, ElementInterface $element = null): string
+    public function getInputHtml(mixed $value, ?\craft\base\ElementInterface $element = null): string
     {
         $options = array_merge(
             [[
@@ -93,7 +93,7 @@ class CategoryGroupsField extends Field implements PreviewableFieldInterface
     /**
      * @inheritdoc
      */
-    public function getTableAttributeHtml($value, ElementInterface $element): string
+    public function getPreviewHtml(mixed $value, ElementInterface $element): string
     {
         if ($value instanceof CategoryGroupCollection) {
             $html = [];
@@ -169,7 +169,7 @@ class CategoryGroupsField extends Field implements PreviewableFieldInterface
     /**
      * @inheritdoc
      */
-    public function serializeValue($value, ?ElementInterface $element = null): mixed
+    public function serializeValue(mixed $value, ?ElementInterface $element = null): mixed
     {
         if ($value instanceof CategoryGroup) {
             // Single selection is enabled, but return an array anyway, in case that setting is disabled in the future

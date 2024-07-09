@@ -112,7 +112,7 @@ class SectionField extends Field implements PreviewableFieldInterface
      * @throws Exception
      * @see craft\base\Field
      */
-    public function getInputHtml($value, ElementInterface $element = null): string
+    public function getInputHtml(mixed $value, ?\craft\base\ElementInterface $element = null): string
     {
         $sections = $this->getSections(); // Get all sections available to the current user.
         $whitelist = array_flip($this->whitelistedSections); // Get all whitelisted sections.
@@ -212,7 +212,7 @@ class SectionField extends Field implements PreviewableFieldInterface
      * @param ElementInterface|null $element
      * @return string
      */
-    public function serializeValue($value, ElementInterface $element = null): string
+    public function serializeValue(mixed $value, ?\craft\base\ElementInterface $element = null): string
     {
         // Convert string IDs to integers for storage.
         if (is_array($value)) {

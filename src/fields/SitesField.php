@@ -118,7 +118,7 @@ class SitesField extends Field implements PreviewableFieldInterface
      * @throws Exception
      * @see craft\base\Field
      */
-    public function getInputHtml($value, ElementInterface $element = null): string
+    public function getInputHtml(mixed $value, ?\craft\base\ElementInterface $element = null): string
     {
 
         $sites = $this->getSites(); // Get all sites available to the current user.
@@ -209,7 +209,7 @@ class SitesField extends Field implements PreviewableFieldInterface
     /**
      * @inheritdoc
      */
-    public function serializeValue($value, ?ElementInterface $element = null) : mixed
+    public function serializeValue(mixed $value, ?ElementInterface $element = null) : mixed
     {
         if (is_array($value)) {
             return implode(',', $value);

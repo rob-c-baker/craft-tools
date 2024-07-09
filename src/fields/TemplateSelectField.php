@@ -64,7 +64,7 @@ class TemplateSelectField extends Field
      * @inheritdoc
      * @throws \Exception
      */
-    public function getInputHtml($value, ElementInterface $element = null): string
+    public function getInputHtml(mixed $value, ?\craft\base\ElementInterface $element = null): string
     {
         // Get site templates path
         $templatesPath = $siteTemplatesPath = Craft::$app->path->getSiteTemplatesPath();
