@@ -15,7 +15,7 @@ class Truncator
         private readonly int      $limit = 1,
         private readonly string   $unit = 'p',
         private readonly ?string  $append = null,
-        private readonly ?array   $allowed_tags = null
+        private readonly array    $allowed_tags = []
     ) {}
 
     public function truncate(): string
