@@ -23,15 +23,15 @@ use yii\queue\RetryableJobInterface;
  */
 class ElasticSearchIndex extends BaseJob implements RetryableJobInterface
 {
-    public const TTR = 300; // 5 mins
-    public const MAX_ATTEMPTS = 5;
+    public const int TTR = 300; // 5 mins
+    public const int MAX_ATTEMPTS = 5;
 
-    public const ACTION_CREATE_INDEX = 'create';
-    public const ACTION_UPDATE_INDEX_MAPPING = 'update-mapping';
-    public const ACTION_UPDATE_SETTINGS = 'update-settings';
-    public const ACTION_DELETE_INDEX = 'delete';
+    public const string ACTION_CREATE_INDEX = 'create';
+    public const string ACTION_UPDATE_INDEX_MAPPING = 'update-mapping';
+    public const string ACTION_UPDATE_SETTINGS = 'update-settings';
+    public const string ACTION_DELETE_INDEX = 'delete';
 
-    public const ALLOWED_ACTIONS = [
+    public const array ALLOWED_ACTIONS = [
         self::ACTION_CREATE_INDEX,
         self::ACTION_UPDATE_INDEX_MAPPING,
         self::ACTION_UPDATE_SETTINGS,
