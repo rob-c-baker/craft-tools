@@ -11,6 +11,7 @@ use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
 use RuntimeException;
 use Twig\Extension\AbstractExtension;
+use Twig\Markup;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\TwigTest;
@@ -221,12 +222,15 @@ class TwigTools extends AbstractExtension
      * @param int $limit
      * @param string $unit
      * @param string|null $append
-     * @param array|null $allowed_tags
-     * @return string
+     * @param string[] $allowed_tags
+     * @return Markup
      */
-    public static function chop(string $content, int $limit=1, string $unit='p', ?string $append=null, ?array $allowed_tags=null): string
+    public static function chop(string $content, int $limit=1, string $unit='p', ?string $append=null, array $allowed_tags=[]): Markup
     {
-        return (new Truncator($content, $limit, $unit, $append, $allowed_tags))->truncate();
+        return new Markup(
+            (new Truncator($content, $limit, $unit, $append, $allowed_tags))->truncate(),
+            'UTF-8'
+        );
     }
 
     /**
