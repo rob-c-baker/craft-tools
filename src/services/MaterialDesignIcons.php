@@ -1,10 +1,7 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace alanrogers\tools\services;
 
-use DOMDocument;
-use DOMElement;
 use Exception;
 use RuntimeException;
 use yii\base\Component;
@@ -26,14 +23,15 @@ class MaterialDesignIcons extends Component
     /**
      * @param string $name
      * @param array $attributes
+     * @param string|null $elements
+     * @param string|null $position
      * @return string
-     * @throws RuntimeException
      */
-    public static function inlineIconSVG(string $name, array $attributes=[]) : string
+    public static function inlineIconSVG(string $name, array $attributes=[], ?string $elements=null, ?string $position=IconLibrary::POSITION_PREPEND) : string
     {
         if (!self::$icon_library) {
             throw new RuntimeException('You must set the path to the SVGs with MaterialDesignIcons::setSVGPath($path) before calling this method.');
         }
-        return self::$icon_library->getIconData($name, IconLibrary::TYPE_SVG, $attributes);
+        return self::$icon_library->getIcon($name, IconLibrary::TYPE_SVG, $attributes, $elements, $position);
     }
 }

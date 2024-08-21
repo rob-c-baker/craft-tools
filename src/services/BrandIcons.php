@@ -1,9 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace alanrogers\tools\services;
 
 use Craft;
-use RuntimeException;
 
 class BrandIcons
 {
@@ -12,10 +11,11 @@ class BrandIcons
     /**
      * @param string $name
      * @param array $attributes
+     * @param string|null $elements
+     * @param string|null $position
      * @return string
-     * @throws RuntimeException
      */
-    public static function inlineIconSVG(string $name, array $attributes=[]) : string
+    public static function inlineIconSVG(string $name, array $attributes=[], ?string $elements=null, ?string $position=IconLibrary::POSITION_PREPEND) : string
     {
         if (!self::$icon_library) {
             self::$icon_library = IconLibrary::factory(
@@ -29,6 +29,6 @@ class BrandIcons
             'fill' => 'currentColor',
             ...$attributes
         ];
-        return self::$icon_library->getIconData($name, IconLibrary::TYPE_SVG, $attributes);
+        return self::$icon_library->getIcon($name, IconLibrary::TYPE_SVG, $attributes, $elements, $position);
     }
 }

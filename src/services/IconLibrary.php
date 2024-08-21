@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace alanrogers\tools\services;
 
@@ -14,6 +13,9 @@ class IconLibrary
     public const string TYPE_PNG = 'png';
     public const string TYPE_GIF = 'gif';
 
+    public const string POSITION_APPEND = 'append';
+    public const string POSITION_PREPEND = 'prepend';
+
     const array ALLOWED_TYPES = [
         self::TYPE_SVG,
         self::TYPE_PNG,
@@ -21,6 +23,12 @@ class IconLibrary
     ];
 
     private static array $instances = [];
+
+    /**
+     * Saved `DOMDocument`s for named icons
+     * @var array<string, DOMDocument>
+     */
+    private array $dom_documents = [];
 
     /**
      * @var string
@@ -41,10 +49,11 @@ class IconLibrary
     /**
      * @param string $name
      * @param string $path
+     * @param bool $check_path Set false to use in unit testing context so the filesystem is not touched.
      */
-    private function __construct(string $name, string $path)
+    public function __construct(string $name, string $path, bool $check_path=true)
     {
-        $this->setPath($path);
+        $this->setPath($path, $check_path);
         $this->name = $name;
     }
 
@@ -59,16 +68,18 @@ class IconLibrary
     /**
      * Sets the path to the directory for the current icon library
      * @param string $path The path to the icon directory
-     * @return self
      */
-    public function setPath(string $path) : self
+    private function setPath(string $path, bool $check_path) : void
     {
-        $real_path = realpath($path);
-        if ($real_path === false) {
-            throw new InvalidArgumentException(sprintf('Icon Path: "%s" does not exist.', $path));
+        if ($check_path) {
+            $real_path = realpath($path);
+            if ($real_path === false) {
+                throw new InvalidArgumentException(sprintf('Icon Path: "%s" does not exist.', $path));
+            }
+            $path = $real_path;
         }
-        $this->path = $real_path;
-        return $this;
+
+        $this->path = $path;
     }
 
     /**
@@ -77,7 +88,7 @@ class IconLibrary
      * @param string $type a TYPE_* class constant
      * @return string|null
      */
-    public function getIconPath(?string $name, string $type=self::TYPE_SVG) : ?string
+    private function getIconPath(?string $name, string $type=self::TYPE_SVG) : ?string
     {
         if (!in_array($type, self::ALLOWED_TYPES, true)) {
             throw new InvalidArgumentException(sprintf('Invalid type supplied: "%s".', $type));
@@ -113,13 +124,54 @@ class IconLibrary
     }
 
     /**
+     * Gets the file data for an icon, with any transformations applied.
+     * @param string $name The name for an icon with no file extensions
+     * @param string $type a TYPE_* class constant
+     * @param array $attributes any attributes to set on the document XML node (for TYPE_SVG) - an attribute set to `null` removes the attribute from the markup.
+     * @param string|null $elements Any additional XML to inject into the document XML node (for TYPE_SVG)
+     * @param string|null $position Either self::POSITION_APPEND or self::POSITION_PREPEND
+     * @return string
+     */
+    public function getIcon(string $name, string $type=self::TYPE_SVG, array $attributes=[], ?string $elements=null, ?string $position=self::POSITION_PREPEND) : string
+    {
+        $data = null;
+
+        // Only parse the DOM if we need to
+        if ($type === self::TYPE_SVG && (!empty($attributes) || $elements !== null)) {
+
+            $dom = $this->getDOM($name);
+            /** @var DOMElement $svg */
+            $svg = $dom->getElementsByTagName('svg')[0] ?? null;
+
+            if (!$svg) {
+                throw new RuntimeException(sprintf('Could not find svg element for icon "%s".', $name));
+            }
+
+            if (!empty($attributes)) {
+                $this->applyXMLAttributes($svg, $attributes);
+            }
+
+            if ($elements !== null) {
+                $this->applyXMLElements($svg, $elements, $position);
+            }
+
+            $data = $dom->saveXML($svg);
+        }
+
+        if ($data === null) {
+            $data = $this->getIconData($name, $type);
+        }
+
+        return $data;
+    }
+
+    /**
      * Gets the contents of the icon file.
      * @param string|null $name If null, empty string returned
      * @param string $type a TYPE_* class constant
-     * @param array $attributes
      * @return string|null
      */
-    public function getIconData(?string $name, string $type=self::TYPE_SVG, array $attributes=[]) : ?string
+    private function getIconData(?string $name, string $type=self::TYPE_SVG) : ?string
     {
         if (!in_array($type, self::ALLOWED_TYPES, true)) {
             throw new InvalidArgumentException(sprintf('Invalid type supplied: "%s".', $type));
@@ -136,61 +188,93 @@ class IconLibrary
         } else {
             $path = $this->getIconPath($name, $type);
             $data = file_get_contents($path);
-
-            if (isset($this->loaded[$filename])) {
-                $this->loaded[$filename]['data'] = $data;
-            } else {
-                $this->loaded[$filename] = [
-                    'path' => $path,
-                    'data' => $data
-                ];
-            }
-        }
-
-        if ($type === self::TYPE_SVG && !empty($attributes)) {
-            $attributes = array_filter($attributes, fn($value) => $value !== null); // removes attributes set to null
-            if ($attributes) {
-                $data = $this->applyXMLAttributes($name, $data, $attributes);
-            }
+            $this->setLoadedIconData($name, $data, $path, $type);
         }
 
         return $data;
     }
 
     /**
+     * Sets the loaded icon data in the cache.
+     * Can be used for unit testing to inject data without touching the filesystem.
      * @param string $name
-     * @param string $xml_str
-     * @param array $attributes
-     * @return string
+     * @param string $data
+     * @param string $path
+     * @param string $type
+     * @return void
      */
-    public function applyXMLAttributes(string $name, string $xml_str, array $attributes=[]) : string
+    public function setLoadedIconData(string $name, string $data, string $path, string $type=self::TYPE_SVG): void
     {
-        $svg = new DOMDocument('1.0', 'utf-8');
-        if (!$svg->loadXML($xml_str)) {
-            throw new RuntimeException(sprintf('Could not load DOM for icon "%s".', $name));
+        $filename = $name . '.' . $type;
+
+        if (isset($this->loaded[$filename])) {
+            $this->loaded[$filename]['data'] = $data;
+        } else {
+            $this->loaded[$filename] = [
+                'path' => $path,
+                'data' => $data
+            ];
         }
+    }
 
-        /** @var DOMElement $svg_el */
-        $svg_el = $svg->getElementsByTagName('svg')[0] ?? null;
-
-        if (!$svg_el) {
-            throw new RuntimeException(sprintf('Could not find svg element in file for icon "%s".', $name));
-        }
-
+    /**
+     * @param DOMElement $svg
+     * @param array $attributes
+     */
+    private function applyXMLAttributes(DOMElement $svg, array $attributes=[]): void
+    {
         foreach ($attributes as $n => $value) {
-            $svg_el->setAttribute($n, $value);
+            if ($value === null) {
+                $svg->removeAttribute($n);
+            } else {
+                $svg->setAttribute($n, $value);
+            }
         }
+    }
 
-        return $svg->saveXML($svg_el);
+    /**
+     * @param DOMElement $svg The element to inject inside
+     * @param string $elements The XML to inject
+     * @param string|null $position Either self::POSITION_APPEND or self::POSITION_PREPEND
+     * @return void
+     */
+    private function applyXMLElements(DOMElement $svg, string $elements, ?string $position=self::POSITION_PREPEND): void
+    {
+        $fragment = $svg->ownerDocument->createDocumentFragment();
+        $fragment->appendXML($elements);
+
+        if ($position === self::POSITION_APPEND) {
+            $svg->append($fragment);
+        } elseif ($position === self::POSITION_PREPEND) {
+            $svg->prepend($fragment);
+        }
+    }
+
+    /**
+     * Returns a DOMDocument for the icon which represents the icon on disk. i.e. We clone the instance from the loaded
+     * DOM, which is based on the file on disk.
+     * @param string $name
+     * @return DOMDocument|null
+     */
+    private function getDOM(string $name): ?DOMDocument
+    {
+        if (!isset($this->dom_documents[$name])) {
+            $this->dom_documents[$name] = new DOMDocument('1.0', 'utf-8');
+            $xml_str = $this->getIconData($name);
+            if (!$this->dom_documents[$name]->loadXML($xml_str)) {
+                throw new RuntimeException(sprintf('Could not load DOM for icon "%s".', $name));
+            }
+        }
+        return clone $this->dom_documents[$name];
     }
 
     /**
      * Gets a new or existing instance of `IconLibrary` based on `$paths` / `$name`
      * @param string|null $name Name of this library
      * @param string ...$paths A number of paths to join that will result in a icon directory path
-     * @return IconLibrary
+     * @return self
      */
-    public static function factory(?string $name=null, string ...$paths) : IconLibrary
+    public static function factory(?string $name=null, string ...$paths) : self
     {
         if ($name === null) {
             $last_path = array_values(array_slice($paths, -1))[0];
@@ -201,7 +285,7 @@ class IconLibrary
         $key = $path . '__' . $name;
 
         if (!isset(self::$instances[$key])) {
-            self::$instances[$key] = new IconLibrary($name, $path);
+            self::$instances[$key] = new self($name, $path);
         }
 
         return self::$instances[$key];
