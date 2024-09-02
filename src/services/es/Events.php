@@ -31,7 +31,9 @@ class Events
             $entry = $e->sender;
 
             // Only if we want this in Elastic search...
-            if ($entry->getStatus() === Entry::STATUS_LIVE && !ElementHelper::isDraftOrRevision($entry)) {
+            if ($entry->getStatus() === Entry::STATUS_LIVE
+                && !ElementHelper::isDraftOrRevision($entry)
+                && $entry->getSection() !== null) {
                 self::afterEntrySave($entry);
             }
         });
@@ -39,15 +41,16 @@ class Events
         // before delete
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT, function(ElementEvent $e)
         {
-            /** @var $element */
-            $element = $e->element;
-            if (!($element instanceof Entry)) {
+            /** @var $entry */
+            $entry = $e->element;
+            if (!($entry instanceof Entry)) {
                 return;
             }
 
             // NOTE: If something gets into ElasticSearch, there are no conditions for this, so it will get deleted there too.
-
-            self::beforeEntryDelete($element);
+            if ($entry->getSection() !== null) {
+                self::beforeEntryDelete($entry);
+            }
         });
     }
 
@@ -62,8 +65,13 @@ class Events
         $section_job = null;
         $sayt_jobs = [];
 
+        if ($entry->getSection() === null) {
+            // probably an entry-type linked to a matrix field, skip
+            return;
+        }
+
         // Make sure this is a section / index defined in ES...
-        $index = Config::getInstance()->getIndexByName($entry->section->handle);
+        $index = Config::getInstance()->getIndexByName($entry->getSection()->handle);
         if (!$index) {
             return;
         }
@@ -117,7 +125,7 @@ class Events
      */
     private static function beforeEntryDelete(Entry $el): void
     {
-        $index = Config::getInstance()->getIndexByName($el->section->handle);
+        $index = Config::getInstance()->getIndexByName($el->getSection()->handle);
         if (!$index) {
             return;
         }
