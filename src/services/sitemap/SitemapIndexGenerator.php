@@ -69,7 +69,7 @@ class SitemapIndexGenerator
             if ($config->type === SitemapType::SECTION) {
 
                 $section_handle = $config->getName(true);
-                $section = Craft::$app->getSections()->getSectionByHandle($section_handle);
+                $section = Craft::$app->getEntries()->getSectionByHandle($section_handle);
 
                 if (!$section) {
                     throw new SitemapException(sprintf('Section "%s" does not exist - cannot create sitemap index', $section_handle));

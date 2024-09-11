@@ -36,7 +36,7 @@ class SiteMapController extends Controller
 
         if ($config->type === SitemapType::SECTION) {
             $section_handle = $config->getName(true);
-            if (!Craft::$app->getSections()->getSectionByHandle($section_handle)) {
+            if (!Craft::$app->getEntries()->getSectionByHandle($section_handle)) {
                 Console::error(sprintf('Attempted section sitemap generation, but no section found for: %s', $config->getName()));
                 return ExitCode::UNSPECIFIED_ERROR;
             }
