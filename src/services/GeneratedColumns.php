@@ -111,7 +111,7 @@ class GeneratedColumns
         return sprintf(
             'ALTER TABLE `%s` ADD COLUMN `%s` %s GENERATED ALWAYS AS %s %s',
             self::TABLE,
-            $this->getColumnName($field),
+            $this->getColumnName($field, false),
             $column_type,
             $field->getValueSql($key),
             $stored ? 'STORED' : 'VIRTUAL'
