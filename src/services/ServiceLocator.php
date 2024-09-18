@@ -12,14 +12,15 @@ use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator as YiiServiceLocator;
 
 /**
- * @property GQLClient $gql_client
+ * @property AlanRogersCache $cache
+ * @property Config $config
+ * @property ElasticSearch $elastic_search
  * @property Error $error
  * @property ErrorHandler $error_handler
- * @property Config $config
- * @property AlanRogersCache $cache
- * @property-read YiiServiceLocator $helpers
- * @property ElasticSearch $elastic_search
+ * @property GeneratedColumns $generated_columns
  * @property JWTAuth $jwt_auth
+ * @property-read YiiServiceLocator $helpers
+ * @property GQLClient $gql_client
  */
 class ServiceLocator extends YiiServiceLocator
 {
@@ -47,11 +48,12 @@ class ServiceLocator extends YiiServiceLocator
         // default components
         $this->setComponents([
             'cache' => AlanRogersCache::class,
-            'gql_client' => GQLClient::class,
+            'config' => Config::class,
+            'elastic_search' => ElasticSearch::class,
             'error' => Error::class,
             'error_handler' => ErrorHandler::class,
-            'elastic_search' => ElasticSearch::class,
-            'config' => Config::class,
+            'generated_columns' => GeneratedColumns::class,
+            'gql_client' => GQLClient::class,
             'jwt_auth' => JWTAuth::class,
         ]);
     }
