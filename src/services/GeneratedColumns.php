@@ -129,7 +129,7 @@ class GeneratedColumns
             'ALTER TABLE `%s` ADD INDEX `%s` (`%s`)',
             self::TABLE,
             $this->getIndexName($field),
-            $this->getColumnName($field)
+            $this->getColumnName($field, false)
         );
     }
 
