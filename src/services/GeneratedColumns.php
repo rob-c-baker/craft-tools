@@ -134,7 +134,7 @@ class GeneratedColumns
         bool $stored = true
     ): string {
         return sprintf(
-            'ALTER TABLE `%s` ADD COLUMN `%s` %s GENERATED ALWAYS AS %s %s',
+            'ALTER TABLE `%s` ADD COLUMN `%s` %s GENERATED ALWAYS AS (%s) %s',
             self::TABLE,
             $this->getColumnName($field, false),
             $column_type,
