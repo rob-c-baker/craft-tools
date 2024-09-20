@@ -116,10 +116,9 @@ class Column
 
     /**
      * Returns SQL to create the index for the generated column.
-     * @param FieldInterface $field
      * @return string
      */
-    public function createIndexSQL(FieldInterface $field): string
+    public function createIndexSQL(): string
     {
         return sprintf(
             'ALTER TABLE `%s` ADD INDEX `%s` (`%s`)',
