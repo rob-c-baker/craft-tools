@@ -6,6 +6,7 @@ namespace alanrogers\tools\validator\validators;
 use alanrogers\tools\validator\Base;
 use InvalidArgumentException;
 use Isbn\Exception;
+use Override;
 
 class ISBN extends Base
 {
@@ -13,6 +14,7 @@ class ISBN extends Base
     public const string VARIANT_10_DIGIT = 'ISBN-10';
     public const string VARIANT_BOTH = 'ISBN-10-&-ISBN-13';
 
+    #[Override]
     protected function validate(mixed $value): bool
     {
         // Check what type we are validating

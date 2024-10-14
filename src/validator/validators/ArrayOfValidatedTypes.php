@@ -5,12 +5,14 @@ namespace alanrogers\tools\validator\validators;
 
 use alanrogers\tools\validator\Base;
 use InvalidArgumentException;
+use Override;
 
 class ArrayOfValidatedTypes extends Base
 {
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function validate(mixed $value): bool
     {
         if (!isset($this->options['validator']) || !$this->options['validator'] instanceof Base) {

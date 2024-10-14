@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace alanrogers\tools\validator\validators;
 
 use alanrogers\tools\validator\Base;
+use Override;
 
 class ARRef extends Base
 {
+    #[Override]
     protected function validate(mixed $value) : bool
     {
         if (!is_string($value)) {

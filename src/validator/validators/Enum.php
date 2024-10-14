@@ -4,12 +4,14 @@ declare(strict_types=1);
 namespace alanrogers\tools\validator\validators;
 
 use alanrogers\tools\validator\Base;
+use Override;
 
 class Enum extends Base
 {
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function validate(mixed $value): bool
     {
         if (!isset($this->options['values'])) {

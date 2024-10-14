@@ -8,6 +8,7 @@ use Assert\Assertion;
 use Assert\AssertionFailedException;
 use craft\elements\Category;
 use craft\records\CategoryGroup;
+use Override;
 
 class CategoryId extends Base
 {
@@ -26,6 +27,7 @@ class CategoryId extends Base
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function validate(mixed $value): bool
     {
         if (!isset($this->options['group'])) {

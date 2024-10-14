@@ -6,6 +6,7 @@ namespace alanrogers\tools\validator\validators;
 use alanrogers\tools\validator\Base;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
+use Override;
 
 class IntegerMinMax extends Base
 {
@@ -16,6 +17,7 @@ class IntegerMinMax extends Base
      * ...Leaving an options out is fine - it will revert to default.
      * @inheritDoc
      */
+    #[Override]
     protected function validate(mixed $value): bool
     {
         if (!isset($this->options['min'])) {

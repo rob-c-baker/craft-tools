@@ -6,12 +6,14 @@ namespace alanrogers\tools\validator\validators;
 use alanrogers\tools\validator\Base;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
+use Override;
 
 class Integer extends Base
 {
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function validate(mixed $value): bool
     {
         try {

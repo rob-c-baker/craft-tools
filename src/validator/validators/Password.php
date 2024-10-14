@@ -5,6 +5,7 @@ namespace alanrogers\tools\validator\validators;
 
 use alanrogers\tools\validator\Base;
 use alanrogers\tools\services\PwnedPassword;
+use Override;
 
 class Password extends Base
 {
@@ -108,6 +109,7 @@ class Password extends Base
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function validate(mixed $value) : bool
     {
         $is_valid = true;

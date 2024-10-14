@@ -5,12 +5,14 @@ namespace alanrogers\tools\validator\validators;
 
 use alanrogers\tools\validator\Base;
 use libphonenumber\NumberParseException;
+use Override;
 
 class PhoneNumber extends Base
 {
     /**
      * @inheritDoc
      */
+    #[Override]
     protected function validate(mixed $value): bool
     {
         if (!isset($this->options['iso2'])) {
