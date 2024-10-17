@@ -41,6 +41,7 @@
         "alanrogers/arimager": "^4.0",
         "beberlei/assert": "^3.2",
         "craftcms/cms": "^5.3",
+        "crunzphp/crunz": "^3.7",
         "egulias/email-validator": "^4.0",
         "elasticsearch/elasticsearch": "^8.7.0",
         "fale/isbn": "^3.1",
